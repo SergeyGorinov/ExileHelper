@@ -1,57 +1,36 @@
 package com.example.poetradeapp
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.net.HttpURLConnection
-import java.net.URL
+import androidx.recyclerview.widget.RecyclerView
 
-class CustomListViewAdapter(private var staticItemsList: Array<MainActivity.StaticData>, private val context: Context) : BaseAdapter() {
+class StaticListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    var StaticImage : ImageView? = itemView.findViewById(R.id.StaticItemImage)
+    var StaticId: TextView? = itemView.findViewById(R.id.StaticItemId)
+    var StaticText: TextView? = itemView.findViewById(R.id.StaticItemText)
+}
 
-    private val inflanter: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+class CustomListViewAdapter(private val staticItemsList: Array<MainActivity.ViewModel>, private val context: Context) : RecyclerView.Adapter<StaticListViewHolder>() {
 
-    override fun getItem(position: Int): MainActivity.StaticData {
-        return staticItemsList[position]
-    }
-
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
-
-    override fun getCount(): Int {
+    override fun getItemCount(): Int {
         return staticItemsList.size
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view: View = convertView ?: inflanter.inflate(R.layout.custom_static_item, parent, false)
-        val item: MainActivity.StaticData = staticItemsList[position]
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StaticListViewHolder {
+        var itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.custom_static_item, parent, false)
+        return StaticListViewHolder(itemView)
+    }
 
-        view.findViewById<TextView>(R.id.StaticItemId).text = item.id
-        view.findViewById<TextView>(R.id.StaticItemText).text = item.text
+    override fun onBindViewHolder(holder: StaticListViewHolder, position: Int) {
+        val item: MainActivity.ViewModel = staticItemsList[position]
+        val viewHolder: StaticListViewHolder = holder
 
-        try {
-            doAsync {
-                val url = URL("https://www.pathofexile.com" + item.image)
-                val connection = url.openConnection() as HttpURLConnection
-                connection.doInput = true
-                connection.connect()
-                val imageStream = connection.inputStream
-                val image = BitmapFactory.decodeStream(imageStream)
-                uiThread {
-                    view.findViewById<ImageView>(R.id.StaticItemImage).setImageBitmap(image)
-                }
-            }
-        }
-        catch (e: Exception) {
-            println(e)
-        }
-        return view
+        viewHolder.StaticId!!.text = item.id
+        viewHolder.StaticText!!.text = item.text
+        viewHolder.StaticImage!!.setImageBitmap(item.image)
     }
 }

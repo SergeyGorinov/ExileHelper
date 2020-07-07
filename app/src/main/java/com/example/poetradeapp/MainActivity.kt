@@ -1,9 +1,10 @@
 package com.example.poetradeapp
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ExpandableListView
 import android.widget.ListAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,7 +16,8 @@ import okhttp3.Request
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.io.IOException
-
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,12 +46,19 @@ class MainActivity : AppCompatActivity() {
         val result: Array<StaticEntries>
     )
 
+    class ViewModel (
+        val id: String,
+        val text: String,
+        val image: Bitmap
+    )
+
     private val httpClient = OkHttpClient()
     private val gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        var items: Array<ViewModel> = arrayOf()
 
         doAsync {
             try {
@@ -68,24 +77,27 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-                request = Request.Builder().url("https://www.pathofexile.com/api/trade/data/static").build()
 
-                httpClient.newCall(request).execute().use {response ->
+                request = Request.Builder().url("https://www.pathofexile.com/api/trade/data/static").build()
+                httpClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful) throw IOException("Failed. Code: ${response.code()}")
                     val jsonData = response.body()!!.string()
                     var data = gson.fromJson<StaticModel>(jsonData)
+
+                    data.result.forEach { MainEntry ->
+                        MainEntry.entries.forEach { Entry ->
+                            val url = URL("https://www.pathofexile.com" + Entry.image)
+                            val connection = url.openConnection() as HttpURLConnection
+                            connection.doInput = true
+                            connection.connect()
+                            val imageStream = connection.inputStream
+                            val image = BitmapFactory.decodeStream(imageStream)
+                            items += ViewModel(Entry.id, Entry.text, image)
+                            connection.disconnect()
+                        }
+                    }
                     uiThread {
-                        try {
-                            var items: Array<StaticData> = arrayOf(StaticData())
-                            data.result.forEach {
-                                items += it
-                            }
-                            StaticItemsList.adapter = CustomListViewAdapter(items, it)
-                            setListViewHeightBasedOnChildren(StaticItemsList)
-                        }
-                        catch (e: java.lang.Exception) {
-                            println(e)
-                        }
+                        StaticItemsList.adapter = CustomListViewAdapter(items, it)
                     }
                 }
             }
