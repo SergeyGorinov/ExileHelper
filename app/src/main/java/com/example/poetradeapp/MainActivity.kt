@@ -1,30 +1,25 @@
 package com.example.poetradeapp
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ListAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModel
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.activity_main.*
-import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.jetbrains.anko.db.classParser
+import org.jetbrains.anko.db.select
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,7 +48,11 @@ class MainActivity : AppCompatActivity() {
         val result: Array<StaticEntries>
     )
 
-    class CurrencyGroup(val id: String, val description: String, val currencies: List<Currency>) :
+    data class ParserFromDB(val id: String, val description: String, val currencies: List<DBCur>)
+
+    data class DBCur(val id: Int, val groupId: String, val groupDesc: String, val curId: String, val curDesc: String, val curImage: Byte)
+
+    class CurrencyGroup(val id: String, val description: String?, val currencies: List<Currency>) :
         ExpandableGroup<Currency>(id, currencies)
 
     @Parcelize
@@ -63,68 +62,44 @@ class MainActivity : AppCompatActivity() {
         val image: Bitmap
     ) : Parcelable
 
-    private val httpClient = OkHttpClient()
-    private val gson = Gson()
+    val gson = Gson()
+    val httpClient = okhttp3.OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        CurrencyGroupList.layoutManager = LinearLayoutManager(this)
-
-        CurrencyGroupList.adapter = CurrencyGroupListAdapter(mutableListOf<ExpandableGroup<*>?>())
-
         doAsync {
-            try {
-                var request =
-                    Request.Builder().url("https://www.pathofexile.com/api/trade/data/leagues")
-                        .build()
-                httpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) throw IOException("Failed. Code: ${response.code()}")
-                    var data = gson.fromJson<LeagueModel>(response.body()!!.string())
-                    uiThread {
-                        try {
-                            val adapter = CustomSpinnerAdapter(data.result, it)
-                            LeagueList.adapter = adapter
-                            LeagueList.onItemSelectedListener = adapter
-                        } catch (e: java.lang.Exception) {
-                            println(e)
-                        }
-                    }
-                }
-
-                request = Request.Builder().url("https://www.pathofexile.com/api/trade/data/static")
+            var request =
+                Request.Builder().url("https://www.pathofexile.com/api/trade/data/leagues")
                     .build()
-                httpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) throw IOException("Failed. Code: ${response.code()}")
-                    val jsonData = response.body()!!.string()
-                    var data = gson.fromJson<StaticModel>(jsonData)
-
-                    data.result.forEach { currencyGroup ->
-                        var currencies = listOf<Currency>()
-                        currencyGroup.entries.forEach { currency ->
-                            val url = URL("https://www.pathofexile.com" + currency.image)
-                            val connection = url.openConnection() as HttpURLConnection
-                            connection.doInput = true
-                            connection.connect()
-                            val imageStream = connection.inputStream
-                            val image = BitmapFactory.decodeStream(imageStream)
-                            currencies += Currency(currency.id, currency.text, image)
-                            connection.disconnect()
-                        }
-                        var group = CurrencyGroup(
-                            currencyGroup.id,
-                            currencyGroup.label,
-                            currencies
-                        )
-                        uiThread {
-                            (CurrencyGroupList.adapter as CurrencyGroupListAdapter).addData(group)
-                        }
+            httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Failed. Code: ${response.code()}")
+                var data = gson.fromJson<MainActivity.LeagueModel>(response.body()!!.string())
+                uiThread {
+                    try {
+                        val adapter = CustomSpinnerAdapter(data.result, it)
+                        LeagueList.adapter = adapter
+                        LeagueList.onItemSelectedListener = adapter
+                    } catch (e: java.lang.Exception) {
+                        println(e)
                     }
                 }
-            } catch (e: Exception) {
-                println(e.message)
             }
+        }
+
+        try {
+            val currencies =
+                database.readableDatabase
+                    .select("StaticData")
+                    .whereArgs("GroupId = 'Currency'")
+                    .parseList(classParser<DBCur>())
+            currencies.forEach {
+                println(it.id)
+            }
+        }
+        catch (e: Exception) {
+            Log.e("ERROR", e.message)
         }
     }
 

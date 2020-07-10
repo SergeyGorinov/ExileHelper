@@ -1,6 +1,5 @@
 package com.example.poetradeapp
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,8 +49,9 @@ class CurrencyViewHolder(itemView: View) : ChildViewHolder(itemView) {
     }
 }
 
-class CurrencyGroupListAdapter(val currencyGroups: MutableList<ExpandableGroup<*>?>?) :
+class CurrencyGroupListAdapter(var currencyGroups: MutableList<ExpandableGroup<*>?>?) :
     ExpandableRecyclerViewAdapter<CurrencyGroupViewHolder, CurrencyViewHolder>(currencyGroups) {
+
     override fun onCreateGroupViewHolder(
         parent: ViewGroup?,
         viewType: Int
@@ -84,8 +84,8 @@ class CurrencyGroupListAdapter(val currencyGroups: MutableList<ExpandableGroup<*
         holder?.bindData(currency)
     }
 
-    fun addData(item: ExpandableGroup<*>?) {
-        currencyGroups?.add(item)
+    fun addData(index: Int, item: ExpandableGroup<*>?) {
+        currencyGroups?.set(index, item)
         this.notifyDataSetChanged()
     }
 }

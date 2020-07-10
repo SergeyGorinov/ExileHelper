@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.TextView
-import android.widget.Toast
 
 class CustomSpinnerAdapter (private var leagueList: Array<MainActivity.League>, private val context: Context) : BaseAdapter(), AdapterView.OnItemSelectedListener {
 
@@ -33,7 +32,7 @@ class CustomSpinnerAdapter (private var leagueList: Array<MainActivity.League>, 
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        Toast.makeText(context, leagueList[position].id, Toast.LENGTH_SHORT).show()
+        //Toast.makeText(context, leagueList[position].id, Toast.LENGTH_SHORT).show()
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
