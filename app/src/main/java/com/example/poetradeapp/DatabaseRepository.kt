@@ -4,6 +4,28 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import org.jetbrains.anko.db.*
 
+class DBData (
+    val Id: Long,
+    val GroupId: String,
+    val GroupDescription: String?,
+    val ItemId: String,
+    val ItemDescription: String?,
+    val ItemImagePath: ByteArray
+)
+
+class DataParser : RowParser<DBData> {
+    override fun parseRow(columns: Array<Any?>): DBData {
+        return DBData(
+            columns[0] as Long,
+            columns[1] as String,
+            columns[2] as String,
+            columns[3] as String,
+            columns[4] as String,
+            columns[5] as ByteArray
+        )
+    }
+}
+
 class DatabaseRepository private constructor(ctx: Context) :
     ManagedSQLiteOpenHelper(ctx, "Database", null, 1) {
     init {
@@ -21,9 +43,9 @@ class DatabaseRepository private constructor(ctx: Context) :
         db?.createTable(
             "StaticData", true,
             "Id" to INTEGER + PRIMARY_KEY + UNIQUE + NOT_NULL,
-            "GroupId" to TEXT,
+            "GroupId" to TEXT + NOT_NULL,
             "GroupDescription" to TEXT,
-            "ItemId" to TEXT,
+            "ItemId" to TEXT + NOT_NULL,
             "ItemDescription" to TEXT,
             "ItemImage" to BLOB
         )

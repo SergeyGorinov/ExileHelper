@@ -1,6 +1,7 @@
 package com.example.poetradeapp
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -9,14 +10,15 @@ import android.view.ViewGroup
 import android.widget.ListAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.Request
-import org.jetbrains.anko.db.classParser
 import org.jetbrains.anko.db.select
+import org.jetbrains.anko.db.transaction
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.io.IOException
@@ -47,10 +49,6 @@ class MainActivity : AppCompatActivity() {
     data class StaticModel(
         val result: Array<StaticEntries>
     )
-
-    data class ParserFromDB(val id: String, val description: String, val currencies: List<DBCur>)
-
-    data class DBCur(val id: Int, val groupId: String, val groupDesc: String, val curId: String, val curDesc: String, val curImage: Byte)
 
     class CurrencyGroup(val id: String, val description: String?, val currencies: List<Currency>) :
         ExpandableGroup<Currency>(id, currencies)
@@ -88,15 +86,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        try {
-            val currencies =
-                database.readableDatabase
-                    .select("StaticData")
-                    .whereArgs("GroupId = 'Currency'")
-                    .parseList(classParser<DBCur>())
-            currencies.forEach {
-                println(it.id)
+        var currencies = listOf<Currency>()
+
+        var groups = mutableListOf<ExpandableGroup<*>?>()
+
+        database.use {
+            transaction {
+
             }
+        }
+
+        try {
+            val dbData = database.readableDatabase.select("StaticData").parseList(DataParser())
+            dbData.forEach {
+                currencies += Currency(it.ItemId, it.ItemDescription ?: "Unknown", BitmapFactory.decodeByteArray(it.ItemImagePath, 0, it.ItemImagePath.size))
+            }
+            groups.add(CurrencyGroup(dbData.first().GroupId, dbData.first().GroupDescription, currencies))
+
+            CurrencyGroupList.layoutManager = LinearLayoutManager(this)
+            CurrencyGroupList.adapter = CurrencyGroupListAdapter(groups)
         }
         catch (e: Exception) {
             Log.e("ERROR", e.message)
