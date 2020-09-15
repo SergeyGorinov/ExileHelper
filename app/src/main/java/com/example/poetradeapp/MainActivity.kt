@@ -1,21 +1,11 @@
 package com.example.poetradeapp
 
 import android.os.Bundle
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ExpandableListView
-import android.widget.ListAdapter
-import android.widget.ListView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import com.github.salomonbrys.kotson.fromJson
-import com.google.gson.Gson
+import com.example.poetradeapp.models.RequestModel
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.android.synthetic.main.activity_main.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.io.IOException
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,67 +34,63 @@ class MainActivity : AppCompatActivity() {
         val result: Array<StaticEntries>
     )
 
-    private val httpClient = OkHttpClient()
-    private val gson = Gson()
+    private val testArray = arrayOf("", "Belgium", "France", "Italy", "Germany", "Spain")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        doAsync {
-            try {
-                var request = Request.Builder().url("https://www.pathofexile.com/api/trade/data/leagues").build()
-                httpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) throw IOException("Failed. Code: ${response.code()}")
-                    var data = gson.fromJson<LeagueModel>(response.body()!!.string())
-                    uiThread {
-                        try {
-                            val adapter = CustomSpinnerAdapter(data.result, it)
-                            LeagueList.adapter = adapter
-                            LeagueList.onItemSelectedListener = adapter
-                        }
-                        catch (e: java.lang.Exception) {
-                            println(e)
-                        }
-                    }
-                }
-                request = Request.Builder().url("https://www.pathofexile.com/api/trade/data/static").build()
+        val adapter = ArrayAdapter(this, R.layout.custom_spinner_item, testArray)
 
-                httpClient.newCall(request).execute().use {response ->
-                    if (!response.isSuccessful) throw IOException("Failed. Code: ${response.code()}")
-                    val jsonData = response.body()!!.string()
-                    var data = gson.fromJson<StaticModel>(jsonData)
-                    uiThread {
-                        try {
-                            var items: Array<StaticData> = arrayOf(StaticData())
-                            data.result.forEach {
-                                items += it
-                            }
-                            StaticItemsList.adapter = CustomListViewAdapter(items, it)
-                            setListViewHeightBasedOnChildren(StaticItemsList)
-                        }
-                        catch (e: java.lang.Exception) {
-                            println(e)
-                        }
-                    }
-                }
-            }
-            catch (e: Exception) {
-                println(e.message)
-            }
-        }
-    }
+        testAutoComplete.setAdapter(adapter)
+        filled_exposed_dropdown.setAdapter(adapter)
 
-    private fun setListViewHeightBasedOnChildren(listView: ListView) {
-        val adapter: ListAdapter = listView.adapter ?: return
-        var totalHeight = 0
-        for (i in 0 until adapter.count) {
-            val listItem: View = adapter.getView(i, null, listView)
-            listItem.measure(0, 0)
-            totalHeight += listItem.measuredHeight
-        }
-        val parameters: ViewGroup.LayoutParams = listView.layoutParams
-        parameters.height = totalHeight + listView.dividerHeight * (adapter.count - 1)
-        listView.layoutParams = parameters
+        val test = jacksonObjectMapper()
+        val serialized = test.writeValueAsString(RequestModel())
+
+        println(serialized)
+
+//        doAsync {
+//            try {
+//                var request = Request.Builder().url("https://www.pathofexile.com/api/trade/data/leagues").build()
+//                httpClient.newCall(request).execute().use { response ->
+//                    if (!response.isSuccessful) throw IOException("Failed. Code: ${response.code()}")
+//                    var data = gson.fromJson<LeagueModel>(response.body()!!.string())
+//                    uiThread {
+//                        try {
+//                            val adapter = CustomSpinnerAdapter(data.result, it)
+//                            LeagueList.adapter = adapter
+//                            LeagueList.onItemSelectedListener = adapter
+//                        }
+//                        catch (e: java.lang.Exception) {
+//                            println(e)
+//                        }
+//                    }
+//                }
+//                request = Request.Builder().url("https://www.pathofexile.com/api/trade/data/static").build()
+//
+//                httpClient.newCall(request).execute().use {response ->
+//                    if (!response.isSuccessful) throw IOException("Failed. Code: ${response.code()}")
+//                    val jsonData = response.body()!!.string()
+//                    var data = gson.fromJson<StaticModel>(jsonData)
+//                    uiThread {
+//                        try {
+//                            var items: Array<StaticData> = arrayOf(StaticData())
+//                            data.result.forEach {
+//                                items += it
+//                            }
+//                            StaticItemsList.adapter = CustomListViewAdapter(items, it)
+//                            setListViewHeightBasedOnChildren(StaticItemsList)
+//                        }
+//                        catch (e: java.lang.Exception) {
+//                            println(e)
+//                        }
+//                    }
+//                }
+//            }
+//            catch (e: Exception) {
+//                println(e.message)
+//            }
+//        }
     }
 }
