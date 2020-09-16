@@ -10,46 +10,10 @@
     <GridView
         android:id="@+id/testGridView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:numColumns="auto_fit"
-        android:gravity="center"/>
-
-    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-        android:id="@+id/testAutoComplete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <AutoCompleteTextView
-            android:id="@+id/filled_exposed_dropdown"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/testButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:text="TEST"/>
-
-    <LinearLayout
-        android:id="@+id/testLayout"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/colorAccent"
-        android:visibility="gone"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:orientation="vertical"
-        android:background="@color/colorPrimary"/>
+        android:numColumns="auto_fit"
+        android:columnWidth="36dp"
+        android:verticalSpacing="4dp"
+        android:horizontalSpacing="4dp"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
