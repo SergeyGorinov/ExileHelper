@@ -3,12 +3,8 @@ package com.example.poetradeapp
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.google.gson.Gson
 
 class LoadingActivity : AppCompatActivity() {
-
-    val gson = Gson()
-    val httpClient = okhttp3.OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
