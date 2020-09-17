@@ -4,7 +4,7 @@
     android:id="@+id/currencyButton"
     android:layout_width="36dp"
     android:layout_height="36dp"
-    android:background="@drawable/image_button_border_selectable"
+    android:background="@drawable/image_button_border_selector"
     android:scaleType="fitCenter"
     android:tintMode="add"
     android:adjustViewBounds="true"
