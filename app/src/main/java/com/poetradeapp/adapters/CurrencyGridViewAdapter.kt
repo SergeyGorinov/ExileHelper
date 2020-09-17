@@ -1,22 +1,16 @@
 package com.poetradeapp.adapters
 
-import android.content.Context
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import com.example.poetradeapp.MainActivity
+import android.widget.ImageButton
 import com.example.poetradeapp.R
-import com.google.android.material.button.MaterialButton
 import com.poetradeapp.http.RequestService
-import kotlinx.coroutines.*
-import java.lang.Exception
+import com.poetradeapp.models.StaticData
 
 class CurrencyGridViewAdapter(
-    private val items: List<MainActivity.StaticData>,
+    private val items: List<StaticData>,
     private val inflanter: LayoutInflater
 ) : BaseAdapter() {
 
@@ -32,12 +26,7 @@ class CurrencyGridViewAdapter(
         val view = convertView ?: inflanter.inflate(R.layout.currency_button, null)
         val holder = Holder(view.findViewById(R.id.currencyButton))
 
-        GlobalScope.launch {
-            val image = items[index].image?.let { client.getStaticImage(it).execute().body()?.bytes() }
-            withContext(Dispatchers.Main) {
-                image?.let { holder.button.icon = BitmapDrawable(parent?.resources, BitmapFactory.decodeByteArray(it, 0, it.size)) }
-            }
-        }
+        items[index].drawable?.let { holder.button.setImageDrawable(it) }
 
         holder.button.setOnClickListener {
             println("Clicked on $index position")
@@ -45,5 +34,5 @@ class CurrencyGridViewAdapter(
         return view
     }
 
-    class Holder(val button: MaterialButton)
+    class Holder(val button: ImageButton)
 }

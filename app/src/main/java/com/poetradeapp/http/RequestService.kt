@@ -1,7 +1,8 @@
 package com.poetradeapp.http
 
-import com.example.poetradeapp.MainActivity
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.poetradeapp.models.LeagueModel
+import com.poetradeapp.models.StaticModel
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -21,10 +22,10 @@ interface RequestService {
     }
 
     @GET
-    fun getLeagueData(@Url url: String): Call<MainActivity.LeagueModel>
+    fun getLeagueData(@Url url: String): Call<LeagueModel>
 
     @GET
-    fun getStaticData(@Url url: String): Call<MainActivity.StaticModel>
+    fun getStaticData(@Url url: String): Call<StaticModel>
 
     @GET
     @Streaming
