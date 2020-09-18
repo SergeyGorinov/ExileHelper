@@ -3,7 +3,7 @@ package com.example.poetradeapp.models
 import com.fasterxml.jackson.annotation.JsonInclude
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class RequestModel(
+data class ItemRequestModel(
     val query: Query = Query(),
     val sort: Sorting = Sorting()
 )

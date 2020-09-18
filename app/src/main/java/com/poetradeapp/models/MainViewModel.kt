@@ -1,12 +1,14 @@
 package com.poetradeapp.models
 
-import android.widget.ImageButton
 import androidx.lifecycle.ViewModel
+import com.poetradeapp.http.RequestService
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
     private var currencyData: List<StaticEntries>? = null
-    private var selectedButton: ImageButton? = null
+    private var selectedCurrencies = mutableListOf<String>()
 
     fun setMainData(data: List<StaticEntries>) {
         currencyData = data
@@ -14,9 +16,33 @@ class MainViewModel : ViewModel() {
 
     fun getMainData() = currencyData
 
-    fun setSelectedButton(button: ImageButton) {
-        selectedButton?.isSelected = false
-        button.isSelected = true
-        selectedButton = button
+    fun addCurrency(id: String) {
+        selectedCurrencies.add(id)
+    }
+
+    fun removeCurrency(id: String) {
+        selectedCurrencies.remove(id)
+    }
+
+    fun sendCurrencyExchangeRequest(retrofit: RequestService) {
+
+        var baseFetchUrl = StringBuilder("/api/trade/fetch/")
+
+        GlobalScope.launch {
+            val resultList = retrofit.getCurrencyExchangeList(
+                "api/trade/exchange/Standard", ExchangeCurrencyRequestModel(
+                    Exchange(want = selectedCurrencies)
+                )
+            ).execute().body()
+
+            baseFetchUrl.append(resultList?.result?.subList(0, 20)?.joinToString(separator = ","))
+            baseFetchUrl.append("?query=${resultList?.id}")
+            baseFetchUrl.append("&exchange")
+
+            val fetchResult =
+                retrofit.getCurrencyExchangeResponse(baseFetchUrl.toString()).execute().body()
+
+            println("done")
+        }
     }
 }

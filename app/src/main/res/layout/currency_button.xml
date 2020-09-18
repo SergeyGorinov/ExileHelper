@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.AppCompatImageButton xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/currencyButton"
-    android:layout_width="36dp"
-    android:layout_height="36dp"
-    android:background="@drawable/image_button_border_selector"
-    android:scaleType="fitCenter"
-    android:tintMode="add"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
     android:adjustViewBounds="true"
-    android:padding="3dp"/>
+    android:background="@drawable/image_button_border_selector"
+    android:padding="4dp"
+    android:scaleType="fitCenter"
+    android:tintMode="add" />

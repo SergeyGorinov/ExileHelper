@@ -1,18 +1,12 @@
 package com.example.poetradeapp
 
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.flexbox.*
-import com.poetradeapp.adapters.CurrencyGroupAdapter
 import com.poetradeapp.adapters.CurrencyListAdapter
 import com.poetradeapp.http.RequestService
-import com.poetradeapp.models.MainViewModel
-import com.poetradeapp.models.StaticData
-import com.poetradeapp.models.StaticEntries
-import com.poetradeapp.ui.SlideUpDownAnimator
+import com.poetradeapp.models.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 
@@ -33,12 +27,16 @@ class MainActivity : AppCompatActivity() {
 
         retrofit = RequestService.create("https://www.pathofexile.com/")
 
-        val staticData = runBlocking {
-            getCurrencyData()
+         runBlocking {
+             viewModel.setMainData(getCurrencyData())
+        }
+
+        testButton.setOnClickListener {
+            viewModel.sendCurrencyExchangeRequest(retrofit)
         }
 
         currencyList.layoutManager = LinearLayoutManager(this)
-        currencyList.adapter = CurrencyListAdapter(staticData.subList(0, 2), this, retrofit)
+        currencyList.adapter = CurrencyListAdapter(viewModel.getMainData()?.subList(3, 4) ?: listOf(), this, retrofit)
     }
 
     private suspend fun getCurrencyData() = run {

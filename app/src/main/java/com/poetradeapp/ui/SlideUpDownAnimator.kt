@@ -1,28 +1,17 @@
 package com.poetradeapp.ui
 
 import android.animation.ObjectAnimator
-import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridView
 
 class SlideUpDownAnimator(private val view: View) {
 
+    private var preMeasuredHeight = 0
+
     fun slideDown() {
         view.visibility = View.VISIBLE
-        val layoutParams = view.layoutParams
-        layoutParams.height = 1
-        view.layoutParams = layoutParams
 
-        view.measure(
-            View.MeasureSpec.makeMeasureSpec(
-                Resources.getSystem().displayMetrics.widthPixels,
-                View.MeasureSpec.EXACTLY
-            ),
-            View.MeasureSpec.makeMeasureSpec(GridView.MEASURED_SIZE_MASK, View.MeasureSpec.AT_MOST)
-        )
-
-        val height = view.measuredHeight
+        val height = preMeasuredHeight//view.measuredHeight
         val valueAnimator = ObjectAnimator.ofInt(1, height)
         valueAnimator.addUpdateListener { animation ->
             val value = animation?.animatedValue as Int
@@ -57,5 +46,9 @@ class SlideUpDownAnimator(private val view: View) {
             valueAnimator.duration = 500L
             valueAnimator.start()
         })
+    }
+
+    fun setHeight(h: Int) {
+        preMeasuredHeight = h
     }
 }
