@@ -18,7 +18,7 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val inflanter = TransitionInflater.from(requireContext())
-        exitTransition = inflanter.inflateTransition(R.transition.fragment_fade_out)
+        exitTransition = inflanter.inflateTransition(R.transition.fragment_fade_in)
         enterTransition = inflanter.inflateTransition(R.transition.fragment_fade_in)
     }
 
