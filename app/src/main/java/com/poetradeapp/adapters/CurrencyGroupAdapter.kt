@@ -11,15 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.poetradeapp.R
-import com.example.poetradeapp.models.Stat
 import com.poetradeapp.http.RequestService
 import com.poetradeapp.models.MainViewModel
 import com.poetradeapp.models.StaticData
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.asFlow
 
 class CurrencyGroupAdapter(
     private val context: Context,
