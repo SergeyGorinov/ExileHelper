@@ -1,6 +1,5 @@
 package com.poetradeapp.models
 
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import com.poetradeapp.http.RequestService
 import kotlinx.coroutines.GlobalScope
@@ -9,10 +8,10 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    private var currencyData: List<StaticEntries>? = null
-    private var selectedCurrencies = mutableListOf<String>()
-
     val channel = Channel<Any>(Channel.CONFLATED)
+
+    private var currencyData: List<StaticEntries> = listOf()
+    private val selectedCurrencies = mutableListOf<String>()
 
     fun setMainData(data: List<StaticEntries>) {
         currencyData = data
@@ -45,8 +44,6 @@ class MainViewModel : ViewModel() {
 
             val fetchResult =
                 retrofit.getCurrencyExchangeResponse(baseFetchUrl.toString()).execute().body()
-
-            println("done")
         }
     }
 }

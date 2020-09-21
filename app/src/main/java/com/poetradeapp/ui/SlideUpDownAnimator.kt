@@ -11,7 +11,7 @@ class SlideUpDownAnimator(private val view: View) {
     fun slideDown() {
         view.visibility = View.VISIBLE
 
-        val height = preMeasuredHeight//view.measuredHeight
+        val height = preMeasuredHeight
         val valueAnimator = ObjectAnimator.ofInt(1, height)
         valueAnimator.addUpdateListener { animation ->
             val value = animation?.animatedValue as Int

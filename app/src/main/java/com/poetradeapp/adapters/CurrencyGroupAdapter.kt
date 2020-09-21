@@ -7,17 +7,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.poetradeapp.R
 import com.poetradeapp.http.RequestService
 import com.poetradeapp.models.MainViewModel
 import com.poetradeapp.models.StaticData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class CurrencyGroupAdapter(
-    private val context: Context,
     private val items: List<StaticData>,
     private val retrofit: RequestService
 ) :
@@ -29,7 +30,7 @@ class CurrencyGroupAdapter(
                 .from(parent.context)
                 .inflate(R.layout.currency_button, parent, false)
 
-        return CurrencyGroupViewHolder(view, context, retrofit)
+        return CurrencyGroupViewHolder(view, parent.context, retrofit)
     }
 
     override fun onBindViewHolder(holder: CurrencyGroupViewHolder, position: Int) {
@@ -48,7 +49,7 @@ class CurrencyGroupViewHolder(
     private val button: ImageButton = itemView.findViewById(R.id.currencyButton)
     private var item: StaticData? = null
     private var model: MainViewModel = ViewModelProvider(
-        (context as AppCompatActivity),
+        (context as FragmentActivity),
         ViewModelProvider.AndroidViewModelFactory(context.application)
     ).get(MainViewModel::class.java)
 
@@ -64,29 +65,24 @@ class CurrencyGroupViewHolder(
     }
 
     fun bind(item: StaticData) {
-
         if (this.item == null)
             this.item = item
 
-        this.item?.let { item ->
-            if (item.drawable == null) {
-                GlobalScope.launch {
-                    val byteImage = item.image?.let { link ->
-                        retrofit.getStaticImage(link).execute().body()?.bytes()
-                    }
-                    byteImage?.let {
-                        item.drawable = BitmapDrawable(
-                            context.resources,
-                            BitmapFactory.decodeByteArray(it, 0, it.size)
-                        )
-                    }
-                    withContext(Dispatchers.Main) {
-                        button.setImageDrawable(item.drawable)
-                    }
+        this.item?.drawable?.let {
+            button.setImageDrawable(it)
+        } ?: GlobalScope.launch {
+            val byteImage = item?.image?.let { link ->
+                retrofit.getStaticImage(link).execute().body()?.bytes()
+            }
+            byteImage?.let { imageData ->
+                this@CurrencyGroupViewHolder.item?.drawable = BitmapDrawable(
+                    context.resources,
+                    BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
+                )
+                GlobalScope.launch(Dispatchers.Main) {
+                    button.setImageDrawable(this@CurrencyGroupViewHolder.item?.drawable)
                 }
             }
-            else
-                button.setImageDrawable(item.drawable)
         }
     }
 }

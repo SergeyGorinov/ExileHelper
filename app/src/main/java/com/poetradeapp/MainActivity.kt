@@ -1,16 +1,23 @@
 package com.example.poetradeapp
 
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayoutStates
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.poetradeapp.fragments.CurrencyExchangeFragment
 import com.poetradeapp.fragments.CurrencyResultFragment
-import com.poetradeapp.fragments.MainFragment
+import com.poetradeapp.fragments.ItemExchangeFragment
 import com.poetradeapp.http.RequestService
 import com.poetradeapp.models.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
 
@@ -20,14 +27,12 @@ class SwipePagerAdapter(fragmentActivity: FragmentActivity) :
 
     override fun createFragment(position: Int): Fragment {
         when (position) {
-            0 -> return MainFragment()
-            1 -> return CurrencyResultFragment()
+            0 -> return CurrencyExchangeFragment()
+            1 -> return ItemExchangeFragment()
         }
-        return MainFragment()
+        return CurrencyExchangeFragment()
     }
 }
-
-class SwipePagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
 class MainActivity : FragmentActivity() {
 
@@ -40,35 +45,32 @@ class MainActivity : FragmentActivity() {
         ).get(MainViewModel::class.java)
     }
 
-    private val mainFragment = MainFragment()
-    private val currencyResultFragment = CurrencyResultFragment()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        viewPager.adapter = SwipePagerAdapter(this)
+        fragmentContainer.adapter = SwipePagerAdapter(this)
 
-        supportFragmentManager.beginTransaction()
-            .add(R.id.mainFragment, mainFragment)
-            .add(R.id.mainFragment, currencyResultFragment)
-            .hide(currencyResultFragment)
-            .commit()
+//        supportFragmentManager.beginTransaction()
+//            .add(R.id.fragmentContainer, currencyExchangeFragment)
+//            .commit()
 
-        GlobalScope.launch {
-            viewModel.channel.consumeEach {
-                supportFragmentManager.beginTransaction()
-                    .hide(mainFragment)
-                    .show(currencyResultFragment)
-                    .commit()
-            }
+//        GlobalScope.launch {
+//            viewModel.channel.consumeEach {
+//                supportFragmentManager.beginTransaction()
+//                    .hide(mainFragment)
+//                    .show(currencyResultFragment)
+//                    .commit()
+//            }
+//        }
+
+        retrofit = RequestService.create("https://www.pathofexile.com/")
+
+        //Loading...
+        runBlocking {
+            viewModel.setMainData(getCurrencyData())
         }
 
-//        retrofit = RequestService.create("https://www.pathofexile.com/")
-//
-//        runBlocking {
-//            viewModel.setMainData(getCurrencyData())
-//        }
 //
 //        testButton.setOnClickListener {
 //            viewModel.sendCurrencyExchangeRequest(retrofit)
@@ -77,15 +79,6 @@ class MainActivity : FragmentActivity() {
 //        currencyList.layoutManager = LinearLayoutManager(this)
 //        currencyList.adapter =
 //            CurrencyListAdapter(viewModel.getMainData()?.subList(0, 5) ?: listOf(), this, retrofit)
-    }
-
-    override fun onBackPressed() {
-        if (currencyResultFragment.isVisible) {
-            supportFragmentManager.beginTransaction()
-                .hide(currencyResultFragment)
-                .show(mainFragment)
-                .commit()
-        }
     }
 
     private suspend fun getCurrencyData() = run {
