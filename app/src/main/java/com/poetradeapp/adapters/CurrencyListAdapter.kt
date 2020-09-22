@@ -7,27 +7,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.poetradeapp.MainActivity
 import com.example.poetradeapp.R
 import com.google.android.material.button.MaterialButton
 import com.poetradeapp.flexbox.*
-import com.poetradeapp.http.RequestService
-import com.poetradeapp.models.StaticData
 import com.poetradeapp.models.StaticEntries
 import com.poetradeapp.ui.SlideUpDownAnimator
 
 class CurrencyListAdapter(
-    private val retrofit: RequestService,
-    private val items: List<StaticEntries>
-) : RecyclerView.Adapter<CurrencyListViewHolder>() {
+    private val items: List<StaticEntries>,
+    private val fromWant: Boolean = false
+) :
+    RecyclerView.Adapter<CurrencyListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyListViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.currency_group, parent, false)
+        val context = parent.context as MainActivity
+        val view = LayoutInflater.from(context).inflate(R.layout.currency_group, parent, false)
         return CurrencyListViewHolder(view, parent.context)
     }
 
     override fun onBindViewHolder(holder: CurrencyListViewHolder, position: Int) {
-        holder.bind(items[position].entries, retrofit)
+        holder.bind(items[position], fromWant)
     }
 
     override fun getItemCount() = items.size
@@ -62,10 +62,12 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
         }
     }
 
-    fun bind(currencies: List<StaticData>, retrofit: RequestService) {
-        val adapter = CurrencyGroupAdapter(currencies, retrofit)
+    fun bind(group: StaticEntries, fromWant: Boolean) {
+        val adapter = CurrencyGroupAdapter(group.entries, fromWant)
         adapter.setHasStableIds(true)
         currencyGroup.adapter = adapter
+
+        button.text = group.id
 
         val layoutParams = currencyGroupLayout.layoutParams
         layoutParams.height = 1

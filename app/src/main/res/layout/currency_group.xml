@@ -8,6 +8,10 @@
         android:id="@+id/currencyGroupButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="#FFF8E1"
+        android:textStyle="bold"
+        android:textAlignment="viewStart"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

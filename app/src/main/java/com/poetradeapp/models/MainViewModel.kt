@@ -2,39 +2,50 @@ package com.poetradeapp.models
 
 import androidx.lifecycle.ViewModel
 import com.poetradeapp.http.RequestService
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel : ViewModel() {
 
     val channel = Channel<Any>(Channel.CONFLATED)
 
     private var currencyData: List<StaticEntries> = listOf()
-    private val selectedCurrencies = mutableListOf<String>()
+    private var currencyResultData: ExchangeCurrencyResponse? = null
+    private val wantSelectedCurrencies = mutableListOf<String>()
+    private val haveSelectedCurrencies = mutableListOf<String>()
 
     fun setMainData(data: List<StaticEntries>) {
         currencyData = data
     }
 
     fun getMainData() = currencyData
+    fun getCurrencyResultsData() = currencyResultData
 
-    fun addCurrency(id: String) {
-        selectedCurrencies.add(id)
+    fun addWantCurrency(id: String) {
+        wantSelectedCurrencies.add(id)
     }
 
-    fun removeCurrency(id: String) {
-        selectedCurrencies.remove(id)
+    fun removeWantCurrency(id: String) {
+        wantSelectedCurrencies.remove(id)
     }
 
-    fun sendCurrencyExchangeRequest(retrofit: RequestService) {
+    fun addHaveCurrency(id: String) {
+        haveSelectedCurrencies.add(id)
+    }
 
-        var baseFetchUrl = StringBuilder("/api/trade/fetch/")
+    fun removeHaveCurrency(id: String) {
+        haveSelectedCurrencies.remove(id)
+    }
 
-        GlobalScope.launch {
+    suspend fun sendCurrencyExchangeRequest() {
+        val retrofit = RequestService.create("https://www.pathofexile.com/")
+        val baseFetchUrl = StringBuilder("/api/trade/fetch/")
+
+        currencyResultData = withContext(Dispatchers.Default) {
             val resultList = retrofit.getCurrencyExchangeList(
                 "api/trade/exchange/Standard", ExchangeCurrencyRequestModel(
-                    Exchange(want = selectedCurrencies)
+                    Exchange(want = wantSelectedCurrencies, have = haveSelectedCurrencies)
                 )
             ).execute().body()
 
@@ -42,8 +53,7 @@ class MainViewModel : ViewModel() {
             baseFetchUrl.append("?query=${resultList?.id}")
             baseFetchUrl.append("&exchange")
 
-            val fetchResult =
-                retrofit.getCurrencyExchangeResponse(baseFetchUrl.toString()).execute().body()
+            retrofit.getCurrencyExchangeResponse(baseFetchUrl.toString()).execute().body()
         }
     }
 }

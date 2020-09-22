@@ -1,4 +1,4 @@
-package com.poetradeapp.fragments
+package com.poetradeapp.fragments.currency
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.poetradeapp.R
 import com.poetradeapp.adapters.CurrencyListAdapter
-import com.poetradeapp.http.RequestService
 import com.poetradeapp.models.MainViewModel
 import kotlinx.android.synthetic.main.fragment_currency_exchange_want.*
 
@@ -31,12 +30,11 @@ class CurrencyExchangeWant : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val retrofit = RequestService.create("https://www.pathofexile.com/")
         currencyList.apply {
             setHasFixedSize(false)
             setItemViewCacheSize(50)
             layoutManager = LinearLayoutManager(activity)
-            adapter = CurrencyListAdapter(retrofit, viewModel.getMainData())
+            adapter = CurrencyListAdapter(viewModel.getMainData(), true)
         }
     }
 }

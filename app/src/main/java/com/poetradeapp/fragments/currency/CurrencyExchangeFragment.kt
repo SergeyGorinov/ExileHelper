@@ -1,4 +1,4 @@
-package com.poetradeapp.fragments
+package com.poetradeapp.fragments.currency
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,10 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.poetradeapp.R
 import com.google.android.material.tabs.TabLayoutMediator
+import com.poetradeapp.models.MainViewModel
 import kotlinx.android.synthetic.main.fragment_currency_exchange.*
+import kotlinx.coroutines.*
 
 class CurrencyExchangeViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
@@ -25,6 +28,13 @@ class CurrencyExchangeViewPagerAdapter(fragmentActivity: FragmentActivity) :
 }
 
 class CurrencyExchangeFragment : Fragment() {
+
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(
+            requireActivity(),
+            ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
+        ).get(MainViewModel::class.java)
+    }
 
     private lateinit var mediator: TabLayoutMediator
 
@@ -54,6 +64,13 @@ class CurrencyExchangeFragment : Fragment() {
             when (pos) {
                 0 -> tab.text = "Want"
                 1 -> tab.text = "Have"
+            }
+        }
+
+        searchCurrency.setOnClickListener {
+            GlobalScope.launch {
+                viewModel.sendCurrencyExchangeRequest()
+                viewModel.channel.send(Any())
             }
         }
     }
