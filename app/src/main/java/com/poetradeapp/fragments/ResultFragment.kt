@@ -38,12 +38,15 @@ class ResultFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_result, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        results.apply {
-            setItemViewCacheSize(20)
-            layoutManager = LinearLayoutManager(activity)
-            adapter = CurrencyResultAdapter(viewModel.getCurrencyResultsData()?.result ?: listOf())
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            results.apply {
+                setItemViewCacheSize(20)
+                layoutManager = LinearLayoutManager(activity)
+                adapter =
+                    CurrencyResultAdapter(viewModel.getCurrencyResultsData()?.result ?: listOf())
+            }
         }
     }
 }

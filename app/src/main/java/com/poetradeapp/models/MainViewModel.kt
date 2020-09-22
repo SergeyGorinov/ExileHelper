@@ -49,11 +49,22 @@ class MainViewModel : ViewModel() {
                 )
             ).execute().body()
 
-            baseFetchUrl.append(resultList?.result?.subList(0, 20)?.joinToString(separator = ","))
-            baseFetchUrl.append("?query=${resultList?.id}")
-            baseFetchUrl.append("&exchange")
+            resultList?.result?.let {
+                if (it.size > 20) {
+                    baseFetchUrl.append(it.subList(0, 20).joinToString(separator = ","))
+                }
+                else {
+                    baseFetchUrl.append(it.joinToString(separator = ","))
+                }
+                baseFetchUrl.append("?query=${resultList.id}")
+                baseFetchUrl.append("&exchange")
 
-            retrofit.getCurrencyExchangeResponse(baseFetchUrl.toString()).execute().body()
+                retrofit.getCurrencyExchangeResponse(baseFetchUrl.toString()).execute().body()
+            }
+        }
+
+        currencyResultData?.let {
+            channel.send(Any())
         }
     }
 }
