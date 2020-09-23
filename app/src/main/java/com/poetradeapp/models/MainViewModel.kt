@@ -1,26 +1,46 @@
 package com.poetradeapp.models
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.util.LruCache
 import androidx.lifecycle.ViewModel
+import com.poetradeapp.RealmCurrencyGroupData
 import com.poetradeapp.http.RequestService
+import io.realm.Realm
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
 
 class MainViewModel : ViewModel() {
 
-    val channel = Channel<Any>(Channel.CONFLATED)
-
-    private var currencyData: List<StaticEntries> = listOf()
-    private var currencyResultData: ExchangeCurrencyResponse? = null
+    private val currencyData: List<RealmCurrencyGroupData> =
+        Realm.getDefaultInstance()
+            .where(RealmCurrencyGroupData::class.java)
+            .findAll()
+            .toList()
     private val wantSelectedCurrencies = mutableListOf<String>()
     private val haveSelectedCurrencies = mutableListOf<String>()
+    private var currencyResultData: ExchangeCurrencyResponse? = null
+    private val currencyIcons: MutableMap<String, Drawable> = mutableMapOf()
 
-    fun setMainData(data: List<StaticEntries>) {
-        currencyData = data
+    fun initializeIcons(context: Context) {
+        currencyData.forEach { group ->
+            group.currencies.forEach { currency ->
+                currency.image?.let {
+                    currencyIcons[currency.id] = BitmapDrawable(
+                        context.resources,
+                        BitmapFactory.decodeByteArray(it, 0, it.size)
+                    )
+                }
+            }
+        }
     }
 
     fun getMainData() = currencyData
     fun getCurrencyResultsData() = currencyResultData
+    fun getCurrencyIcon(id: String): Drawable? = currencyIcons[id]
 
     fun addWantCurrency(id: String) {
         wantSelectedCurrencies.add(id)
@@ -52,8 +72,7 @@ class MainViewModel : ViewModel() {
             resultList?.result?.let {
                 if (it.size > 20) {
                     baseFetchUrl.append(it.subList(0, 20).joinToString(separator = ","))
-                }
-                else {
+                } else {
                     baseFetchUrl.append(it.joinToString(separator = ","))
                 }
                 baseFetchUrl.append("?query=${resultList.id}")
@@ -61,10 +80,6 @@ class MainViewModel : ViewModel() {
 
                 retrofit.getCurrencyExchangeResponse(baseFetchUrl.toString()).execute().body()
             }
-        }
-
-        currencyResultData?.let {
-            channel.send(Any())
         }
     }
 }

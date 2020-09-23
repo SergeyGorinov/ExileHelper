@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.poetradeapp.MainActivity
 import com.example.poetradeapp.R
+import com.poetradeapp.RealmCurrencyData
 import com.poetradeapp.models.MainViewModel
-import com.poetradeapp.models.StaticData
 
 class CurrencyGroupAdapter(
-    private val items: List<StaticData>,
+    private val items: List<RealmCurrencyData>,
     private val fromWant: Boolean
 ) :
     RecyclerView.Adapter<CurrencyGroupViewHolder>() {
@@ -49,7 +49,7 @@ class CurrencyGroupViewHolder(
     RecyclerView.ViewHolder(itemView) {
 
     private val button: ImageButton = itemView.findViewById(R.id.currencyButton)
-    private var item: StaticData? = null
+    private var item: RealmCurrencyData? = null
 
     init {
         button.setOnClickListener { button ->
@@ -66,12 +66,12 @@ class CurrencyGroupViewHolder(
         }
     }
 
-    fun bind(item: StaticData) {
+    fun bind(item: RealmCurrencyData) {
         if (this.item == null)
             this.item = item
 
-        this.item?.drawable?.let {
-            button.setImageDrawable(it)
+        this.item?.let {
+            button.setImageDrawable(model.getCurrencyIcon(it.id))
         }
     }
 }

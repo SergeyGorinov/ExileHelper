@@ -1,7 +1,5 @@
 package com.poetradeapp
 
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
@@ -10,27 +8,34 @@ import com.poetradeapp.fragments.LoaderFragment
 import com.poetradeapp.fragments.MainFragment
 import com.poetradeapp.fragments.ResultFragment
 import com.poetradeapp.http.RequestService
-import com.poetradeapp.models.*
+import com.poetradeapp.models.MainViewModel
 import io.realm.Realm
+import io.realm.RealmList
 import io.realm.RealmObject
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.consumeEach
 
-open class RealmTest(
-    var name: String = "",
-    var age: Int = 0
+open class RealmCurrencyData(
+    var id: String = "",
+    var label: String = "",
+    var image: ByteArray? = null
 ) : RealmObject()
 
-class MainActivity : FragmentActivity() {
+open class RealmCurrencyGroupData(
+    var id: String = "",
+    var label: String? = "",
+    var currencies: RealmList<RealmCurrencyData> = RealmList()
+) : RealmObject()
 
-    private lateinit var retrofit: RequestService
-    private lateinit var realm: Realm
+interface FragmentChanger {
+    fun changeFragment()
+}
 
+class MainActivity : FragmentActivity(), FragmentChanger {
     private val loaderFragment = LoaderFragment()
     private val mainFragment = MainFragment()
     private val resultFragment = ResultFragment()
 
-    private val viewModel by lazy {
+    private val viewModel: MainViewModel by lazy {
         ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory(this.application)
@@ -41,71 +46,93 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.mainFragmentContainer, loaderFragment)
-            .add(R.id.mainFragmentContainer, mainFragment)
-            .add(R.id.mainFragmentContainer, resultFragment)
-            .hide(mainFragment)
-            .hide(resultFragment)
-            .commit()
+        val realm = Realm.getDefaultInstance()
 
-//        realm = Realm.getDefaultInstance()
-//
 //        realm.beginTransaction()
 //        realm.deleteAll()
 //        realm.commitTransaction()
 
-        GlobalScope.launch {
-            viewModel.channel.consumeEach {
-                supportFragmentManager.beginTransaction()
-                    .hide(mainFragment)
-                    .show(resultFragment)
-                    .commit()
+        if (realm.where(RealmCurrencyData::class.java).count() == 0L) {
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.mainFragmentContainer, loaderFragment)
+                .show(loaderFragment)
+                .commit()
+            GlobalScope.launch {
+                updateData()
+            }.invokeOnCompletion {
+                GlobalScope.launch(Dispatchers.Main) {
+                    supportFragmentManager
+                        .beginTransaction()
+                        .remove(loaderFragment)
+                        .add(R.id.mainFragmentContainer, mainFragment)
+                        .add(R.id.mainFragmentContainer, resultFragment)
+                        .show(mainFragment)
+                        .commit()
+                }
             }
-        }
-
-        retrofit = RequestService.create("https://www.pathofexile.com/")
-
-        GlobalScope.launch {
-            updateData()
-        }.invokeOnCompletion {
-            GlobalScope.launch(Dispatchers.Main) {
-                supportFragmentManager
-                    .beginTransaction()
-                    .hide(loaderFragment)
-                    .show(mainFragment)
-                    .commit()
-            }
+        } else {
+            supportFragmentManager
+                .beginTransaction()
+                .remove(loaderFragment)
+                .add(R.id.mainFragmentContainer, mainFragment)
+                .add(R.id.mainFragmentContainer, resultFragment)
+                .hide(resultFragment)
+                .show(mainFragment)
+                .commit()
         }
     }
 
+    override fun onBackPressed() {
+        if (!resultFragment.isHidden) {
+            supportFragmentManager
+                .beginTransaction()
+                .hide(resultFragment)
+                .show(mainFragment)
+                .commit()
+        }
+        else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun changeFragment() {
+        supportFragmentManager
+            .beginTransaction()
+            .hide(mainFragment)
+            .show(resultFragment)
+            .commit()
+    }
+
     private suspend fun updateData() {
-        val data = withContext(Dispatchers.Default) {
-            retrofit.getStaticData("api/trade/data/static").execute().body()?.let {
-                withContext(Dispatchers.Main) {
-                    loaderFragment.progressBar.max =
-                        it.result.sumBy { sum -> sum.entries.count { c -> c.image != null } }
-                }
-                it.result.forEach { currencyGroup ->
+        val retrofit = RequestService.create("https://www.pathofexile.com/")
+        retrofit.getStaticData("api/trade/data/static").execute().body()?.let { data ->
+            withContext(Dispatchers.Main) {
+                loaderFragment.progressBar.max =
+                    data.result.sumBy { sum -> sum.entries.count { c -> c.image != null } }
+            }
+            Realm.getDefaultInstance().executeTransaction { bgRealm ->
+                data.result.forEach { currencyGroup ->
+                    val realmCurrencyGroup =
+                        bgRealm.createObject(RealmCurrencyGroupData::class.java)
+                    realmCurrencyGroup.id = currencyGroup.id
+                    realmCurrencyGroup.label = currencyGroup.label
                     currencyGroup.entries.forEach { currency ->
+                        val realmCurrency = bgRealm.createObject(RealmCurrencyData::class.java)
                         currency.image?.let { link ->
-                            val rawImage = retrofit.getStaticImage(link).execute().body()?.bytes()
-                            rawImage?.let { imageData ->
-                                currency.drawable = BitmapDrawable(
-                                    resources,
-                                    BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
-                                )
-                                withContext(Dispatchers.Main) {
-                                    loaderFragment.progressBar.incrementProgressBy(1)
-                                }
+                            realmCurrency.image =
+                                retrofit.getStaticImage(link).execute().body()?.bytes()
+                            GlobalScope.launch(Dispatchers.Main) {
+                                loaderFragment.progressBar.incrementProgressBy(1)
                             }
                         }
+                        realmCurrency.id = currency.id
+                        realmCurrency.label = currency.text
+                        realmCurrencyGroup.currencies.add(realmCurrency)
                     }
                 }
-                it.result
             }
         }
-        data?.let { viewModel.setMainData(data) } ?: viewModel.setMainData(listOf())
+        viewModel.initializeIcons(this)
     }
 }

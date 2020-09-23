@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:columnCount="3">
 
-    <TableLayout
-        android:id="@+id/relativePriceInfo"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_columnWeight="3"
+        android:layout_gravity="fill_horizontal|center_vertical"
+        android:gravity="start"
+        android:orientation="vertical">
 
-        <TableRow>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -22,12 +25,10 @@
 
             <ImageView
                 android:id="@+id/haveImageRelativePrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_marginHorizontal="2dp"
                 android:adjustViewBounds="true"
-                android:maxWidth="18dp"
-                android:maxHeight="18dp"
                 android:scaleType="fitCenter" />
 
             <TextView
@@ -50,16 +51,17 @@
 
             <ImageView
                 android:id="@+id/wantImageRelativePrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_marginHorizontal="2dp"
                 android:adjustViewBounds="true"
-                android:maxWidth="18dp"
-                android:maxHeight="18dp"
                 android:scaleType="fitCenter" />
-        </TableRow>
+        </LinearLayout>
 
-        <TableRow>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -69,12 +71,10 @@
 
             <ImageView
                 android:id="@+id/wantImageRelativePriceReverse"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_marginHorizontal="2dp"
                 android:adjustViewBounds="true"
-                android:maxWidth="18dp"
-                android:maxHeight="18dp"
                 android:scaleType="fitCenter" />
 
             <TextView
@@ -97,26 +97,27 @@
 
             <ImageView
                 android:id="@+id/haveImageRelativePriceReverse"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_marginHorizontal="2dp"
                 android:adjustViewBounds="true"
-                android:maxWidth="18dp"
-                android:maxHeight="18dp"
                 android:scaleType="fitCenter" />
-        </TableRow>
-    </TableLayout>
+        </LinearLayout>
+    </LinearLayout>
 
-    <TableLayout
-        android:id="@+id/exchangeWindow"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/characterInfo"
-        app:layout_constraintStart_toEndOf="@id/relativePriceInfo"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_columnWeight="5"
+        android:layout_gravity="fill_horizontal|center_vertical"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-        <TableRow>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -133,9 +134,13 @@
                 android:layout_marginStart="5dp"
                 android:text="You will pay"
                 android:textSize="8sp" />
-        </TableRow>
+        </LinearLayout>
 
-        <TableRow>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -208,17 +213,21 @@
                     android:layout_height="wrap_content"
                     android:textSize="10sp" />
             </LinearLayout>
-        </TableRow>
-    </TableLayout>
+        </LinearLayout>
+    </LinearLayout>
 
-    <TableLayout
-        android:id="@+id/characterInfo"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_columnWeight="3"
+        android:layout_gravity="fill_horizontal|center_vertical"
+        android:gravity="end"
+        android:orientation="vertical">
 
-        <TableRow>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -237,24 +246,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="8sp" />
-        </TableRow>
+        </LinearLayout>
 
-        <TableRow>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/account"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="8sp" />
-        </TableRow>
+        </LinearLayout>
 
-        <TableRow>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="8sp" />
-        </TableRow>
-    </TableLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </LinearLayout>
+</GridLayout>

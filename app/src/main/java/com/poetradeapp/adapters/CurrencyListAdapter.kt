@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.poetradeapp.MainActivity
 import com.example.poetradeapp.R
 import com.google.android.material.button.MaterialButton
+import com.poetradeapp.RealmCurrencyGroupData
 import com.poetradeapp.flexbox.*
-import com.poetradeapp.models.StaticEntries
 import com.poetradeapp.ui.SlideUpDownAnimator
 
 class CurrencyListAdapter(
-    private val items: List<StaticEntries>,
+    private val items: List<RealmCurrencyGroupData>,
     private val fromWant: Boolean = false
 ) :
     RecyclerView.Adapter<CurrencyListViewHolder>() {
@@ -62,8 +62,8 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
         }
     }
 
-    fun bind(group: StaticEntries, fromWant: Boolean) {
-        val adapter = CurrencyGroupAdapter(group.entries, fromWant)
+    fun bind(group: RealmCurrencyGroupData, fromWant: Boolean) {
+        val adapter = CurrencyGroupAdapter(group.currencies, fromWant)
         adapter.setHasStableIds(true)
         currencyGroup.adapter = adapter
 

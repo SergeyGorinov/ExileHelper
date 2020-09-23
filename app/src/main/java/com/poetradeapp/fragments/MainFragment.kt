@@ -8,7 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.poetradeapp.R
 import com.poetradeapp.adapters.SwipePagerAdapter
+import com.poetradeapp.fragments.currency.CurrencyExchangeFragment
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlin.math.abs
+import kotlin.math.max
 
 class MainFragment : Fragment() {
 
@@ -28,6 +31,28 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fragmentContainer.adapter = SwipePagerAdapter(requireActivity())
+        fragmentContainer.setPageTransformer { page, position ->
+            view.apply {
+                val pageWidth = width
+                val pageHeight = height
+                when {
+                    position < -1 -> {
+                        alpha = 0f
+                    }
+                    position <= 1 -> {
+                        val scaleFactor = max(0.5, 1 - abs(position).toDouble())
+                        val verticalMargin = pageHeight * (1 - scaleFactor) / 2
+                        val horizontalMargin = pageWidth * (1 - scaleFactor) / 2
+                    }
+                }
+            }
+        }
+        val adapter = SwipePagerAdapter(requireActivity())
+        adapter.addFragment(CurrencyExchangeFragment())
+        adapter.addFragment(ItemExchangeFragment())
+        fragmentContainer.adapter = adapter
+        testButton.setOnClickListener {
+            adapter.removeFragment(0)
+        }
     }
 }

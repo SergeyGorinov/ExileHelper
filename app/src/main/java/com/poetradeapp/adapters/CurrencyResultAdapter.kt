@@ -11,6 +11,9 @@ import com.example.poetradeapp.R
 import com.poetradeapp.MainActivity
 import com.poetradeapp.models.ExchangeCurrencyResponseModel
 import com.poetradeapp.models.MainViewModel
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 class CurrencyResultAdapter(private val items: List<ExchangeCurrencyResponseModel>) :
     RecyclerView.Adapter<CurrencyResultViewHolder>() {
@@ -70,41 +73,48 @@ class CurrencyResultViewHolder(itemView: View, private val model: MainViewModel)
         itemView.findViewById(R.id.status)
 
     fun bind(item: ExchangeCurrencyResponseModel) {
-        val haveCurrency = model.getMainData().flatMap { f -> f.entries }
+        val haveCurrency = model.getMainData().flatMap { f -> f.currencies }
             .firstOrNull { fon -> fon.id == item.listing.price.exchange.currency }
-        val wantCurrency = model.getMainData().flatMap { f -> f.entries }
+        val wantCurrency = model.getMainData().flatMap { f -> f.currencies}
             .firstOrNull { fon -> fon.id == item.listing.price.item.currency }
 
-        val haveWantPrice =
-            "%.4f".format((item.listing.price.item.amount / item.listing.price.exchange.amount).toFloat())
-        val wantHavePrice =
-            "%.4f".format((item.listing.price.exchange.amount / item.listing.price.item.amount).toFloat())
+        val haveAmount =
+            if (item.listing.price.exchange.amount == 0) 1 else item.listing.price.exchange.amount
+        val wantAmount =
+            if (item.listing.price.item.amount == 0) 1 else item.listing.price.item.amount
+
+        val haveWantPrice = BigDecimal(haveAmount.toDouble() / wantAmount.toDouble())
+            .setScale(4, RoundingMode.FLOOR)
+        val wantHavePrice = BigDecimal(wantAmount.toDouble() / haveAmount.toDouble())
+            .setScale(4, RoundingMode.FLOOR)
 
         val fullAccount = "${item.listing.account.name}(${item.listing.account.lastCharacterName})"
 
-        haveCurrency?.drawable?.let {
-            haveImageRelativePrice.setImageDrawable(it)
-            haveImageRelativePriceReverse.setImageDrawable(it)
-            haveImageExchange.setImageDrawable(it)
+        haveCurrency?.let {
+            val currencyIcon = model.getCurrencyIcon(it.id)
+            haveImageRelativePrice.setImageDrawable(currencyIcon)
+            haveImageRelativePriceReverse.setImageDrawable(currencyIcon)
+            haveImageExchange.setImageDrawable(currencyIcon)
         }
 
-        wantCurrency?.drawable?.let {
-            wantImageRelativePrice.setImageDrawable(it)
-            wantImageRelativePriceReverse.setImageDrawable(it)
-            wantImageExchange.setImageDrawable(it)
+        wantCurrency?.let {
+            val currencyIcon = model.getCurrencyIcon(it.id)
+            wantImageRelativePrice.setImageDrawable(currencyIcon)
+            wantImageRelativePriceReverse.setImageDrawable(currencyIcon)
+            wantImageExchange.setImageDrawable(currencyIcon)
         }
 
-        havewantRelativePrice.text = haveWantPrice
-        wanthaveRelativePrice.text = wantHavePrice
+        havewantRelativePrice.text = DecimalFormat("0.####").format(haveWantPrice)
+        wanthaveRelativePrice.text = DecimalFormat("0.####").format(wantHavePrice)
 
-        haveLabelExchange.text = haveCurrency?.text ?: "Unknown"
-        wantLabelExchange.text = wantCurrency?.text ?: "Unknown"
+        haveLabelExchange.text = haveCurrency?.label ?: "Unknown"
+        wantLabelExchange.text = wantCurrency?.label ?: "Unknown"
 
         haveCountExchange.text = item.listing.price.exchange.amount.toString()
         wantCountExchange.text = item.listing.price.item.amount.toString()
 
         stockCount.text = item.listing.price.item.stock.toString()
-        stockLabel.text = wantCurrency?.text ?: "Unknown"
+        stockLabel.text = wantCurrency?.label ?: "Unknown"
         account.text = fullAccount
         status.text = item.listing.account.online.status ?: "Online"
     }

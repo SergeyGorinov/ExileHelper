@@ -5,21 +5,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.poetradeapp.R
 import com.poetradeapp.adapters.CurrencyListAdapter
 import com.poetradeapp.models.MainViewModel
 import kotlinx.android.synthetic.main.fragment_currency_exchange_want.*
 
-class CurrencyExchangeWant : Fragment() {
+class CurrencyExchangeWant(viewModel: MainViewModel) : Fragment() {
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(
-            requireActivity(),
-            ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
-        ).get(MainViewModel::class.java)
-    }
+    private val listAdapter = CurrencyListAdapter(viewModel.getMainData(), true)
+    private val listLayoutManager = LinearLayoutManager(context)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,9 +27,9 @@ class CurrencyExchangeWant : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         currencyList.apply {
             setHasFixedSize(false)
-            setItemViewCacheSize(50)
-            layoutManager = LinearLayoutManager(activity)
-            adapter = CurrencyListAdapter(viewModel.getMainData(), true)
+            setItemViewCacheSize(30)
+            layoutManager = listLayoutManager
+            adapter = listAdapter
         }
     }
 }
