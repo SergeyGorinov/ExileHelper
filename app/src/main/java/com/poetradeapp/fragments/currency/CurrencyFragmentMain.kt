@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.poetradeapp.R
 import com.poetradeapp.MainActivity
-import com.poetradeapp.fragments.ResultFragment
 import com.poetradeapp.models.MainViewModel
 import kotlinx.android.synthetic.main.fragment_currency_main.*
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +43,7 @@ class CurrencyFragmentMain : Fragment() {
     private lateinit var viewModel: MainViewModel
 
     private val currencyFragmentExchange = CurrencyFragmentExchange()
-    val currencyFragmentResult = ResultFragment()
+    val currencyFragmentResult = CurrencyResultFragment()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

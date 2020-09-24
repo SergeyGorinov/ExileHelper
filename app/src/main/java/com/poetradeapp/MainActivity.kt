@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.poetradeapp.R
 import com.poetradeapp.adapters.SwipePagerAdapter
-import com.poetradeapp.fragments.ItemExchangeFragment
+import com.poetradeapp.fragments.item.ItemExchangeFragment
 import com.poetradeapp.fragments.LoaderFragment
 import com.poetradeapp.fragments.currency.CurrencyFragmentMain
 import com.poetradeapp.http.RequestService

@@ -1,4 +1,4 @@
-package com.poetradeapp.fragments
+package com.poetradeapp.fragments.item
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

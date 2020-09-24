@@ -1,4 +1,4 @@
-package com.poetradeapp.fragments
+package com.poetradeapp.fragments.currency
 
 import android.content.Context
 import android.os.Bundle
@@ -11,14 +11,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.poetradeapp.R
 import com.poetradeapp.MainActivity
-import com.poetradeapp.adapters.CurrencyListAdapter
 import com.poetradeapp.adapters.CurrencyResultAdapter
-import com.poetradeapp.adapters.CurrencyResultViewHolder
-import com.poetradeapp.models.ExchangeCurrencyResponseModel
 import com.poetradeapp.models.MainViewModel
 import kotlinx.android.synthetic.main.fragment_result.*
 
-class ResultFragment : Fragment() {
+class CurrencyResultFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
 
