@@ -5,9 +5,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.poetradeapp.R
 import com.poetradeapp.adapters.SwipePagerAdapter
-import com.poetradeapp.fragments.item.ItemExchangeFragment
+import com.poetradeapp.fragments.item.ItemExchangeMainFragment
 import com.poetradeapp.fragments.LoaderFragment
-import com.poetradeapp.fragments.currency.CurrencyFragmentMain
+import com.poetradeapp.fragments.currency.CurrencyExchangeMainFragment
 import com.poetradeapp.http.RequestService
 import com.poetradeapp.models.MainViewModel
 import io.realm.Realm
@@ -37,8 +37,8 @@ class MainActivity : FragmentActivity() {
         ).get(MainViewModel::class.java)
     }
 
-    private val currencyFragmentMain = CurrencyFragmentMain()
-    private val itemExchangeFragment = ItemExchangeFragment()
+    private val currencyFragmentMain = CurrencyExchangeMainFragment()
+    private val itemExchangeFragment = ItemExchangeMainFragment()
     private val loaderFragment = LoaderFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {

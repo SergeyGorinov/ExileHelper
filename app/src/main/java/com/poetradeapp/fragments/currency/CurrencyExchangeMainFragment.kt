@@ -12,7 +12,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.poetradeapp.R
 import com.poetradeapp.MainActivity
 import com.poetradeapp.models.MainViewModel
-import kotlinx.android.synthetic.main.fragment_currency_main.*
+import kotlinx.android.synthetic.main.fragment_currency_exchange_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ class CurrencyExchangeViewPagerAdapter(fragmentActivity: FragmentActivity) :
     }
 }
 
-class CurrencyFragmentMain : Fragment() {
+class CurrencyExchangeMainFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
 
@@ -57,7 +57,7 @@ class CurrencyFragmentMain : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_currency_main, container, false)
+        return inflater.inflate(R.layout.fragment_currency_exchange_main, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

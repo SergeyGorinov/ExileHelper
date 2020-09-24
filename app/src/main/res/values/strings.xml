@@ -2,6 +2,6 @@
     <string name="app_name">PoeTradeApp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="searchCurrencyButtonText">Search</string>
+    <string name="searchButtonText">Search</string>
     <string name="logo_image_description">Logo image</string>
 </resources>
