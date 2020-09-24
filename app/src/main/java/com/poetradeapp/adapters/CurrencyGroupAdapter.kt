@@ -71,7 +71,8 @@ class CurrencyGroupViewHolder(
             this.item = item
 
         this.item?.let {
-            button.setImageDrawable(model.getCurrencyIcon(it.id))
+            val id = it.id
+            button.setImageDrawable(model.getCurrencyIcon(id))
         }
     }
 }

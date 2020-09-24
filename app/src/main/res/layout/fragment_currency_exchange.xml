@@ -10,24 +10,15 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/currencyExchangeTabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             app:tabGravity="fill"
             app:tabMaxWidth="0dp"
             app:tabMode="fixed" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/currencyExchangeContainer"
+        android:id="@+id/currencyExchangeMainContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/searchCurrency"
-        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:text="@string/searchCurrencyButtonText" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,5 +1,6 @@
 package com.poetradeapp.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.transition.TransitionInflater
 import androidx.fragment.app.Fragment
@@ -9,44 +10,45 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.poetradeapp.R
+import com.poetradeapp.MainActivity
 import com.poetradeapp.adapters.CurrencyListAdapter
 import com.poetradeapp.adapters.CurrencyResultAdapter
 import com.poetradeapp.adapters.CurrencyResultViewHolder
+import com.poetradeapp.models.ExchangeCurrencyResponseModel
 import com.poetradeapp.models.MainViewModel
 import kotlinx.android.synthetic.main.fragment_result.*
 
 class ResultFragment : Fragment() {
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(
-            requireActivity(),
-            ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
-        ).get(MainViewModel::class.java)
-    }
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val inflanter = TransitionInflater.from(requireContext())
-        exitTransition = inflanter.inflateTransition(R.transition.fragment_fade)
-        enterTransition = inflanter.inflateTransition(R.transition.fragment_fade)
+        exitTransition = inflanter.inflateTransition(R.transition.fragment_slide)
+        enterTransition = inflanter.inflateTransition(R.transition.fragment_slide)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        viewModel = ViewModelProvider(
+            context as MainActivity,
+            ViewModelProvider.AndroidViewModelFactory(context.application)
+        ).get(MainViewModel::class.java)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_result, container, false)
+        val view = inflater.inflate(R.layout.fragment_result, container, false)
+        return view
     }
 
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-        if (!hidden) {
-            results.apply {
-                setItemViewCacheSize(20)
-                layoutManager = LinearLayoutManager(activity)
-                adapter =
-                    CurrencyResultAdapter(viewModel.getCurrencyResultsData()?.result ?: listOf())
-            }
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        results.setItemViewCacheSize(20)
+        results.layoutManager = LinearLayoutManager(view.context)
+        results.adapter = CurrencyResultAdapter(viewModel.getCurrencyResultsData()?.result ?: listOf())
     }
 }

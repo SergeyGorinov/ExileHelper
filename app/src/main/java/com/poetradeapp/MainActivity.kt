@@ -4,14 +4,16 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.poetradeapp.R
+import com.poetradeapp.adapters.SwipePagerAdapter
+import com.poetradeapp.fragments.ItemExchangeFragment
 import com.poetradeapp.fragments.LoaderFragment
-import com.poetradeapp.fragments.MainFragment
-import com.poetradeapp.fragments.ResultFragment
+import com.poetradeapp.fragments.currency.CurrencyFragmentMain
 import com.poetradeapp.http.RequestService
 import com.poetradeapp.models.MainViewModel
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 
 open class RealmCurrencyData(
@@ -26,14 +28,7 @@ open class RealmCurrencyGroupData(
     var currencies: RealmList<RealmCurrencyData> = RealmList()
 ) : RealmObject()
 
-interface FragmentChanger {
-    fun changeFragment()
-}
-
-class MainActivity : FragmentActivity(), FragmentChanger {
-    private val loaderFragment = LoaderFragment()
-    private val mainFragment = MainFragment()
-    private val resultFragment = ResultFragment()
+class MainActivity : FragmentActivity() {
 
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(
@@ -41,6 +36,10 @@ class MainActivity : FragmentActivity(), FragmentChanger {
             ViewModelProvider.AndroidViewModelFactory(this.application)
         ).get(MainViewModel::class.java)
     }
+
+    private val currencyFragmentMain = CurrencyFragmentMain()
+    private val itemExchangeFragment = ItemExchangeFragment()
+    private val loaderFragment = LoaderFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,56 +51,34 @@ class MainActivity : FragmentActivity(), FragmentChanger {
 //        realm.deleteAll()
 //        realm.commitTransaction()
 
+        mainContainer.offscreenPageLimit = 2
+
         if (realm.where(RealmCurrencyData::class.java).count() == 0L) {
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.mainFragmentContainer, loaderFragment)
-                .show(loaderFragment)
-                .commit()
+            val adapter = SwipePagerAdapter(
+                this,
+                mutableListOf(loaderFragment, currencyFragmentMain, itemExchangeFragment)
+            )
+            mainContainer.adapter = adapter
             GlobalScope.launch {
                 updateData()
             }.invokeOnCompletion {
                 GlobalScope.launch(Dispatchers.Main) {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .remove(loaderFragment)
-                        .add(R.id.mainFragmentContainer, mainFragment)
-                        .add(R.id.mainFragmentContainer, resultFragment)
-                        .show(mainFragment)
-                        .commit()
+                    adapter.removeFragment(0)
                 }
             }
         } else {
-            supportFragmentManager
-                .beginTransaction()
-                .remove(loaderFragment)
-                .add(R.id.mainFragmentContainer, mainFragment)
-                .add(R.id.mainFragmentContainer, resultFragment)
-                .hide(resultFragment)
-                .show(mainFragment)
-                .commit()
+            viewModel.initializeIcons(this)
+            mainContainer.adapter =
+                SwipePagerAdapter(this, mutableListOf(currencyFragmentMain, itemExchangeFragment))
         }
     }
 
     override fun onBackPressed() {
-        if (!resultFragment.isHidden) {
-            supportFragmentManager
-                .beginTransaction()
-                .hide(resultFragment)
-                .show(mainFragment)
-                .commit()
+        if (!currencyFragmentMain.currencyFragmentResult.isHidden) {
+            currencyFragmentMain.hideResults()
         }
-        else {
+        else
             super.onBackPressed()
-        }
-    }
-
-    override fun changeFragment() {
-        supportFragmentManager
-            .beginTransaction()
-            .hide(mainFragment)
-            .show(resultFragment)
-            .commit()
     }
 
     private suspend fun updateData() {
