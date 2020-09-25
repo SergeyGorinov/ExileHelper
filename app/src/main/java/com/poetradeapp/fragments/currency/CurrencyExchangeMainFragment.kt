@@ -31,10 +31,10 @@ class CurrencyExchangeViewPagerAdapter(fragmentActivity: FragmentActivity) :
 
     override fun createFragment(position: Int): Fragment {
         when (position) {
-            0 -> return CurrencyExchangeWant(viewModel)
-            1 -> return CurrencyExchangeHave(viewModel)
+            0 -> return CurrencyExchangeWantFragment(viewModel)
+            1 -> return CurrencyExchangeHaveFragment(viewModel)
         }
-        return CurrencyExchangeWant(viewModel)
+        return CurrencyExchangeWantFragment(viewModel)
     }
 }
 
@@ -42,7 +42,7 @@ class CurrencyExchangeMainFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
 
-    private val currencyFragmentExchange = CurrencyFragmentExchange()
+    private val currencyFragmentExchange = CurrencyExchangeFragment()
     val currencyFragmentResult = CurrencyResultFragment()
 
     override fun onAttach(context: Context) {

@@ -10,7 +10,7 @@ import com.example.poetradeapp.R
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_currency_exchange.*
 
-class CurrencyFragmentExchange : Fragment() {
+class CurrencyExchangeFragment : Fragment() {
 
     private lateinit var mediator: TabLayoutMediator
 

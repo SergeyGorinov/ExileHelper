@@ -1,7 +1,7 @@
 package com.example.poetradeapp.models
 
 class Enums {
-    enum class ItemCategory(id: String?, text: String) {
+    enum class ItemCategory(val id: String?, val text: String) {
         Any(null, "Any"),
         Weapon("weapon", "Any Weapon"),
         WeaponOne("weapon.one", "One-Handed Weapon"),

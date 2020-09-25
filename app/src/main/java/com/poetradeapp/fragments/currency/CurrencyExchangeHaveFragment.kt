@@ -9,18 +9,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.poetradeapp.R
 import com.poetradeapp.adapters.CurrencyListAdapter
 import com.poetradeapp.models.MainViewModel
-import kotlinx.android.synthetic.main.fragment_currency_exchange_want.*
+import kotlinx.android.synthetic.main.fragment_currency_exchange_have.*
 
-class CurrencyExchangeWant(viewModel: MainViewModel) : Fragment() {
+class CurrencyExchangeHaveFragment(viewModel: MainViewModel)  : Fragment() {
 
-    private val listAdapter = CurrencyListAdapter(viewModel.getMainData(), true)
+    private val listAdapter = CurrencyListAdapter(viewModel.getMainData())
     private val listLayoutManager = LinearLayoutManager(context)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_currency_exchange_want, container, false)
+        return inflater.inflate(R.layout.fragment_currency_exchange_have, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
