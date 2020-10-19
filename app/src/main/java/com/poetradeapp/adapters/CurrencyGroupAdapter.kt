@@ -6,32 +6,36 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.poetradeapp.MainActivity
-import com.example.poetradeapp.R
-import com.poetradeapp.RealmCurrencyData
-import com.poetradeapp.models.MainViewModel
+import coil.request.ImageRequest
+import com.poetradeapp.R
+import com.poetradeapp.activities.CurrencyExchangeActivity
+import com.poetradeapp.models.CurrencyViewData
+import com.poetradeapp.models.viewmodels.CurrencyExchangeViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class CurrencyGroupAdapter(
-    private val items: List<RealmCurrencyData>,
+    private val items: List<CurrencyViewData>,
     private val fromWant: Boolean
 ) :
     RecyclerView.Adapter<CurrencyGroupViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyGroupViewHolder {
 
-        val context = parent.context as MainActivity
+        val context = parent.context as CurrencyExchangeActivity
 
-        val model = ViewModelProvider(
+        val viewModel = ViewModelProvider(
             context,
             ViewModelProvider.AndroidViewModelFactory(context.application)
-        ).get(MainViewModel::class.java)
+        ).get(CurrencyExchangeViewModel::class.java)
 
         val view =
             LayoutInflater
                 .from(context)
                 .inflate(R.layout.currency_button, parent, false)
 
-        return CurrencyGroupViewHolder(view, model, fromWant)
+        return CurrencyGroupViewHolder(view, viewModel, fromWant)
     }
 
     override fun onBindViewHolder(holder: CurrencyGroupViewHolder, position: Int) {
@@ -43,36 +47,43 @@ class CurrencyGroupAdapter(
 
 class CurrencyGroupViewHolder(
     itemView: View,
-    private val model: MainViewModel,
+    private val viewModel: CurrencyExchangeViewModel,
     private val fromWant: Boolean
 ) :
     RecyclerView.ViewHolder(itemView) {
 
     private val button: ImageButton = itemView.findViewById(R.id.currencyButton)
-    private var item: RealmCurrencyData? = null
+    private val imageLoader = (itemView.context as CurrencyExchangeActivity).imageLoader
 
-    init {
+    fun bind(item: CurrencyViewData) {
+
         button.setOnClickListener { button ->
             button.isSelected = !button.isSelected
-            item?.let {
-                if (button.isSelected) {
-                    if (fromWant) model.addWantCurrency(it.id)
-                    else model.addHaveCurrency(it.id)
-                } else {
-                    if (fromWant) model.removeWantCurrency(it.id)
-                    else model.removeHaveCurrency(it.id)
-                }
+            if (button.isSelected) {
+                if (fromWant) viewModel.addWantCurrency(item.id)
+                else viewModel.addHaveCurrency(item.id)
+            } else {
+                if (fromWant) viewModel.removeWantCurrency(item.id)
+                else viewModel.removeHaveCurrency(item.id)
             }
         }
-    }
 
-    fun bind(item: RealmCurrencyData) {
-        if (this.item == null)
-            this.item = item
-
-        this.item?.let {
-            val id = it.id
-            button.setImageDrawable(model.getCurrencyIcon(id))
+        if (item.drawable == null) {
+            item.image?.let { link ->
+                GlobalScope.launch(Dispatchers.Main) {
+                    val request = ImageRequest.Builder(itemView.context)
+                        .data("https://www.pathofexile.com$link")
+                        .size(32, 32)
+                        .build()
+                    item.drawable = imageLoader.getImageLoader().execute(request).drawable
+                }.invokeOnCompletion {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        button.setImageDrawable(item.drawable)
+                    }
+                }
+            }
+        } else {
+            button.setImageDrawable(item.drawable)
         }
     }
 }

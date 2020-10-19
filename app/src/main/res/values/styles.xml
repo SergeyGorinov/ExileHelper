@@ -6,4 +6,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>e
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="TitleFontStyle" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/fontinsmallcaps</item>
+        <item name="color">#fff8e1</item>
+    </style>
 </resources>

@@ -2,27 +2,33 @@ package com.poetradeapp.adapters
 
 import android.content.Context
 import android.content.res.Resources
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.poetradeapp.MainActivity
-import com.example.poetradeapp.R
 import com.google.android.material.button.MaterialButton
-import com.poetradeapp.RealmCurrencyGroupData
-import com.poetradeapp.flexbox.*
+import com.google.android.material.textfield.TextInputEditText
+import com.poetradeapp.R
+import com.poetradeapp.flexbox.FlexDirection
+import com.poetradeapp.flexbox.FlexWrap
+import com.poetradeapp.flexbox.FlexboxLayoutManager
+import com.poetradeapp.flexbox.JustifyContent
+import com.poetradeapp.models.CurrencyGroupViewData
 import com.poetradeapp.ui.SlideUpDownAnimator
+import java.util.*
 
 class CurrencyListAdapter(
-    private val items: List<RealmCurrencyGroupData>,
+    private val items: ArrayList<CurrencyGroupViewData>,
     private val fromWant: Boolean = false
 ) :
     RecyclerView.Adapter<CurrencyListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyListViewHolder {
-        val context = parent.context as MainActivity
-        val view = LayoutInflater.from(context).inflate(R.layout.currency_group, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.currency_group, parent, false)
         return CurrencyListViewHolder(view, parent.context)
     }
 
@@ -36,8 +42,12 @@ class CurrencyListAdapter(
 class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
     private val button: MaterialButton = itemView.findViewById(R.id.currencyGroupButton)
     private val currencyGroup: RecyclerView = itemView.findViewById(R.id.currencyGroup)
-    private val currencyGroupLayout: ConstraintLayout =
+    private val currencyGroupLayout: LinearLayout =
         itemView.findViewById(R.id.currencyGroupLayout)
+    private val currencyGroupSearch: TextInputEditText =
+        itemView.findViewById(R.id.currencyGroupSearch)
+    private val currencyGroupSearchLayout: LinearLayout =
+        itemView.findViewById(R.id.currencyGroupSearchLayout)
     private val animator: SlideUpDownAnimator
     private var flexboxLayoutManager: FlexboxLayoutManager
 
@@ -49,25 +59,106 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
         flexboxLayoutManager.justifyContent = JustifyContent.CENTER
         flexboxLayoutManager.flexDirection = FlexDirection.ROW
 
-        currencyGroup.setHasFixedSize(true)
-        currencyGroup.setItemViewCacheSize(100)
-
         currencyGroup.layoutManager = flexboxLayoutManager
 
         button.setOnClickListener {
-            if (currencyGroupLayout.visibility == View.VISIBLE)
+            if (currencyGroupLayout.visibility == View.VISIBLE) {
                 animator.slideUp()
-            else
+            } else {
                 animator.slideDown()
+            }
         }
     }
 
-    fun bind(group: RealmCurrencyGroupData, fromWant: Boolean) {
-        val adapter = CurrencyGroupAdapter(group.currencies, fromWant)
-        adapter.setHasStableIds(true)
-        currencyGroup.adapter = adapter
+    fun bind(group: CurrencyGroupViewData, fromWant: Boolean) {
+        when (group.id) {
+            "Cards" -> {
+                val adapter = CardsGroupAdapter(fromWant)
 
-        button.text = group.id
+                button.setOnClickListener {
+                    if (currencyGroupLayout.visibility == View.VISIBLE) {
+                        animator.slideUp(currencyGroupSearchLayout)
+                    } else {
+                        animator.slideDown(currencyGroupSearchLayout)
+                    }
+                }
+
+                currencyGroup.setItemViewCacheSize(50)
+                currencyGroup.adapter = adapter
+
+                currencyGroupSearchLayout.visibility = View.VISIBLE
+                currencyGroupSearch.hint =
+                    itemView.context.getString(R.string.cards_group_search_hint)
+                currencyGroupSearch.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) =
+                        Unit
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
+
+                    override fun afterTextChanged(p0: Editable?) {
+                        if (p0 != null && p0.length > 2) {
+                            val newItems =
+                                group.currencies.filter { f ->
+                                    f.label
+                                        .toLowerCase(Locale.getDefault())
+                                        .contains(
+                                            p0.toString().toLowerCase(Locale.getDefault())
+                                        )
+                                }
+                            if (newItems.size > 50)
+                                adapter.updateItems(newItems.subList(0, 50))
+                            else
+                                adapter.updateItems(newItems)
+                        } else
+                            adapter.updateItems(listOf())
+                    }
+                })
+            }
+            "Maps" -> {
+                val adapter = MapsGroupAdapter(fromWant)
+
+                button.setOnClickListener {
+                    if (currencyGroupLayout.visibility == View.VISIBLE) {
+                        animator.slideUp(currencyGroupSearchLayout)
+                    } else {
+                        animator.slideDown(currencyGroupSearchLayout)
+                    }
+                }
+
+                currencyGroup.setItemViewCacheSize(20)
+                currencyGroup.adapter = adapter
+
+                currencyGroupSearchLayout.visibility = View.VISIBLE
+                currencyGroupSearch.hint =
+                    itemView.context.getString(R.string.maps_group_search_hint)
+                currencyGroupSearch.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) =
+                        Unit
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
+
+                    override fun afterTextChanged(p0: Editable?) {
+                        if (p0 != null && p0.length > 2) {
+                            val newItems =
+                                group.currencies.filter { f ->
+                                    f.label
+                                        .toLowerCase(Locale.getDefault())
+                                        .contains(p0.toString().toLowerCase(Locale.getDefault()))
+                                }.groupBy { g -> g.groupLabel }
+                            adapter.updateItems(newItems)
+                        } else
+                            adapter.updateItems(mapOf())
+                    }
+                })
+            }
+            else -> {
+                val adapter = CurrencyGroupAdapter(group.currencies, fromWant)
+                currencyGroup.setItemViewCacheSize(100)
+                currencyGroup.adapter = adapter
+            }
+        }
+
+        button.text = group.label
 
         val layoutParams = currencyGroupLayout.layoutParams
         layoutParams.height = 1

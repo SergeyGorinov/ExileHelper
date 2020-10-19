@@ -1,31 +1,34 @@
 package com.poetradeapp.adapters
 
+import android.graphics.Rect
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.example.poetradeapp.R
-import com.poetradeapp.MainActivity
+import coil.request.ImageRequest
+import com.poetradeapp.R
+import com.poetradeapp.activities.CurrencyExchangeActivity
 import com.poetradeapp.models.ExchangeCurrencyResponseModel
-import com.poetradeapp.models.MainViewModel
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.text.DecimalFormat
+import com.poetradeapp.ui.CenteredImageSpan
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class CurrencyResultAdapter(private val items: List<ExchangeCurrencyResponseModel>) :
     RecyclerView.Adapter<CurrencyResultViewHolder>() {
+
+    private var oddRow = true
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyResultViewHolder {
-        val context = parent.context as MainActivity
-        val view = LayoutInflater.from(context)
+        val activity = parent.context as CurrencyExchangeActivity
+        val view = LayoutInflater.from(activity)
             .inflate(R.layout.currency_result_item, parent, false)
-        val model = ViewModelProvider(
-            context,
-            ViewModelProvider.AndroidViewModelFactory(context.application)
-        ).get(MainViewModel::class.java)
-        return CurrencyResultViewHolder(view, model)
+        val holder = CurrencyResultViewHolder(view, activity, oddRow)
+        oddRow = !oddRow
+        return holder
     }
 
     override fun onBindViewHolder(holder: CurrencyResultViewHolder, position: Int) {
@@ -35,87 +38,104 @@ class CurrencyResultAdapter(private val items: List<ExchangeCurrencyResponseMode
     override fun getItemCount() = items.size
 }
 
-class CurrencyResultViewHolder(itemView: View, private val model: MainViewModel) :
+class CurrencyResultViewHolder(
+    itemView: View,
+    activity: CurrencyExchangeActivity,
+    oddRow: Boolean
+) :
     RecyclerView.ViewHolder(itemView) {
-    private val haveImageRelativePrice: ImageView =
-        itemView.findViewById(R.id.haveImageRelativePrice)
-    private val wantImageRelativePrice: ImageView =
-        itemView.findViewById(R.id.wantImageRelativePrice)
-    private val havewantRelativePrice: TextView =
-        itemView.findViewById(R.id.havewantRelativePrice)
-    private val wantImageRelativePriceReverse: ImageView =
-        itemView.findViewById(R.id.wantImageRelativePriceReverse)
-    private val haveImageRelativePriceReverse: ImageView =
-        itemView.findViewById(R.id.haveImageRelativePriceReverse)
-    private val wanthaveRelativePrice: TextView =
-        itemView.findViewById(R.id.wanthaveRelativePrice)
+    private val stockTextView = itemView.findViewById<TextView>(R.id.stockText)
+    private val exchangeTextView = itemView.findViewById<TextView>(R.id.exchangeText)
+    private val playerName = itemView.findViewById<TextView>(R.id.nickWithCountry)
+    private val playerStatus = itemView.findViewById<TextView>(R.id.playerStatus)
+    private val imageLoader = activity.imageLoader
+    private val staticDataInstance = activity.staticDataInstance
 
-    private val wantLabelExchange: TextView =
-        itemView.findViewById(R.id.wantLabelExchange)
-    private val wantImageExchange: ImageView =
-        itemView.findViewById(R.id.wantImageExchange)
-    private val wantCountExchange: TextView =
-        itemView.findViewById(R.id.wantCountExchange)
-    private val haveLabelExchange: TextView =
-        itemView.findViewById(R.id.haveLabelExchange)
-    private val haveImageExchange: ImageView =
-        itemView.findViewById(R.id.haveImageExchange)
-    private val haveCountExchange: TextView =
-        itemView.findViewById(R.id.haveCountExchange)
-
-    private val stockCount: TextView =
-        itemView.findViewById(R.id.stockCount)
-    private val stockLabel: TextView =
-        itemView.findViewById(R.id.stockLabel)
-    private val account: TextView =
-        itemView.findViewById(R.id.account)
-    private val status: TextView =
-        itemView.findViewById(R.id.status)
+    init {
+        if (oddRow) {
+            itemView.setBackgroundColor(itemView.context.getColor(R.color.odd_result_row_color))
+        }
+    }
 
     fun bind(item: ExchangeCurrencyResponseModel) {
-        val haveCurrency = model.getMainData().flatMap { f -> f.currencies }
+
+        stockTextView.text =
+            itemView.context.getString(R.string.stock_text, item.listing.price.item.stock)
+        playerName.text = itemView.context.getString(
+            R.string.account_text,
+            item.listing.account.name,
+            item.listing.account.lastCharacterName
+        )
+        playerStatus.text = item.listing.account.online?.status ?: "Online"
+
+        val exchangeText = SpannableStringBuilder(
+            itemView.context.getString(
+                R.string.exchange_text,
+                item.listing.price.item.amount,
+                item.listing.price.exchange.amount
+            )
+        )
+
+        val haveCurrency = staticDataInstance
+            .getCurrencyData()
+            .flatMap { f -> f.currencies }
             .firstOrNull { fon -> fon.id == item.listing.price.exchange.currency }
-        val wantCurrency = model.getMainData().flatMap { f -> f.currencies}
+        val wantCurrency = staticDataInstance
+            .getCurrencyData()
+            .flatMap { f -> f.currencies }
             .firstOrNull { fon -> fon.id == item.listing.price.item.currency }
 
-        val haveAmount =
-            if (item.listing.price.exchange.amount == 0) 1 else item.listing.price.exchange.amount
-        val wantAmount =
-            if (item.listing.price.item.amount == 0) 1 else item.listing.price.item.amount
-
-        val haveWantPrice = BigDecimal(haveAmount.toDouble() / wantAmount.toDouble())
-            .setScale(4, RoundingMode.FLOOR)
-        val wantHavePrice = BigDecimal(wantAmount.toDouble() / haveAmount.toDouble())
-            .setScale(4, RoundingMode.FLOOR)
-
-        val fullAccount = "${item.listing.account.name}(${item.listing.account.lastCharacterName})"
-
-        haveCurrency?.let {
-            val currencyIcon = model.getCurrencyIcon(it.id)
-            haveImageRelativePrice.setImageDrawable(currencyIcon)
-            haveImageRelativePriceReverse.setImageDrawable(currencyIcon)
-            haveImageExchange.setImageDrawable(currencyIcon)
+        GlobalScope.launch(Dispatchers.Default) {
+            if (wantCurrency?.image != null) {
+                val request = ImageRequest.Builder(itemView.context)
+                    .data("https://www.pathofexile.com${wantCurrency.image}")
+                    .size(32, 32)
+                    .build()
+                imageLoader.getImageLoader().execute(request).drawable?.let {
+                    it.bounds =
+                        Rect(
+                            0,
+                            0,
+                            it.intrinsicWidth,
+                            it.intrinsicHeight
+                        )
+                    exchangeText.setSpan(
+                        CenteredImageSpan(it),
+                        exchangeText.indexOf("  x") + 1,
+                        exchangeText.indexOf("  x") + 2,
+                        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+                    )
+                }
+            } else {
+                exchangeText.insert(exchangeText.indexOf("  x") + 1, wantCurrency?.label)
+            }
+            if (haveCurrency?.image != null) {
+                val request = ImageRequest.Builder(itemView.context)
+                    .data("https://www.pathofexile.com${haveCurrency.image}")
+                    .size(32, 32)
+                    .build()
+                imageLoader.getImageLoader().execute(request).drawable?.let {
+                    it.bounds =
+                        Rect(
+                            0,
+                            0,
+                            it.intrinsicWidth,
+                            it.intrinsicHeight
+                        )
+                    exchangeText.setSpan(
+                        CenteredImageSpan(it),
+                        exchangeText.indexOf("x  ") + 2,
+                        exchangeText.indexOf("x  ") + 3,
+                        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+                    )
+                }
+            } else {
+                exchangeText.insert(exchangeText.indexOf("x  ") + 2, haveCurrency?.label)
+            }
+        }.invokeOnCompletion {
+            GlobalScope.launch(Dispatchers.Main) {
+                exchangeTextView.setText(exchangeText, TextView.BufferType.SPANNABLE)
+            }
         }
-
-        wantCurrency?.let {
-            val currencyIcon = model.getCurrencyIcon(it.id)
-            wantImageRelativePrice.setImageDrawable(currencyIcon)
-            wantImageRelativePriceReverse.setImageDrawable(currencyIcon)
-            wantImageExchange.setImageDrawable(currencyIcon)
-        }
-
-        havewantRelativePrice.text = DecimalFormat("0.####").format(haveWantPrice)
-        wanthaveRelativePrice.text = DecimalFormat("0.####").format(wantHavePrice)
-
-        haveLabelExchange.text = haveCurrency?.label ?: "Unknown"
-        wantLabelExchange.text = wantCurrency?.label ?: "Unknown"
-
-        haveCountExchange.text = item.listing.price.exchange.amount.toString()
-        wantCountExchange.text = item.listing.price.item.amount.toString()
-
-        stockCount.text = item.listing.price.item.stock.toString()
-        stockLabel.text = wantCurrency?.label ?: "Unknown"
-        account.text = fullAccount
-        status.text = item.listing.account.online.status ?: "Online"
     }
 }

@@ -1,56 +1,42 @@
 package com.poetradeapp.fragments.currency
 
-import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.poetradeapp.R
-import com.poetradeapp.MainActivity
-import com.poetradeapp.models.MainViewModel
+import com.google.android.material.tabs.TabLayoutMediator
+import com.poetradeapp.R
+import com.poetradeapp.activities.CurrencyExchangeActivity
 import kotlinx.android.synthetic.main.fragment_currency_exchange_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class CurrencyExchangeViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(
-            fragmentActivity,
-            ViewModelProvider.AndroidViewModelFactory(fragmentActivity.application)
-        ).get(MainViewModel::class.java)
-    }
+    private val items =
+        (fragmentActivity as CurrencyExchangeActivity).staticDataInstance.getCurrencyData()
 
     override fun getItemCount() = 2
 
     override fun createFragment(position: Int): Fragment {
         when (position) {
-            0 -> return CurrencyExchangeWantFragment(viewModel)
-            1 -> return CurrencyExchangeHaveFragment(viewModel)
+            0 -> return CurrencyExchangeWantFragment(items)
+            1 -> return CurrencyExchangeHaveFragment(items)
         }
-        return CurrencyExchangeWantFragment(viewModel)
+        return CurrencyExchangeWantFragment(items)
     }
 }
 
 class CurrencyExchangeMainFragment : Fragment() {
 
-    private lateinit var viewModel: MainViewModel
-
-    private val currencyFragmentExchange = CurrencyExchangeFragment()
-    val currencyFragmentResult = CurrencyResultFragment()
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        viewModel = ViewModelProvider(
-            requireActivity(),
-            ViewModelProvider.AndroidViewModelFactory(requireActivity().application)
-        ).get(MainViewModel::class.java)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val inflanter = TransitionInflater.from(requireContext())
+        exitTransition = inflanter.inflateTransition(R.transition.fragment_slide)
+        enterTransition = inflanter.inflateTransition(R.transition.fragment_slide)
     }
 
     override fun onCreateView(
@@ -62,31 +48,15 @@ class CurrencyExchangeMainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        searchCurrency.setOnClickListener {
-            GlobalScope.launch {
-                viewModel.sendCurrencyExchangeRequest()
-            }.invokeOnCompletion {
-                GlobalScope.launch(Dispatchers.Main) {
-                    requireActivity().supportFragmentManager
-                        .beginTransaction()
-                        .hide(currencyFragmentExchange)
-                        .add(R.id.currencyExchangeContainer, currencyFragmentResult)
-                        .show(currencyFragmentResult)
-                        .commit()
-                }
-            }
-        }
-        (context as MainActivity).supportFragmentManager
-            .beginTransaction()
-            .add(R.id.currencyExchangeContainer, currencyFragmentExchange)
-            .commit()
-    }
 
-    fun hideResults() {
-        (context as MainActivity).supportFragmentManager
-            .beginTransaction()
-            .remove(currencyFragmentResult)
-            .show(currencyFragmentExchange)
-            .commit()
+        currencyExchangeMainContainer.offscreenPageLimit = 2
+        currencyExchangeMainContainer.adapter = CurrencyExchangeViewPagerAdapter(requireActivity())
+
+        TabLayoutMediator(currencyExchangeTabs, currencyExchangeMainContainer) { tab, pos ->
+            when (pos) {
+                0 -> tab.text = "Want"
+                1 -> tab.text = "Have"
+            }
+        }.attach()
     }
 }

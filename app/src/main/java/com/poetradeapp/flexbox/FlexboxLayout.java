@@ -29,16 +29,16 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 
-import com.example.poetradeapp.R;
+import com.poetradeapp.R;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A layout that arranges its children in a way its attributes can be specified like the
@@ -197,7 +197,7 @@ public class FlexboxLayout extends ViewGroup implements FlexContainer {
      */
     private SparseIntArray mOrderCache;
 
-    private FlexboxHelper mFlexboxHelper = new FlexboxHelper(this);
+    private final FlexboxHelper mFlexboxHelper = new FlexboxHelper(this);
 
     private List<FlexLine> mFlexLines = new ArrayList<>();
 
@@ -205,7 +205,7 @@ public class FlexboxLayout extends ViewGroup implements FlexContainer {
      * Used for receiving the calculation of the flex results to avoid creating a new instance
      * every time flex lines are calculated.
      */
-    private FlexboxHelper.FlexLinesResult mFlexLinesResult = new FlexboxHelper.FlexLinesResult();
+    private final FlexboxHelper.FlexLinesResult mFlexLinesResult = new FlexboxHelper.FlexLinesResult();
 
     public FlexboxLayout(Context context) {
         this(context, null);
@@ -1464,11 +1464,7 @@ public class FlexboxLayout extends ViewGroup implements FlexContainer {
     }
 
     private void setWillNotDrawFlag() {
-        if (mDividerDrawableHorizontal == null && mDividerDrawableVertical == null) {
-            setWillNotDraw(true);
-        } else {
-            setWillNotDraw(false);
-        }
+        setWillNotDraw(mDividerDrawableHorizontal == null && mDividerDrawableVertical == null);
     }
 
     /**

@@ -1,0 +1,113 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/groupSocket"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|center_vertical"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:id="@+id/topSocketGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/socket1"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/connector1_2"
+            android:layout_width="31dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="-6dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/socket2"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="-6dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/connector2_3"
+        android:layout_width="14dp"
+        android:layout_height="31dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="-6dp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/middleSocketGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-6dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/socket4"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/connector4_3"
+            android:layout_width="31dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="-6dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/socket3"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="-6dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/connector4_5"
+        android:layout_width="14dp"
+        android:layout_height="31dp"
+        android:layout_marginTop="-6dp"
+        android:layout_marginEnd="29dp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/bottomSocketGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-6dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/socket5"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/connector5_6"
+            android:layout_width="31dp"
+            android:layout_height="14dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="-6dp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/socket6"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="-6dp"
+            android:visibility="gone" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,275 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:columnCount="3">
+    android:background="#0A0A0A"
+    android:padding="12dp">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/stockText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="@color/default_text_color"
+        app:layout_constraintBottom_toTopOf="@id/exchangeText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SelectableText" />
+
+    <TextView
+        android:id="@+id/exchangeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="@color/default_text_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stockText"
+        tools:ignore="SelectableText" />
+
+    <TextView
+        android:id="@+id/nickWithCountry"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_columnWeight="3"
-        android:layout_gravity="fill_horizontal|center_vertical"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/fontinsmallcaps"
         android:gravity="start"
-        android:orientation="vertical">
+        android:textColor="@color/default_text_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/playerStatus"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/exchangeText"
+        tools:ignore="SelectableText" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1 x"
-                android:textSize="9sp" />
-
-            <ImageView
-                android:id="@+id/haveImageRelativePrice"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginHorizontal="2dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" is worth "
-                android:textSize="9sp" />
-
-            <TextView
-                android:id="@+id/havewantRelativePrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="9sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" x"
-                android:textSize="9sp" />
-
-            <ImageView
-                android:id="@+id/wantImageRelativePrice"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginHorizontal="2dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1 x"
-                android:textSize="9sp" />
-
-            <ImageView
-                android:id="@+id/wantImageRelativePriceReverse"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginHorizontal="2dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" is worth "
-                android:textSize="9sp" />
-
-            <TextView
-                android:id="@+id/wanthaveRelativePrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="9sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" x"
-                android:textSize="9sp" />
-
-            <ImageView
-                android:id="@+id/haveImageRelativePriceReverse"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginHorizontal="2dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/playerStatus"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_columnWeight="5"
-        android:layout_gravity="fill_horizontal|center_vertical"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="5dp"
-                android:text="You will get"
-                android:textSize="8sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginStart="5dp"
-                android:text="You will pay"
-                android:textSize="8sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/wantLabelExchange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="10sp" />
-
-                <ImageView
-                    android:id="@+id/wantImageExchange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="2dp"
-                    android:adjustViewBounds="true"
-                    android:maxWidth="20dp"
-                    android:maxHeight="20dp"
-                    android:scaleType="fitCenter" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="x "
-                    android:textSize="10sp" />
-
-                <TextView
-                    android:id="@+id/wantCountExchange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="10sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginStart="5dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/haveCountExchange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="10sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" x"
-                    android:textSize="10sp" />
-
-                <ImageView
-                    android:id="@+id/haveImageExchange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="2dp"
-                    android:adjustViewBounds="true"
-                    android:maxWidth="20dp"
-                    android:maxHeight="20dp"
-                    android:scaleType="fitCenter" />
-
-                <TextView
-                    android:id="@+id/haveLabelExchange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="10sp" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_columnWeight="3"
-        android:layout_gravity="fill_horizontal|center_vertical"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/fontinsmallcaps"
         android:gravity="end"
-        android:orientation="vertical">
+        android:textColor="@color/default_text_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/nickWithCountry"
+        app:layout_constraintTop_toBottomOf="@id/exchangeText"
+        tools:ignore="SelectableText" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Stock: "
-                android:textSize="8sp" />
-
-            <TextView
-                android:id="@+id/stockCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="8sp" />
-
-            <TextView
-                android:id="@+id/stockLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="8sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/account"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="8sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="8sp" />
-        </LinearLayout>
-    </LinearLayout>
-</GridLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

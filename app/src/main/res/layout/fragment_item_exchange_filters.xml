@@ -1,84 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#000">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/typeFiltersButton"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/filtersList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/filter_button_default"
-        android:orientation="horizontal"
-        android:paddingStart="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:buttonTint="#FFF"
-            android:checked="true" />
-
-        <com.google.android.material.button.MaterialButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:background="@android:color/transparent"
-            android:fontFamily="@font/fontinsmallcaps"
-            android:gravity="start|center_vertical"
-            android:paddingStart="0dp"
-            android:text="Type Filters"
-            android:textAllCaps="false"
-            android:textColor="@color/default_text_color"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/typeFilters"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_marginLeft="56dp"
-        android:layout_marginTop="2dp"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/typeFiltersButton">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="2dp"
-            android:layout_weight="2"
-            android:background="@drawable/filter_textfield_default"
-            android:fontFamily="@font/fontinsmallcaps"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dp"
-            android:text="Item Category"
-            android:textColor="@color/default_text_color"
-            android:textStyle="bold" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:endIconTint="#999999">
-
-            <AutoCompleteTextView
-                android:id="@+id/itemCategoryDropDown"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#1E2124"
-                android:dropDownWidth="match_parent"
-                android:fontFamily="@font/fontinsmallcaps"
-                android:gravity="center_vertical|center"
-                android:inputType="textNoSuggestions"
-                android:textColor="#E2E2E2"
-                android:textColorHint="#C2C2C2"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

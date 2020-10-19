@@ -1,3 +1,2 @@
-include ':material'
 include ':app'
 rootProject.name='PoeTradeApp'

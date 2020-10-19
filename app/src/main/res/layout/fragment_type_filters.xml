@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/itemCategoryLayout"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginBottom="1dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="2"
+            android:background="@drawable/filter_textfield_default"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:text="@string/type_filters_item_category_text"
+            android:textColor="@color/default_text_color"
+            android:textStyle="bold"
+            tools:ignore="RtlSymmetry" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textColorHint="#999999"
+            app:endIconTint="#999999"
+            app:hintTextColor="@android:color/transparent">
+
+            <AutoCompleteTextView
+                android:id="@+id/itemCategoryDropDown"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#1E2124"
+                android:dropDownWidth="match_parent"
+                android:fontFamily="@font/fontinsmallcaps"
+                android:gravity="center_vertical|center"
+                android:inputType="textNoSuggestions"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:ignore="LabelFor" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="1dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemCategoryLayout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="2"
+            android:background="@drawable/filter_textfield_default"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:text="@string/type_filters_item_rarity_text"
+            android:textColor="@color/default_text_color"
+            android:textStyle="bold"
+            tools:ignore="RtlSymmetry" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textColorHint="#999999"
+            app:endIconTint="#999999"
+            app:hintTextColor="@android:color/transparent">
+
+            <AutoCompleteTextView
+                android:id="@+id/itemRarityDropDown"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#1E2124"
+                android:dropDownWidth="match_parent"
+                android:fontFamily="@font/fontinsmallcaps"
+                android:gravity="center_vertical|center"
+                android:inputType="textNoSuggestions"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:ignore="LabelFor" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
