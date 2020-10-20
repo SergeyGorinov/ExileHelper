@@ -2,6 +2,9 @@ package com.poetradeapp.models.requestmodels
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlin.properties.Delegates
 
 interface NullCheckable {
     @JsonIgnore
@@ -92,7 +95,7 @@ class ItemRequestModelFields {
     data class MapFilter(
         var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
-        val filters: MapFilters = MapFilters()
+        var filters: MapFilters = MapFilters()
     ) : NullCheckable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
@@ -187,29 +190,70 @@ class ItemRequestModelFields {
         }
     }
 
+    @ExperimentalCoroutinesApi
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
     data class MapFilters(
-        var map_tier: MinMax? = null,
-        var map_iiq: MinMax? = null,
-        var map_shaped: DropDown? = null,
-        var map_blighted: DropDown? = null,
-        var map_series: DropDown? = null,
-        var map_packsize: MinMax? = null,
-        var map_iir: MinMax? = null,
-        var map_elder: DropDown? = null,
-        var map_region: DropDown? = null
+        private var _map_tier: MinMax? = null,
+        private var _map_iiq: MinMax? = null,
+        private var _map_shaped: DropDown? = null,
+        private var _map_blighted: DropDown? = null,
+        private var _map_series: DropDown? = null,
+        private var _map_packsize: MinMax? = null,
+        private var _map_iir: MinMax? = null,
+        private var _map_elder: DropDown? = null,
+        private var _map_region: DropDown? = null
     ) : NullCheckable {
+
+        val isEmptyState = MutableStateFlow(isEmpty())
+
+        var mapTier: MinMax? by Delegates.observable(_map_tier) { _, _, new ->
+            _map_tier = new
+            isEmptyState.value = isEmpty()
+        }
+        var mapIiq: MinMax? by Delegates.observable(_map_iir) { _, _, new ->
+            _map_iir = new
+            isEmptyState.value = isEmpty()
+        }
+        var mapShaped: DropDown? by Delegates.observable(_map_shaped) { _, _, new ->
+            _map_shaped = new
+            isEmptyState.value = isEmpty()
+        }
+        var mapBlighted: DropDown? by Delegates.observable(_map_blighted) { _, _, new ->
+            _map_blighted = new
+            isEmptyState.value = isEmpty()
+        }
+        var mapSeries: DropDown? by Delegates.observable(_map_series) { _, _, new ->
+            _map_series = new
+            isEmptyState.value = isEmpty()
+        }
+        var mapPacksize: MinMax? by Delegates.observable(_map_packsize) { _, _, new ->
+            _map_packsize = new
+            isEmptyState.value = isEmpty()
+        }
+        var mapIir: MinMax? by Delegates.observable(_map_iir) { _, _, new ->
+            _map_iir = new
+            isEmptyState.value = isEmpty()
+        }
+        var mapElder: DropDown? by Delegates.observable(_map_elder) { _, _, new ->
+            _map_elder = new
+            isEmptyState.value = isEmpty()
+        }
+        var mapRegion: DropDown? by Delegates.observable(_map_region) { _, _, new ->
+            _map_region = new
+            isEmptyState.value = isEmpty()
+        }
+
         override fun isEmpty(): Boolean {
             return listOfNotNull(
-                map_tier,
-                map_iiq,
-                map_shaped,
-                map_blighted,
-                map_series,
-                map_packsize,
-                map_iir,
-                map_elder,
-                map_region
+                _map_tier,
+                _map_iiq,
+                _map_shaped,
+                _map_blighted,
+                _map_series,
+                _map_packsize,
+                _map_iir,
+                _map_elder,
+                _map_region
             ).all { a -> a.isEmpty() }
         }
     }

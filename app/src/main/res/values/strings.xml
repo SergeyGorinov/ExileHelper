@@ -35,4 +35,5 @@
     <string name="type_filters_item_category_text">Item Category</string>
     <string name="type_filters_item_rarity_text">Item Rarity</string>
     <string name="toolbar_search_item_hint">Search item</string>
+    <string name="clear_filter_description">clearFilter</string>
 </resources>

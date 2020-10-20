@@ -3,13 +3,12 @@ package com.poetradeapp.ui
 import android.animation.ObjectAnimator
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 
 class SlideUpDownAnimator(private val view: View) {
 
     private var preMeasuredHeight = 0
 
-    fun slideDown(searchField: LinearLayout? = null) {
+    fun slideDown() {
         view.visibility = View.VISIBLE
 
         val height = preMeasuredHeight
@@ -30,7 +29,7 @@ class SlideUpDownAnimator(private val view: View) {
         valueAnimator.start()
     }
 
-    fun slideUp(searchField: LinearLayout? = null) {
+    fun slideUp() {
         view.post(kotlinx.coroutines.Runnable {
             preMeasuredHeight = view.height
             val valueAnimator = ObjectAnimator.ofInt(preMeasuredHeight, 0)

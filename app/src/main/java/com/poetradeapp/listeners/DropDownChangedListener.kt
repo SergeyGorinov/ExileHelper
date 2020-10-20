@@ -7,7 +7,9 @@ import com.poetradeapp.models.FiltersEnum
 import com.poetradeapp.models.GenericEnum
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.DropDown
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.Filters
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class DropDownChangedListener(
     private val item: FiltersEnum,
     private val filters: Filters
@@ -29,19 +31,19 @@ class DropDownChangedListener(
             val filter = filters.map_filters.filters
             when (item) {
                 EnumFilters.MapFilter.ShapedMap -> {
-                    filter.map_shaped = value
+                    filter.mapShaped = value
                 }
                 EnumFilters.MapFilter.ElderMap -> {
-                    filter.map_elder = value
+                    filter.mapElder = value
                 }
                 EnumFilters.MapFilter.BlightedMap -> {
-                    filter.map_blighted = value
+                    filter.mapBlighted = value
                 }
                 EnumFilters.MapFilter.MapRegion -> {
-                    filter.map_region = value
+                    filter.mapRegion = value
                 }
                 EnumFilters.MapFilter.MapSeries -> {
-                    filter.map_series = value
+                    filter.mapSeries = value
                 }
             }
         }

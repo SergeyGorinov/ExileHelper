@@ -18,7 +18,9 @@ import com.poetradeapp.models.EnumFilters
 import com.poetradeapp.models.Enums
 import com.poetradeapp.models.FiltersEnum
 import com.poetradeapp.models.viewmodels.ItemsSearchViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class ItemFilterAdapter<T>(private val items: Array<T>) :
     RecyclerView.Adapter<ItemFilterRecyclerViewVH>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemFilterRecyclerViewVH {
@@ -43,6 +45,7 @@ class ItemFilterAdapter<T>(private val items: Array<T>) :
     override fun getItemCount() = items.size
 }
 
+@ExperimentalCoroutinesApi
 class ItemFilterRecyclerViewVH(
     itemView: View,
     model: ItemsSearchViewModel
@@ -81,6 +84,8 @@ class ItemFilterRecyclerViewVH(
                     filters
                 )
             )
+            filterMin.setText("")
+            filterMax.setText("")
         }
     }
 

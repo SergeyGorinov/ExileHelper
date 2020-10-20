@@ -7,7 +7,9 @@ import com.poetradeapp.models.EnumFilters
 import com.poetradeapp.models.FiltersEnum
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.Filters
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.MinMax
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class MinMaxTextChangedListener(
     private val item: FiltersEnum,
     private val filterMin: TextInputEditText,
@@ -82,16 +84,16 @@ class MinMaxTextChangedListener(
             val filter = filters.map_filters.filters
             when (item) {
                 EnumFilters.MapFilter.MapTier -> {
-                    filter.map_tier = minMax
+                    filter.mapTier = minMax
                 }
                 EnumFilters.MapFilter.MapPacksize -> {
-                    filter.map_packsize = minMax
+                    filter.mapPacksize = minMax
                 }
                 EnumFilters.MapFilter.MapIIQ -> {
-                    filter.map_iiq = minMax
+                    filter.mapIiq = minMax
                 }
                 EnumFilters.MapFilter.MapIIR -> {
-                    filter.map_iir = minMax
+                    filter.mapIir = minMax
                 }
             }
         }

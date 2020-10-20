@@ -5,6 +5,7 @@ import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.poetradeapp.PoeTradeApplication
 import com.poetradeapp.R
@@ -18,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_loader.*
 import kotlinx.coroutines.*
 import retrofit2.await
 import javax.inject.Inject
+import kotlin.system.exitProcess
 
 @ExperimentalCoroutinesApi
 class LoaderFragment : Fragment() {
@@ -52,7 +54,15 @@ class LoaderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         loaderProgressBar.progress = 0
 
-        GlobalScope.launch {
+        val handler = CoroutineExceptionHandler { _, exception ->
+            requireActivity().runOnUiThread {
+                AlertDialog.Builder(requireContext()).setTitle("Error")
+                    .setMessage("Error during get remote data")
+                    .setOnCancelListener { exitProcess(-1) }.show()
+            }
+        }
+
+        GlobalScope.launch(handler) {
             downloadData()
         }.invokeOnCompletion {
             GlobalScope.launch(Dispatchers.Main) {
@@ -62,7 +72,6 @@ class LoaderFragment : Fragment() {
     }
 
     private suspend fun downloadData() {
-
         val leaguesDataResponse =
             retrofit.getService().getLeagueData("api/trade/data/leagues").await()
         val itemsDataResponse =

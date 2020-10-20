@@ -77,9 +77,9 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
 
                 button.setOnClickListener {
                     if (currencyGroupLayout.visibility == View.VISIBLE) {
-                        animator.slideUp(currencyGroupSearchLayout)
+                        animator.slideUp()
                     } else {
-                        animator.slideDown(currencyGroupSearchLayout)
+                        animator.slideDown()
                     }
                 }
 
@@ -119,9 +119,9 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
 
                 button.setOnClickListener {
                     if (currencyGroupLayout.visibility == View.VISIBLE) {
-                        animator.slideUp(currencyGroupSearchLayout)
+                        animator.slideUp()
                     } else {
-                        animator.slideDown(currencyGroupSearchLayout)
+                        animator.slideDown()
                     }
                 }
 
