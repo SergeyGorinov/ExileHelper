@@ -3,15 +3,15 @@ package com.poetradeapp.listeners
 import android.text.Editable
 import android.text.TextWatcher
 import com.google.android.material.textfield.TextInputEditText
-import com.poetradeapp.models.EnumFilters
-import com.poetradeapp.models.FiltersEnum
+import com.poetradeapp.models.enums.IFilter
+import com.poetradeapp.models.enums.ViewFilters
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.Filters
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.MinMax
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 class MinMaxTextChangedListener(
-    private val item: FiltersEnum,
+    private val item: IFilter,
     private val filterMin: TextInputEditText,
     private val filterMax: TextInputEditText,
     private val filters: Filters
@@ -23,155 +23,155 @@ class MinMaxTextChangedListener(
         val min = filterMin.text?.toString()?.toIntOrNull()
         val max = filterMax.text?.toString()?.toIntOrNull()
         val minMax = MinMax(min, max)
-        if (item is EnumFilters.WeaponFilters) {
+        if (item is ViewFilters.WeaponFilters) {
             val filter = filters.weapon_filters.filters
             when (item) {
-                EnumFilters.WeaponFilters.Damage -> {
+                ViewFilters.WeaponFilters.Damage -> {
                     filter.damage = minMax
                 }
-                EnumFilters.WeaponFilters.APS -> {
+                ViewFilters.WeaponFilters.APS -> {
                     filter.aps = minMax
                 }
-                EnumFilters.WeaponFilters.CritChance -> {
+                ViewFilters.WeaponFilters.CritChance -> {
                     filter.crit = minMax
                 }
-                EnumFilters.WeaponFilters.DPS -> {
+                ViewFilters.WeaponFilters.DPS -> {
                     filter.dps = minMax
                 }
-                EnumFilters.WeaponFilters.PDPS -> {
+                ViewFilters.WeaponFilters.PDPS -> {
                     filter.pdps = minMax
                 }
-                EnumFilters.WeaponFilters.EDPS -> {
+                ViewFilters.WeaponFilters.EDPS -> {
                     filter.edps = minMax
                 }
             }
         }
-        if (item is EnumFilters.ArmourFilters) {
+        if (item is ViewFilters.ArmourFilters) {
             val filter = filters.armour_filters.filters
             when (item) {
-                EnumFilters.ArmourFilters.Armour -> {
+                ViewFilters.ArmourFilters.Armour -> {
                     filter.ar = minMax
                 }
-                EnumFilters.ArmourFilters.Evasion -> {
+                ViewFilters.ArmourFilters.Evasion -> {
                     filter.ev = minMax
                 }
-                EnumFilters.ArmourFilters.EnergyShield -> {
+                ViewFilters.ArmourFilters.EnergyShield -> {
                     filter.es = minMax
                 }
-                EnumFilters.ArmourFilters.Block -> {
+                ViewFilters.ArmourFilters.Block -> {
                     filter.block = minMax
                 }
             }
         }
-        if (item is EnumFilters.ReqFilter) {
+        if (item is ViewFilters.ReqFilters) {
             val filter = filters.req_filters.filters
             when (item) {
-                EnumFilters.ReqFilter.Level -> {
+                ViewFilters.ReqFilters.Level -> {
                     filter.lvl = minMax
                 }
-                EnumFilters.ReqFilter.Strength -> {
+                ViewFilters.ReqFilters.Strength -> {
                     filter.str = minMax
                 }
-                EnumFilters.ReqFilter.Dexterity -> {
+                ViewFilters.ReqFilters.Dexterity -> {
                     filter.dex = minMax
                 }
-                EnumFilters.ReqFilter.Intelligence -> {
+                ViewFilters.ReqFilters.Intelligence -> {
                     filter.int = minMax
                 }
             }
         }
-        if (item is EnumFilters.MapFilter) {
+        if (item is ViewFilters.MapFilters) {
             val filter = filters.map_filters.filters
             when (item) {
-                EnumFilters.MapFilter.MapTier -> {
+                ViewFilters.MapFilters.MapTier -> {
                     filter.mapTier = minMax
                 }
-                EnumFilters.MapFilter.MapPacksize -> {
+                ViewFilters.MapFilters.MapPacksize -> {
                     filter.mapPacksize = minMax
                 }
-                EnumFilters.MapFilter.MapIIQ -> {
+                ViewFilters.MapFilters.MapIIQ -> {
                     filter.mapIiq = minMax
                 }
-                EnumFilters.MapFilter.MapIIR -> {
+                ViewFilters.MapFilters.MapIIR -> {
                     filter.mapIir = minMax
                 }
             }
         }
-        if (item is EnumFilters.MiscFilter) {
+        if (item is ViewFilters.MiscFilters) {
             val filter = filters.misc_filters.filters
             when (item) {
-                EnumFilters.MiscFilter.Quality -> {
+                ViewFilters.MiscFilters.Quality -> {
                     filter.quality = minMax
                 }
-                EnumFilters.MiscFilter.ItemLevel -> {
+                ViewFilters.MiscFilters.ItemLevel -> {
                     filter.ilvl = minMax
                 }
-                EnumFilters.MiscFilter.GemLevel -> {
+                ViewFilters.MiscFilters.GemLevel -> {
                     filter.gem_level = minMax
                 }
-                EnumFilters.MiscFilter.GemExperience -> {
+                ViewFilters.MiscFilters.GemExperience -> {
                     filter.gem_level_progress = minMax
                 }
-                EnumFilters.MiscFilter.TalismanTier -> {
+                ViewFilters.MiscFilters.TalismanTier -> {
                     filter.talisman_tier = minMax
                 }
-                EnumFilters.MiscFilter.StoredExperience -> {
+                ViewFilters.MiscFilters.StoredExperience -> {
                     filter.stored_experience = minMax
                 }
-                EnumFilters.MiscFilter.StackSize -> {
+                ViewFilters.MiscFilters.StackSize -> {
                     filter.stack_size = minMax
                 }
             }
         }
-        if (item is EnumFilters.HeistFilter) {
+        if (item is ViewFilters.HeistFilters) {
             val filter = filters.heist_filters.filters
             when (item) {
-                EnumFilters.HeistFilter.AgilityLevel -> {
+                ViewFilters.HeistFilters.AgilityLevel -> {
                     filter.heist_agility = minMax
                 }
-                EnumFilters.HeistFilter.AreaLevel -> {
+                ViewFilters.HeistFilters.AreaLevel -> {
                     filter.area_level = minMax
                 }
-                EnumFilters.HeistFilter.BruteForceLevel -> {
+                ViewFilters.HeistFilters.BruteForceLevel -> {
                     filter.heist_brute_force = minMax
                 }
-                EnumFilters.HeistFilter.CounterThaumLevel -> {
+                ViewFilters.HeistFilters.CounterThaumLevel -> {
                     filter.heist_counter_thaumaturgy = minMax
                 }
-                EnumFilters.HeistFilter.DeceptionLevel -> {
+                ViewFilters.HeistFilters.DeceptionLevel -> {
                     filter.heist_deception = minMax
                 }
-                EnumFilters.HeistFilter.DemolitionLevel -> {
+                ViewFilters.HeistFilters.DemolitionLevel -> {
                     filter.heist_demolition = minMax
                 }
-                EnumFilters.HeistFilter.EngineeringLevel -> {
+                ViewFilters.HeistFilters.EngineeringLevel -> {
                     filter.heist_engineering = minMax
                 }
-                EnumFilters.HeistFilter.EscapeRoutesRevealed -> {
+                ViewFilters.HeistFilters.EscapeRoutesRevealed -> {
                     filter.heist_escape_routes = minMax
                 }
-                EnumFilters.HeistFilter.LockpickingLevel -> {
+                ViewFilters.HeistFilters.LockpickingLevel -> {
                     filter.heist_lockpicking = minMax
                 }
-                EnumFilters.HeistFilter.PerceptionLevel -> {
+                ViewFilters.HeistFilters.PerceptionLevel -> {
                     filter.heist_perception = minMax
                 }
-                EnumFilters.HeistFilter.RewardRoomsRevealed -> {
+                ViewFilters.HeistFilters.RewardRoomsRevealed -> {
                     filter.heist_reward_rooms = minMax
                 }
-                EnumFilters.HeistFilter.TotalEscapeRoutes -> {
+                ViewFilters.HeistFilters.TotalEscapeRoutes -> {
                     filter.heist_max_escape_routes = minMax
                 }
-                EnumFilters.HeistFilter.TotalRewardRooms -> {
+                ViewFilters.HeistFilters.TotalRewardRooms -> {
                     filter.heist_max_reward_rooms = minMax
                 }
-                EnumFilters.HeistFilter.TotalWings -> {
+                ViewFilters.HeistFilters.TotalWings -> {
                     filter.heist_max_wings = minMax
                 }
-                EnumFilters.HeistFilter.WingsRevealed -> {
+                ViewFilters.HeistFilters.WingsRevealed -> {
                     filter.heist_max_wings = minMax
                 }
-                EnumFilters.HeistFilter.TrapDisarmamentLevel -> {
+                ViewFilters.HeistFilters.TrapDisarmamentLevel -> {
                     filter.heist_trap_disarmament = minMax
                 }
             }

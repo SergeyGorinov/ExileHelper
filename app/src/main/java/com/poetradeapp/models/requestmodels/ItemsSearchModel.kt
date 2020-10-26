@@ -11,12 +11,26 @@ interface NullCheckable {
     fun isEmpty(): Boolean
 }
 
+interface Activatable {
+    var disabled: Boolean
+}
+
+interface Clearable {
+    @JsonIgnore
+    fun clearAll()
+
+    @ExperimentalCoroutinesApi
+    val isEmptyState: MutableStateFlow<Boolean>
+}
+
+@ExperimentalCoroutinesApi
 @JsonInclude
 data class ItemRequestModel(
     val query: ItemRequestModelFields.Query = ItemRequestModelFields.Query(),
     val sort: ItemRequestModelFields.Sorting = ItemRequestModelFields.Sorting()
 )
 
+@ExperimentalCoroutinesApi
 class ItemRequestModelFields {
     @JsonInclude
     data class Query(
@@ -93,10 +107,18 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class MapFilter(
-        var disabled: Boolean = true,
+        override var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         var filters: MapFilters = MapFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable, Clearable {
+
+        @ExperimentalCoroutinesApi
+        override val isEmptyState: MutableStateFlow<Boolean> = filters.isEmptyState
+
+        override fun clearAll() {
+            filters = MapFilters()
+        }
+
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }
@@ -104,10 +126,10 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class MiscFilter(
-        var disabled: Boolean = true,
+        override var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         val filters: MiscFilters = MiscFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }
@@ -115,10 +137,10 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class SocketFilter(
-        var disabled: Boolean = true,
+        override var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         val filters: SocketFilters = SocketFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }
@@ -126,10 +148,10 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class ArmourFilter(
-        var disabled: Boolean = true,
+        override var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         val filters: ArmourFilters = ArmourFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }
@@ -137,10 +159,10 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class WeaponFilter(
-        var disabled: Boolean = true,
+        override var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         val filters: WeaponFilters = WeaponFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }
@@ -148,10 +170,10 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class TypeFilter(
-        var disabled: Boolean = false,
+        override var disabled: Boolean = false,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         val filters: TypeFilters = TypeFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }
@@ -159,10 +181,10 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class ReqFilter(
-        var disabled: Boolean = true,
+        override var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         val filters: ReqFilters = ReqFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }
@@ -170,10 +192,10 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class TradeFilter(
-        var disabled: Boolean = true,
+        override var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         val filters: TradeFilters = TradeFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }
@@ -181,10 +203,10 @@ class ItemRequestModelFields {
 
     @JsonInclude
     data class HeistFilter(
-        var disabled: Boolean = true,
+        override var disabled: Boolean = true,
         @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AllFieldsNullFilter::class)
         val filters: HeistFilters = HeistFilters()
-    ) : NullCheckable {
+    ) : NullCheckable, Activatable {
         override fun isEmpty(): Boolean {
             return filters.isEmpty()
         }

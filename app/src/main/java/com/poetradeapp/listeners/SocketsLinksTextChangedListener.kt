@@ -2,12 +2,14 @@ package com.poetradeapp.listeners
 
 import android.text.Editable
 import android.text.TextWatcher
-import com.poetradeapp.models.EnumFilters
+import com.poetradeapp.models.enums.ViewFilters
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class SocketsLinksTextChangedListener(
-    private val item: EnumFilters.SocketFilters,
-    private val type: EnumFilters.SocketTypes,
+    private val item: ViewFilters.SocketFilters,
+    private val type: ViewFilters.SocketTypes,
     private val filters: ItemRequestModelFields.SocketFilters
 ) : TextWatcher {
 
@@ -16,26 +18,26 @@ class SocketsLinksTextChangedListener(
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
         val value = p0?.toString()?.toIntOrNull()
         val filter = when (item) {
-            EnumFilters.SocketFilters.Sockets -> filters.sockets
-            EnumFilters.SocketFilters.Links -> filters.links
+            ViewFilters.SocketFilters.Sockets -> filters.sockets
+            ViewFilters.SocketFilters.Links -> filters.links
         }
         when (type) {
-            EnumFilters.SocketTypes.R -> {
+            ViewFilters.SocketTypes.R -> {
                 filter.r = value
             }
-            EnumFilters.SocketTypes.G -> {
+            ViewFilters.SocketTypes.G -> {
                 filter.g = value
             }
-            EnumFilters.SocketTypes.B -> {
+            ViewFilters.SocketTypes.B -> {
                 filter.b = value
             }
-            EnumFilters.SocketTypes.W -> {
+            ViewFilters.SocketTypes.W -> {
                 filter.w = value
             }
-            EnumFilters.SocketTypes.MIN -> {
+            ViewFilters.SocketTypes.MIN -> {
                 filter.min = value
             }
-            EnumFilters.SocketTypes.MAX -> {
+            ViewFilters.SocketTypes.MAX -> {
                 filter.max = value
             }
         }

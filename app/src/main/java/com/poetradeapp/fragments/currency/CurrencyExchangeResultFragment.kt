@@ -15,7 +15,9 @@ import com.poetradeapp.activities.CurrencyExchangeActivity
 import com.poetradeapp.adapters.CurrencyResultAdapter
 import com.poetradeapp.models.viewmodels.CurrencyExchangeViewModel
 import kotlinx.android.synthetic.main.fragment_result.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class CurrencyExchangeResultFragment : Fragment() {
 
     private lateinit var viewModel: CurrencyExchangeViewModel

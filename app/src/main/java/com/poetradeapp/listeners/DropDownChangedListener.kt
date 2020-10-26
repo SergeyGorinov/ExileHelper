@@ -2,114 +2,114 @@ package com.poetradeapp.listeners
 
 import android.view.View
 import android.widget.AdapterView
-import com.poetradeapp.models.EnumFilters
-import com.poetradeapp.models.FiltersEnum
-import com.poetradeapp.models.GenericEnum
+import com.poetradeapp.models.enums.IEnum
+import com.poetradeapp.models.enums.IFilter
+import com.poetradeapp.models.enums.ViewFilters
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.DropDown
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.Filters
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 class DropDownChangedListener(
-    private val item: FiltersEnum,
+    private val item: IFilter,
     private val filters: Filters
 ) : AdapterView.OnItemClickListener {
     override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-        val value = DropDown((p0?.getItemAtPosition(p2) as GenericEnum?)?.id)
-        if (item is EnumFilters.TypeFilters) {
+        val value = DropDown((p0?.getItemAtPosition(p2) as IEnum?)?.id)
+        if (item is ViewFilters.TypeFilters) {
             val filter = filters.type_filters.filters
             when (item) {
-                EnumFilters.TypeFilters.Category -> {
+                ViewFilters.TypeFilters.Category -> {
                     filter.category = value
                 }
-                EnumFilters.TypeFilters.Rarity -> {
+                ViewFilters.TypeFilters.Rarity -> {
                     filter.rarity = value
                 }
             }
         }
-        if (item is EnumFilters.MapFilter) {
+        if (item is ViewFilters.MapFilters) {
             val filter = filters.map_filters.filters
             when (item) {
-                EnumFilters.MapFilter.ShapedMap -> {
+                ViewFilters.MapFilters.ShapedMap -> {
                     filter.mapShaped = value
                 }
-                EnumFilters.MapFilter.ElderMap -> {
+                ViewFilters.MapFilters.ElderMap -> {
                     filter.mapElder = value
                 }
-                EnumFilters.MapFilter.BlightedMap -> {
+                ViewFilters.MapFilters.BlightedMap -> {
                     filter.mapBlighted = value
                 }
-                EnumFilters.MapFilter.MapRegion -> {
+                ViewFilters.MapFilters.MapRegion -> {
                     filter.mapRegion = value
                 }
-                EnumFilters.MapFilter.MapSeries -> {
+                ViewFilters.MapFilters.MapSeries -> {
                     filter.mapSeries = value
                 }
             }
         }
-        if (item is EnumFilters.MiscFilter) {
+        if (item is ViewFilters.MiscFilters) {
             val filter = filters.misc_filters.filters
             when (item) {
-                EnumFilters.MiscFilter.GemQualityType -> {
+                ViewFilters.MiscFilters.GemQualityType -> {
                     filter.gem_alternate_quality = value
                 }
-                EnumFilters.MiscFilter.ShaperInfluence -> {
+                ViewFilters.MiscFilters.ShaperInfluence -> {
                     filter.shaper_item = value
                 }
-                EnumFilters.MiscFilter.ElderInfluence -> {
+                ViewFilters.MiscFilters.ElderInfluence -> {
                     filter.elder_item = value
                 }
-                EnumFilters.MiscFilter.CrusaderInfluence -> {
+                ViewFilters.MiscFilters.CrusaderInfluence -> {
                     filter.crusader_item = value
                 }
-                EnumFilters.MiscFilter.RedeemerInfluence -> {
+                ViewFilters.MiscFilters.RedeemerInfluence -> {
                     filter.redeemer_item = value
                 }
-                EnumFilters.MiscFilter.HunterInfluence -> {
+                ViewFilters.MiscFilters.HunterInfluence -> {
                     filter.hunter_item = value
                 }
-                EnumFilters.MiscFilter.WarlordInfluence -> {
+                ViewFilters.MiscFilters.WarlordInfluence -> {
                     filter.warlord_item = value
                 }
-                EnumFilters.MiscFilter.FracturedItem -> {
+                ViewFilters.MiscFilters.FracturedItem -> {
                     filter.fractured_item = value
                 }
-                EnumFilters.MiscFilter.SynthesisedItem -> {
+                ViewFilters.MiscFilters.SynthesisedItem -> {
                     filter.synthesised_item = value
                 }
-                EnumFilters.MiscFilter.AlternateArt -> {
+                ViewFilters.MiscFilters.AlternateArt -> {
                     filter.alternate_art = value
                 }
-                EnumFilters.MiscFilter.Identified -> {
+                ViewFilters.MiscFilters.Identified -> {
                     filter.identified = value
                 }
-                EnumFilters.MiscFilter.Corrupted -> {
+                ViewFilters.MiscFilters.Corrupted -> {
                     filter.corrupted = value
                 }
-                EnumFilters.MiscFilter.Mirrored -> {
+                ViewFilters.MiscFilters.Mirrored -> {
                     filter.mirrored = value
                 }
-                EnumFilters.MiscFilter.Crafted -> {
+                ViewFilters.MiscFilters.Crafted -> {
                     filter.crafted = value
                 }
-                EnumFilters.MiscFilter.Veiled -> {
+                ViewFilters.MiscFilters.Veiled -> {
                     filter.veiled = value
                 }
-                EnumFilters.MiscFilter.Enchanted -> {
+                ViewFilters.MiscFilters.Enchanted -> {
                     filter.enchanted = value
                 }
             }
         }
-        if (item is EnumFilters.TradeFilters) {
+        if (item is ViewFilters.TradeFilters) {
             val filter = filters.trade_filters.filters
             when (item) {
-                EnumFilters.TradeFilters.Listed -> {
+                ViewFilters.TradeFilters.Listed -> {
                     filter.indexed = value
                 }
-                EnumFilters.TradeFilters.SaleType -> {
+                ViewFilters.TradeFilters.SaleType -> {
                     filter.sale_type = value
                 }
-                EnumFilters.TradeFilters.BuyoutPrice -> {
+                ViewFilters.TradeFilters.BuyoutPrice -> {
                     filter.price.option = value.option
                 }
             }

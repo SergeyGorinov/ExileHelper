@@ -5,7 +5,9 @@ import androidx.fragment.app.FragmentActivity
 import com.poetradeapp.R
 import com.poetradeapp.fragments.LoaderFragment
 import com.poetradeapp.fragments.MainFragment
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class MainActivity : FragmentActivity() {
 
     private val mainFragment = MainFragment()

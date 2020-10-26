@@ -7,41 +7,24 @@ import android.view.View
 import android.widget.AdapterView
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import com.poetradeapp.PoeTradeApplication
+import coil.ImageLoader
 import com.poetradeapp.R
 import com.poetradeapp.adapters.ItemsSearchFieldAdapter
 import com.poetradeapp.fragments.PreloadFragment
 import com.poetradeapp.fragments.item.ItemExchangeMainFragment
 import com.poetradeapp.fragments.item.ItemsSearchResultFragment
-import com.poetradeapp.helpers.CoilImageLoader
-import com.poetradeapp.helpers.SocketsTemplateLoader
-import com.poetradeapp.helpers.StaticDataLoader
 import com.poetradeapp.http.RequestService
-import com.poetradeapp.models.ExchangeItemsResponseModel
+import com.poetradeapp.models.responsemodels.ExchangeItemsResponseModel
 import com.poetradeapp.models.viewmodels.ItemsSearchViewModel
+import com.poetradeapp.ui.SocketsTemplateLoader
 import kotlinx.android.synthetic.main.activity_item_search.*
 import kotlinx.android.synthetic.main.fragment_item_exchange_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import org.koin.android.ext.android.inject
 import retrofit2.await
-import java.util.*
-import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class ItemsSearchActivity : FragmentActivity() {
-
-    @Inject
-    lateinit var retrofit: RequestService
-
-    @Inject
-    lateinit var staticDataInstance: StaticDataLoader
-
-    @Inject
-    lateinit var imageLoader: CoilImageLoader
-
-    @Inject
-    lateinit var socketsTemplate: SocketsTemplateLoader
 
     private val viewModel by lazy {
         ViewModelProvider(
@@ -54,11 +37,13 @@ class ItemsSearchActivity : FragmentActivity() {
     private val itemExchangeMainFragment = ItemExchangeMainFragment()
     private val itemExchangeResultFragment = ItemsSearchResultFragment()
 
+    private val retrofit: RequestService by inject()
+    val imageLoader: ImageLoader by inject()
+    val socketsTemplate: SocketsTemplateLoader by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item_search)
-
-        (this.application as PoeTradeApplication).getDaggerComponent().inject(this)
 
         items_toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -116,22 +101,22 @@ class ItemsSearchActivity : FragmentActivity() {
                     return
                 GlobalScope.launch(Dispatchers.Default) {
                     founded.clear()
-                    staticDataInstance.getItemsData().forEach { items ->
-                        val includedItems = items.entries.filter { item ->
-                            item.text.toLowerCase(Locale.getDefault())
-                                .contains(
-                                    p0.toString().toLowerCase(
-                                        Locale.getDefault()
-                                    )
-                                )
-                        }
-                        if (includedItems.isNotEmpty()) {
-                            founded.add(Triple(0, items.label, null))
-                            includedItems.forEach {
-                                founded.add(Triple(1, it.type, it.name))
-                            }
-                        }
-                    }
+//                    staticDataInstance.getItemsData().forEach { items ->
+//                        val includedItems = items.entries.filter { item ->
+//                            item.text.toLowerCase(Locale.getDefault())
+//                                .contains(
+//                                    p0.toString().toLowerCase(
+//                                        Locale.getDefault()
+//                                    )
+//                                )
+//                        }
+//                        if (includedItems.isNotEmpty()) {
+//                            founded.add(Triple(0, items.label, null))
+//                            includedItems.forEach {
+//                                founded.add(Triple(1, it.type, it.name))
+//                            }
+//                        }
+//                    }
                 }.invokeOnCompletion {
                     GlobalScope.launch(Dispatchers.Main) {
                         toolbar_search_input.setAdapter(
@@ -230,7 +215,7 @@ class ItemsSearchActivity : FragmentActivity() {
 
     private suspend fun getItemsExchangeData(): List<ExchangeItemsResponseModel> {
         val baseFetchUrl = StringBuilder("/api/trade/fetch/")
-        val service = retrofit.getService()
+        val service = retrofit
 
         return withContext(Dispatchers.Default) {
             val resultList = service.getItemsExchangeList(

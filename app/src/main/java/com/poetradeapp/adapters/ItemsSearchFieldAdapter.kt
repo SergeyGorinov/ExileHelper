@@ -12,7 +12,7 @@ class ItemsSearchFieldAdapter(
     context: Context,
     resId: Int,
     tvId: Int,
-    private var items: List<Triple<Int, String, String?>>,
+    private var items: List<Triple<Int, String, String?>>
 ) : ArrayAdapter<Triple<Int, String, String?>>(context, resId, tvId, items) {
 
     override fun getItem(position: Int): Triple<Int, String, String?>? = items[position]

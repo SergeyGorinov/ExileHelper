@@ -36,4 +36,7 @@
     <string name="type_filters_item_rarity_text">Item Rarity</string>
     <string name="toolbar_search_item_hint">Search item</string>
     <string name="clear_filter_description">clearFilter</string>
+    <string name="socket_filter_header">Socket Filters</string>
+    <string name="trade_filter_header">Trade Filters</string>
+    <string name="type_filter_header">Type Filters</string>
 </resources>

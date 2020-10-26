@@ -1,7 +1,7 @@
 package com.poetradeapp.models.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.poetradeapp.models.ExchangeCurrencyResponseModel
+import com.poetradeapp.models.responsemodels.ExchangeCurrencyResponseModel
 
 class CurrencyExchangeViewModel : ViewModel() {
 

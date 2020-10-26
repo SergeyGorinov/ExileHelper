@@ -8,15 +8,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.poetradeapp.R
 import com.poetradeapp.activities.CurrencyExchangeActivity
-import com.poetradeapp.models.CurrencyViewData
 import com.poetradeapp.models.viewmodels.CurrencyExchangeViewModel
+import com.poetradeapp.models.viewmodels.StaticItemViewData
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class CardsGroupAdapter(
     private val fromWant: Boolean
 ) :
     RecyclerView.Adapter<CardsGroupViewHolder>() {
 
-    private var items: List<CurrencyViewData> = listOf()
+    private var items: List<StaticItemViewData> = listOf()
 
     override fun getItemCount() = items.size
 
@@ -41,7 +43,7 @@ class CardsGroupAdapter(
         holder.bind(items[position])
     }
 
-    fun updateItems(items: List<CurrencyViewData>) {
+    fun updateItems(items: List<StaticItemViewData>) {
         this.items = items
         notifyItemRangeChanged(0, items.size)
         notifyDataSetChanged()
@@ -56,7 +58,7 @@ class CardsGroupViewHolder(
     RecyclerView.ViewHolder(itemView) {
 
     private val button: Button = itemView.findViewById(R.id.cardButton)
-    private var item: CurrencyViewData? = null
+    private var item: StaticItemViewData? = null
 
     init {
         button.setOnClickListener { button ->
@@ -73,7 +75,7 @@ class CardsGroupViewHolder(
         }
     }
 
-    fun bind(item: CurrencyViewData) {
+    fun bind(item: StaticItemViewData) {
         this.item = item
 
         this.item?.let {

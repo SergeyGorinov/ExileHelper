@@ -3,6 +3,7 @@ package com.poetradeapp.ui
 import android.animation.ObjectAnimator
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 
 class SlideUpDownAnimator(private val view: View) {
 
@@ -10,6 +11,9 @@ class SlideUpDownAnimator(private val view: View) {
 
     fun slideDown() {
         view.visibility = View.VISIBLE
+        if (view is RecyclerView) {
+            view.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
+        }
 
         val height = preMeasuredHeight
         val valueAnimator = ObjectAnimator.ofInt(1, height)

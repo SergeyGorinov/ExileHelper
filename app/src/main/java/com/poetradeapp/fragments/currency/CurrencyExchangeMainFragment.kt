@@ -10,14 +10,15 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.poetradeapp.R
-import com.poetradeapp.activities.CurrencyExchangeActivity
+import com.poetradeapp.models.viewmodels.StaticGroupViewData
 import kotlinx.android.synthetic.main.fragment_currency_exchange_main.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class CurrencyExchangeViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
 
-    private val items =
-        (fragmentActivity as CurrencyExchangeActivity).staticDataInstance.getCurrencyData()
+    private val items = arrayListOf<StaticGroupViewData>()
 
     override fun getItemCount() = 2
 
@@ -30,6 +31,7 @@ class CurrencyExchangeViewPagerAdapter(fragmentActivity: FragmentActivity) :
     }
 }
 
+@ExperimentalCoroutinesApi
 class CurrencyExchangeMainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

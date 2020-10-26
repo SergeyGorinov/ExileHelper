@@ -16,12 +16,14 @@ import com.poetradeapp.flexbox.FlexDirection
 import com.poetradeapp.flexbox.FlexWrap
 import com.poetradeapp.flexbox.FlexboxLayoutManager
 import com.poetradeapp.flexbox.JustifyContent
-import com.poetradeapp.models.CurrencyGroupViewData
+import com.poetradeapp.models.viewmodels.StaticGroupViewData
 import com.poetradeapp.ui.SlideUpDownAnimator
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
 
+@ExperimentalCoroutinesApi
 class CurrencyListAdapter(
-    private val items: ArrayList<CurrencyGroupViewData>,
+    private val items: ArrayList<StaticGroupViewData>,
     private val fromWant: Boolean = false
 ) :
     RecyclerView.Adapter<CurrencyListViewHolder>() {
@@ -39,6 +41,7 @@ class CurrencyListAdapter(
     override fun getItemCount() = items.size
 }
 
+@ExperimentalCoroutinesApi
 class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.ViewHolder(itemView) {
     private val button: MaterialButton = itemView.findViewById(R.id.currencyGroupButton)
     private val currencyGroup: RecyclerView = itemView.findViewById(R.id.currencyGroup)
@@ -70,7 +73,7 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
         }
     }
 
-    fun bind(group: CurrencyGroupViewData, fromWant: Boolean) {
+    fun bind(group: StaticGroupViewData, fromWant: Boolean) {
         when (group.id) {
             "Cards" -> {
                 val adapter = CardsGroupAdapter(fromWant)
@@ -98,7 +101,7 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
                     override fun afterTextChanged(p0: Editable?) {
                         if (p0 != null && p0.length > 2) {
                             val newItems =
-                                group.currencies.filter { f ->
+                                group.staticItems.filter { f ->
                                     f.label
                                         .toLowerCase(Locale.getDefault())
                                         .contains(
@@ -140,7 +143,7 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
                     override fun afterTextChanged(p0: Editable?) {
                         if (p0 != null && p0.length > 2) {
                             val newItems =
-                                group.currencies.filter { f ->
+                                group.staticItems.filter { f ->
                                     f.label
                                         .toLowerCase(Locale.getDefault())
                                         .contains(p0.toString().toLowerCase(Locale.getDefault()))
@@ -152,7 +155,7 @@ class CurrencyListViewHolder(itemView: View, context: Context) : RecyclerView.Vi
                 })
             }
             else -> {
-                val adapter = CurrencyGroupAdapter(group.currencies, fromWant)
+                val adapter = CurrencyGroupAdapter(group.staticItems, fromWant)
                 currencyGroup.setItemViewCacheSize(100)
                 currencyGroup.adapter = adapter
             }

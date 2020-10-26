@@ -1,4 +1,4 @@
-package com.poetradeapp.helpers
+package com.poetradeapp.ui
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -8,12 +8,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.poetradeapp.R
-import com.poetradeapp.models.Socket
-import javax.inject.Inject
-import javax.inject.Singleton
+import com.poetradeapp.models.responsemodels.Socket
 
-@Singleton
-class SocketsTemplateLoader @Inject constructor(private val context: Context) {
+class SocketsTemplateLoader(private val context: Context) {
 
     private val redSocket: Drawable? = ContextCompat.getDrawable(context, R.drawable.red_socket)
     private val greenSocket: Drawable? =

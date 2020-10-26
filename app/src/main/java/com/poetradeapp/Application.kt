@@ -1,57 +1,68 @@
 package com.poetradeapp
 
 import android.app.Application
-import android.content.Context
-import com.poetradeapp.activities.CurrencyExchangeActivity
-import com.poetradeapp.activities.ItemsSearchActivity
-import com.poetradeapp.adapters.CurrencyGroupViewHolder
-import com.poetradeapp.fragments.LoaderFragment
-import com.poetradeapp.fragments.MainFragment
-import dagger.Component
-import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
+import androidx.room.Room
+import coil.ImageLoader
+import coil.util.CoilUtils
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.poetradeapp.dl.DatabaseRepository
+import com.poetradeapp.http.RequestService
+import com.poetradeapp.ui.SocketsTemplateLoader
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import okhttp3.OkHttpClient
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+import retrofit2.Retrofit
+import retrofit2.converter.jackson.JacksonConverterFactory
 
-@Module
-class ContextProvider constructor(private val context: Context) {
-    @Provides
-    @Singleton
-    fun context(): Context {
-        return context
-    }
-}
-
-@Module
-class BaseUriProvider {
-    @Provides
-    @Singleton
-    fun baseUri(): String {
-        return "https://www.pathofexile.com/"
-    }
-}
-
-@Component(modules = [ContextProvider::class, BaseUriProvider::class])
-@Singleton
-interface ApplicationComponent {
-    fun inject(target: LoaderFragment)
-    fun inject(target: MainFragment)
-    fun inject(target: CurrencyExchangeActivity)
-    fun inject(target: ItemsSearchActivity)
-    fun inject(target: CurrencyGroupViewHolder)
-}
-
+@ExperimentalCoroutinesApi
 class PoeTradeApplication : Application() {
+    private val coilModule = module {
+        single {
+            OkHttpClient.Builder()
+                .cache(CoilUtils.createDefaultCache(androidContext()))
+                .build()
+        }
+        single {
+            ImageLoader
+                .Builder(androidContext())
+                .okHttpClient { get() }
+                .build()
+        }
+    }
 
-    private lateinit var applicationComponent: ApplicationComponent
+    private val retrofitModule = module {
+        factory {
+            Retrofit.Builder()
+                .baseUrl("https://www.pathofexile.com/")
+                .addConverterFactory(JacksonConverterFactory.create(jacksonObjectMapper()))
+                .build()
+                .create(RequestService::class.java) as RequestService
+        }
+    }
+
+    private val socketTemplateModule = module {
+        single {
+            SocketsTemplateLoader(androidContext())
+        }
+    }
+
+    private val RepositoryModule = module {
+        factory {
+            Room.databaseBuilder(
+                androidContext(),
+                DatabaseRepository::class.java,
+                "data.db"
+            ).build()
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
-
-        applicationComponent = DaggerApplicationComponent
-            .builder()
-            .contextProvider(ContextProvider(this))
-            .build()
+        startKoin {
+            androidContext(this@PoeTradeApplication)
+            modules(listOf(coilModule, retrofitModule, socketTemplateModule, RepositoryModule))
+        }
     }
-
-    fun getDaggerComponent() = applicationComponent
 }

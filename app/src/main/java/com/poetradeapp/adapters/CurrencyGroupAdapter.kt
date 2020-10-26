@@ -9,14 +9,16 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.request.ImageRequest
 import com.poetradeapp.R
 import com.poetradeapp.activities.CurrencyExchangeActivity
-import com.poetradeapp.models.CurrencyViewData
 import com.poetradeapp.models.viewmodels.CurrencyExchangeViewModel
+import com.poetradeapp.models.viewmodels.StaticItemViewData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class CurrencyGroupAdapter(
-    private val items: List<CurrencyViewData>,
+    private val items: List<StaticItemViewData>,
     private val fromWant: Boolean
 ) :
     RecyclerView.Adapter<CurrencyGroupViewHolder>() {
@@ -45,6 +47,7 @@ class CurrencyGroupAdapter(
     override fun getItemCount() = items.size
 }
 
+@ExperimentalCoroutinesApi
 class CurrencyGroupViewHolder(
     itemView: View,
     private val viewModel: CurrencyExchangeViewModel,
@@ -55,7 +58,7 @@ class CurrencyGroupViewHolder(
     private val button: ImageButton = itemView.findViewById(R.id.currencyButton)
     private val imageLoader = (itemView.context as CurrencyExchangeActivity).imageLoader
 
-    fun bind(item: CurrencyViewData) {
+    fun bind(item: StaticItemViewData) {
 
         button.setOnClickListener { button ->
             button.isSelected = !button.isSelected
@@ -75,7 +78,7 @@ class CurrencyGroupViewHolder(
                         .data("https://www.pathofexile.com$link")
                         .size(32, 32)
                         .build()
-                    item.drawable = imageLoader.getImageLoader().execute(request).drawable
+                    item.drawable = imageLoader.execute(request).drawable
                 }.invokeOnCompletion {
                     GlobalScope.launch(Dispatchers.Main) {
                         button.setImageDrawable(item.drawable)

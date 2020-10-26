@@ -2,12 +2,15 @@ package com.poetradeapp.models.requestmodels
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.poetradeapp.models.requestmodels.ItemRequestModelFields.Status
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @JsonInclude
 data class ExchangeCurrencyRequestModel(
     val exchange: Exchange = Exchange()
 )
 
+@ExperimentalCoroutinesApi
 @JsonInclude
 data class Exchange(
     val status: Status = Status("online"),
@@ -24,5 +27,9 @@ data class Exchange(
 class FullfilableFilter {
     override fun equals(other: Any?): Boolean {
         return other != null
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
     }
 }

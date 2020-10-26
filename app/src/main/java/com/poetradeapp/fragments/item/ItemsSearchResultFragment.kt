@@ -15,7 +15,9 @@ import com.poetradeapp.activities.ItemsSearchActivity
 import com.poetradeapp.adapters.ItemsResultAdapter
 import com.poetradeapp.models.viewmodels.ItemsSearchViewModel
 import kotlinx.android.synthetic.main.fragment_result.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class ItemsSearchResultFragment : Fragment() {
 
     private lateinit var viewModel: ItemsSearchViewModel

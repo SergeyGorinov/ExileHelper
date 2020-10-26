@@ -7,36 +7,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.poetradeapp.PoeTradeApplication
 import com.poetradeapp.R
 import com.poetradeapp.activities.MainActivity
-import com.poetradeapp.helpers.CoilImageLoader
-import com.poetradeapp.helpers.StaticDataLoader
+import com.poetradeapp.dl.DatabaseRepository
 import com.poetradeapp.http.RequestService
-import com.poetradeapp.models.CurrencyGroupViewData
-import com.poetradeapp.models.CurrencyViewData
+import com.poetradeapp.models.HashData
+import com.poetradeapp.models.database.*
+import com.poetradeapp.models.enums.HashType
 import kotlinx.android.synthetic.main.fragment_loader.*
 import kotlinx.coroutines.*
+import org.koin.android.ext.android.inject
 import retrofit2.await
-import javax.inject.Inject
+import java.io.File
 import kotlin.system.exitProcess
 
 @ExperimentalCoroutinesApi
 class LoaderFragment : Fragment() {
 
-    @Inject
-    lateinit var imageLoader: CoilImageLoader
-
-    @Inject
-    lateinit var retrofit: RequestService
-
-    @Inject
-    lateinit var staticDataInstance: StaticDataLoader
+    private val repository: DatabaseRepository by inject()
+    private val retrofit: RequestService by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        (requireActivity().application as PoeTradeApplication).getDaggerComponent().inject(this)
 
         val transitionInflanter = TransitionInflater.from(context)
         enterTransition = transitionInflanter.inflateTransition(R.transition.fragment_fade)
@@ -54,7 +46,7 @@ class LoaderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         loaderProgressBar.progress = 0
 
-        val handler = CoroutineExceptionHandler { _, exception ->
+        val handler = CoroutineExceptionHandler { _, _ ->
             requireActivity().runOnUiThread {
                 AlertDialog.Builder(requireContext()).setTitle("Error")
                     .setMessage("Error during get remote data")
@@ -63,7 +55,7 @@ class LoaderFragment : Fragment() {
         }
 
         GlobalScope.launch(handler) {
-            downloadData()
+            checkForUpdate()
         }.invokeOnCompletion {
             GlobalScope.launch(Dispatchers.Main) {
                 (context as MainActivity).closeLoader()
@@ -71,77 +63,136 @@ class LoaderFragment : Fragment() {
         }
     }
 
-    private suspend fun downloadData() {
+    private suspend fun checkForUpdate() {
+        val hashTableFile = File(requireContext().dataDir, "hashTable")
+
         val leaguesDataResponse =
-            retrofit.getService().getLeagueData("api/trade/data/leagues").await()
+            retrofit.getLeagueData("api/trade/data/leagues").await()
         val itemsDataResponse =
-            retrofit.getService().getItemsData("api/trade/data/items").await()
+            retrofit.getItemsData("api/trade/data/items").await()
         val statsDataResponse =
-            retrofit.getService().getStatsData("api/trade/data/stats").await()
-        val currenciesDataResponse =
-            retrofit.getService().getCurrencyData("api/trade/data/static").await()
+            retrofit.getStatsData("api/trade/data/stats").await()
+        val staticDataResponse =
+            retrofit.getStaticData("api/trade/data/static").await()
 
-        val allEntriesCount =
-            leaguesDataResponse.result.count() +
-                    itemsDataResponse.result.sumBy { sum -> sum.entries.count() } +
-                    statsDataResponse.result.count() +
-                    currenciesDataResponse.result.sumBy { sum -> sum.entries.count() }
-
-        val mapsGroup = CurrencyGroupViewData("Maps", "All Maps")
-
-        withContext(Dispatchers.Main) {
-            loaderProgressBar.max = allEntriesCount
-        }
-
-        leaguesDataResponse.result.forEach { league ->
-            staticDataInstance.addLeagueData(league)
-            withContext(Dispatchers.Main) {
-                loaderProgressBar.incrementProgressBy(1)
-            }
-        }
-
-        itemsDataResponse.result.forEach { items ->
-            staticDataInstance.addItemsData(items)
-            withContext(Dispatchers.Main) {
-                loaderProgressBar.incrementProgressBy(1)
-            }
-        }
-
-        statsDataResponse.result.forEach { stats ->
-            staticDataInstance.addStatsData(stats)
-            withContext(Dispatchers.Main) {
-                loaderProgressBar.incrementProgressBy(1)
-            }
-        }
-
-        currenciesDataResponse.result.forEach { currencyGroupData ->
-            val currencies = arrayListOf<CurrencyViewData>()
-            currencyGroupData.entries.forEach { currencyData ->
-                val currency = CurrencyViewData(
-                    currencyData.id,
-                    currencyData.text,
-                    currencyData.image,
-                    currencyGroupData.label
-                )
-                currencies.add(currency)
-                withContext(Dispatchers.Main) {
-                    loaderProgressBar.incrementProgressBy(1)
+        val hashData = if (!hashTableFile.exists()) {
+            hashTableFile.createNewFile()
+            mutableListOf()
+        } else {
+            hashTableFile.readLines().map {
+                val data = it.split('=')
+                val type = when (data[0]) {
+                    HashType.LeaguesHash.text -> HashType.LeaguesHash
+                    HashType.ItemsHash.text -> HashType.ItemsHash
+                    HashType.StatsHash.text -> HashType.StatsHash
+                    HashType.StaticItemsHash.text -> HashType.StaticItemsHash
+                    else -> HashType.LeaguesHash
                 }
+                HashData(type, data[1].toInt(), false)
+            }.toMutableList()
+        }
+
+        HashType.values().forEach { type ->
+            val hashCode = when (type) {
+                HashType.LeaguesHash -> leaguesDataResponse.hashCode()
+                HashType.ItemsHash -> itemsDataResponse.hashCode()
+                HashType.StatsHash -> statsDataResponse.hashCode()
+                HashType.StaticItemsHash -> staticDataResponse.hashCode()
             }
-            if (currencies.size > 0) {
-                if (currencyGroupData.id.startsWith("Maps")) {
-                    mapsGroup.currencies.addAll(currencies)
-                } else {
-                    staticDataInstance.addCurrencyData(
-                        CurrencyGroupViewData(
-                            currencyGroupData.id,
-                            currencyGroupData.label,
-                            currencies
-                        )
+            hashData.singleOrNull { s -> s.type == type }?.let {
+                if (it.hash != hashCode) {
+                    it.hash = hashCode
+                    it.isUpdated = true
+                }
+            } ?: run {
+                hashData.add(
+                    HashData(
+                        type,
+                        hashCode,
+                        true
                     )
-                }
+                )
             }
         }
-        staticDataInstance.addCurrencyData(mapsGroup)
+
+        if (hashData.any { a -> a.isUpdated }) {
+            hashData.filter { f -> f.isUpdated }.forEach {
+                when (it.type) {
+                    HashType.LeaguesHash -> {
+                        leaguesDataResponse.result.map { m ->
+                            LeagueModel(
+                                id = m.id,
+                                label = m.text
+                            )
+                        }.forEach { league ->
+                            repository.dao().insert(league)
+                        }
+                    }
+                    HashType.ItemsHash -> {
+                        itemsDataResponse.result.map { m ->
+                            ItemGroupWithItems(
+                                ItemGroupModel(label = m.label),
+                                m.entries.map { item ->
+                                    ItemModel(
+                                        type = item.type,
+                                        text = item.text,
+                                        name = item.name,
+                                        disc = item.disc,
+                                        unique = item.flags?.unique,
+                                        prophecy = item.flags?.prophecy
+                                    )
+                                }
+                            )
+                        }.forEach { group ->
+                            repository.dao().insert(group)
+                        }
+                    }
+                    HashType.StatsHash -> {
+                        statsDataResponse.result.map { m ->
+                            StatGroupWithItems(
+                                StatGroupModel(label = m.label),
+                                m.entries.map { item ->
+                                    StatModel(
+                                        id = item.id,
+                                        text = item.text,
+                                        type = item.type,
+                                        options = item.option?.options?.map { option ->
+                                            Option(
+                                                option.id,
+                                                option.text
+                                            )
+                                        }
+                                    )
+                                }
+                            )
+                        }.forEach { group ->
+                            repository.dao().insert(group)
+                        }
+                    }
+                    HashType.StaticItemsHash -> {
+                        staticDataResponse.result.map { m ->
+                            StaticGroupWithItems(
+                                StaticGroupModel(
+                                    id = m.id,
+                                    label = m.label
+                                ),
+                                m.entries.map { item ->
+                                    StaticItemModel(
+                                        id = item.id,
+                                        label = item.text,
+                                        image = item.image
+                                    )
+                                }
+                            )
+                        }.forEach { group ->
+                            repository.dao().insert(group)
+                        }
+                    }
+                }
+            }
+            hashTableFile.writeText(hashData.joinToString("\n") {
+                "${it.type.text}=${it.hash}"
+            })
+        }
     }
 }

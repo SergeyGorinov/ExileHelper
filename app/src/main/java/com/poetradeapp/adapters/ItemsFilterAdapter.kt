@@ -14,15 +14,19 @@ import com.poetradeapp.R
 import com.poetradeapp.activities.ItemsSearchActivity
 import com.poetradeapp.listeners.DropDownChangedListener
 import com.poetradeapp.listeners.MinMaxTextChangedListener
-import com.poetradeapp.models.EnumFilters
-import com.poetradeapp.models.Enums
-import com.poetradeapp.models.FiltersEnum
+import com.poetradeapp.models.enums.Dropdowns
+import com.poetradeapp.models.enums.IFilter
+import com.poetradeapp.models.enums.ViewFilters
+import com.poetradeapp.models.enums.getValuesByType
 import com.poetradeapp.models.viewmodels.ItemsSearchViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
-class ItemFilterAdapter<T>(private val items: Array<T>) :
+class ItemFilterAdapter(item: ViewFilters.AllFilters) :
     RecyclerView.Adapter<ItemFilterRecyclerViewVH>() {
+
+    private val items = item.getValuesByType()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemFilterRecyclerViewVH {
         val activity = parent.context as ItemsSearchActivity
 
@@ -39,7 +43,7 @@ class ItemFilterAdapter<T>(private val items: Array<T>) :
     }
 
     override fun onBindViewHolder(holder: ItemFilterRecyclerViewVH, position: Int) {
-        holder.bind(items[position] as FiltersEnum)
+        holder.bind(items[position] as IFilter)
     }
 
     override fun getItemCount() = items.size
@@ -60,7 +64,7 @@ class ItemFilterRecyclerViewVH(
         filterDropDownLayout.findViewById(R.id.filterDropDown)
     private val filters = model.getItemRequestData().query.filters
 
-    fun bind(item: FiltersEnum) {
+    fun bind(item: IFilter) {
         filterName.text = item.text
         if (item.isDropDown) {
             filterMinMax.visibility = View.GONE
@@ -89,98 +93,98 @@ class ItemFilterRecyclerViewVH(
         }
     }
 
-    private fun setItems(item: FiltersEnum) {
-        if (item is EnumFilters.MapFilter) {
+    private fun setItems(item: IFilter) {
+        if (item is ViewFilters.MapFilters) {
             when (item) {
-                EnumFilters.MapFilter.ShapedMap,
-                EnumFilters.MapFilter.ElderMap,
-                EnumFilters.MapFilter.BlightedMap -> {
+                ViewFilters.MapFilters.ShapedMap,
+                ViewFilters.MapFilters.ElderMap,
+                ViewFilters.MapFilters.BlightedMap -> {
                     filterDropDown.setAdapter(
                         DropDownAdapter(
                             itemView.context,
                             R.layout.dropdown_item,
                             R.id.itemText,
-                            Enums.YesNo.values().toList()
+                            Dropdowns.YesNo.values().toList()
                         )
                     )
-                    filterDropDown.setText(Enums.YesNo.Any.text, false)
+                    filterDropDown.setText(Dropdowns.YesNo.Any.text, false)
                 }
-                EnumFilters.MapFilter.MapRegion -> {
+                ViewFilters.MapFilters.MapRegion -> {
                     filterDropDown.setAdapter(
                         DropDownAdapter(
                             itemView.context,
                             R.layout.dropdown_item,
                             R.id.itemText,
-                            Enums.MapRegion.values().toList()
+                            Dropdowns.MapRegion.values().toList()
                         )
                     )
-                    filterDropDown.setText(Enums.MapRegion.Any.text, false)
+                    filterDropDown.setText(Dropdowns.MapRegion.Any.text, false)
                 }
-                EnumFilters.MapFilter.MapSeries -> {
+                ViewFilters.MapFilters.MapSeries -> {
                     filterDropDown.setAdapter(
                         DropDownAdapter(
                             itemView.context,
                             R.layout.dropdown_item,
                             R.id.itemText,
-                            Enums.MapSeries.values().toList()
+                            Dropdowns.MapSeries.values().toList()
                         )
                     )
-                    filterDropDown.setText(Enums.MapSeries.Any.text, false)
+                    filterDropDown.setText(Dropdowns.MapSeries.Any.text, false)
                 }
             }
         }
-        if (item is EnumFilters.MiscFilter) {
+        if (item is ViewFilters.MiscFilters) {
             when (item) {
-                EnumFilters.MiscFilter.GemQualityType -> {
+                ViewFilters.MiscFilters.GemQualityType -> {
                     filterDropDown.setAdapter(
                         DropDownAdapter(
                             itemView.context,
                             R.layout.dropdown_item,
                             R.id.itemText,
-                            Enums.GemQualityType.values().toList()
+                            Dropdowns.GemQualityType.values().toList()
                         )
                     )
-                    filterDropDown.setText(Enums.GemQualityType.Any.text, false)
+                    filterDropDown.setText(Dropdowns.GemQualityType.Any.text, false)
                 }
-                EnumFilters.MiscFilter.ShaperInfluence,
-                EnumFilters.MiscFilter.ElderInfluence,
-                EnumFilters.MiscFilter.CrusaderInfluence,
-                EnumFilters.MiscFilter.RedeemerInfluence,
-                EnumFilters.MiscFilter.HunterInfluence,
-                EnumFilters.MiscFilter.WarlordInfluence,
-                EnumFilters.MiscFilter.FracturedItem,
-                EnumFilters.MiscFilter.SynthesisedItem,
-                EnumFilters.MiscFilter.AlternateArt,
-                EnumFilters.MiscFilter.Identified,
-                EnumFilters.MiscFilter.Corrupted,
-                EnumFilters.MiscFilter.Mirrored,
-                EnumFilters.MiscFilter.Crafted,
-                EnumFilters.MiscFilter.Veiled,
-                EnumFilters.MiscFilter.Enchanted -> {
+                ViewFilters.MiscFilters.ShaperInfluence,
+                ViewFilters.MiscFilters.ElderInfluence,
+                ViewFilters.MiscFilters.CrusaderInfluence,
+                ViewFilters.MiscFilters.RedeemerInfluence,
+                ViewFilters.MiscFilters.HunterInfluence,
+                ViewFilters.MiscFilters.WarlordInfluence,
+                ViewFilters.MiscFilters.FracturedItem,
+                ViewFilters.MiscFilters.SynthesisedItem,
+                ViewFilters.MiscFilters.AlternateArt,
+                ViewFilters.MiscFilters.Identified,
+                ViewFilters.MiscFilters.Corrupted,
+                ViewFilters.MiscFilters.Mirrored,
+                ViewFilters.MiscFilters.Crafted,
+                ViewFilters.MiscFilters.Veiled,
+                ViewFilters.MiscFilters.Enchanted -> {
                     filterDropDown.setAdapter(
                         DropDownAdapter(
                             itemView.context,
                             R.layout.dropdown_item,
                             R.id.itemText,
-                            Enums.YesNo.values().toList()
+                            Dropdowns.YesNo.values().toList()
                         )
                     )
-                    filterDropDown.setText(Enums.YesNo.Any.text, false)
+                    filterDropDown.setText(Dropdowns.YesNo.Any.text, false)
                 }
             }
         }
-        if (item is EnumFilters.HeistFilter) {
+        if (item is ViewFilters.HeistFilters) {
             when (item) {
-                EnumFilters.HeistFilter.ContractObjectiveValue -> {
+                ViewFilters.HeistFilters.ContractObjectiveValue -> {
                     filterDropDown.setAdapter(
                         DropDownAdapter(
                             itemView.context,
                             R.layout.dropdown_item,
                             R.id.itemText,
-                            Enums.ContractObjectiveValue.values().toList()
+                            Dropdowns.ContractObjectiveValue.values().toList()
                         )
                     )
-                    filterDropDown.setText(Enums.ContractObjectiveValue.Any.text, false)
+                    filterDropDown.setText(Dropdowns.ContractObjectiveValue.Any.text, false)
                 }
             }
         }

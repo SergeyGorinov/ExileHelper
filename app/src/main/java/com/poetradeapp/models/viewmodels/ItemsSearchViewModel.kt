@@ -1,9 +1,11 @@
 package com.poetradeapp.models.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.poetradeapp.models.ExchangeItemsResponseModel
 import com.poetradeapp.models.requestmodels.ItemRequestModel
+import com.poetradeapp.models.responsemodels.ExchangeItemsResponseModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class ItemsSearchViewModel : ViewModel() {
 
     private val itemRequestData = ItemRequestModel()

@@ -2,12 +2,13 @@ buildscript {
     ext.gradle_version = '4.1.0'
     ext.kotlin_version = '1.4.10'
     ext.kotlinx_version = '1.3.9'
-    ext.dagger_version = '2.28.3'
     ext.material_library_version = '1.2.1-LOCAL'
-    ext.constraintlayout_version = '2.0.1'
+    ext.constraintlayout_version = '2.0.2'
     ext.jackson_version = '2.11.2'
     ext.retrofit_version = '2.9.0'
     ext.coil_version = '1.0.0-rc3'
+    ext.koin_version = '2.2.0-rc-3'
+    ext.room_version = '2.2.5'
 
     repositories {
         google()

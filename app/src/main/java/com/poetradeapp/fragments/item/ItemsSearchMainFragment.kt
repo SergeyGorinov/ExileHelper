@@ -11,7 +11,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.poetradeapp.R
 import kotlinx.android.synthetic.main.fragment_item_exchange_main.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class ItemsSearchViewPagerAdapter(fragmentActivity: FragmentActivity) :
     FragmentStateAdapter(fragmentActivity) {
 
@@ -25,6 +27,7 @@ class ItemsSearchViewPagerAdapter(fragmentActivity: FragmentActivity) :
     }
 }
 
+@ExperimentalCoroutinesApi
 class ItemExchangeMainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

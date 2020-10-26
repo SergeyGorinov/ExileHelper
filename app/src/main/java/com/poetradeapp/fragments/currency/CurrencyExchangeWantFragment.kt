@@ -10,10 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.poetradeapp.R
 import com.poetradeapp.activities.CurrencyExchangeActivity
 import com.poetradeapp.adapters.CurrencyListAdapter
-import com.poetradeapp.models.CurrencyGroupViewData
+import com.poetradeapp.models.viewmodels.StaticGroupViewData
 import kotlinx.android.synthetic.main.fragment_currency_exchange_want.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class CurrencyExchangeWantFragment(items: ArrayList<CurrencyGroupViewData>) : Fragment() {
+@ExperimentalCoroutinesApi
+class CurrencyExchangeWantFragment(items: ArrayList<StaticGroupViewData>) : Fragment() {
 
     private val listAdapter = CurrencyListAdapter(items, true)
     private val listLayoutManager = LinearLayoutManager(context)

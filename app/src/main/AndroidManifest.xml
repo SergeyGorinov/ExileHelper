@@ -16,7 +16,9 @@
         <activity
             android:name="com.poetradeapp.activities.CurrencyExchangeActivity"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name="com.poetradeapp.activities.ItemsSearchActivity" />
+        <activity
+            android:name="com.poetradeapp.activities.ItemsSearchActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name="com.poetradeapp.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

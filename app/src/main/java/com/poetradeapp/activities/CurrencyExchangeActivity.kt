@@ -4,37 +4,24 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
-import com.poetradeapp.PoeTradeApplication
+import coil.ImageLoader
 import com.poetradeapp.R
 import com.poetradeapp.fragments.PreloadFragment
 import com.poetradeapp.fragments.currency.CurrencyExchangeMainFragment
 import com.poetradeapp.fragments.currency.CurrencyExchangeResultFragment
-import com.poetradeapp.helpers.CoilImageLoader
-import com.poetradeapp.helpers.StaticDataLoader
 import com.poetradeapp.http.RequestService
-import com.poetradeapp.models.ExchangeCurrencyResponseModel
 import com.poetradeapp.models.requestmodels.Exchange
 import com.poetradeapp.models.requestmodels.ExchangeCurrencyRequestModel
+import com.poetradeapp.models.responsemodels.ExchangeCurrencyResponseModel
 import com.poetradeapp.models.viewmodels.CurrencyExchangeViewModel
 import kotlinx.android.synthetic.main.activity_currency_exchange.*
 import kotlinx.android.synthetic.main.fragment_currency_exchange_main.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import org.koin.android.ext.android.get
 import retrofit2.await
-import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class CurrencyExchangeActivity : FragmentActivity() {
-
-    @Inject
-    lateinit var retrofit: RequestService
-
-    @Inject
-    lateinit var staticDataInstance: StaticDataLoader
-
-    @Inject
-    lateinit var imageLoader: CoilImageLoader
 
     private val viewModel by lazy {
         ViewModelProvider(
@@ -47,11 +34,15 @@ class CurrencyExchangeActivity : FragmentActivity() {
     private val currencyExchangeMainFragment = CurrencyExchangeMainFragment()
     private val currencyExchangeResultFragment = CurrencyExchangeResultFragment()
 
+    private lateinit var retrofit: RequestService
+    lateinit var imageLoader: ImageLoader
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_currency_exchange)
 
-        (this.application as PoeTradeApplication).getDaggerComponent().inject(this)
+        retrofit = get()
+        imageLoader = get()
 
         currency_toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -105,10 +96,9 @@ class CurrencyExchangeActivity : FragmentActivity() {
 
     private suspend fun getCurrencyExchangeData(): List<ExchangeCurrencyResponseModel> {
         val baseFetchUrl = StringBuilder("/api/trade/fetch/")
-        val service = retrofit.getService()
 
         return withContext(Dispatchers.Default) {
-            val resultList = service.getCurrencyExchangeList(
+            val resultList = retrofit.getCurrencyExchangeList(
                 "api/trade/exchange/Heist", ExchangeCurrencyRequestModel(
                     Exchange(
                         want = viewModel.getWantSelectedCurrencies(),
@@ -126,7 +116,7 @@ class CurrencyExchangeActivity : FragmentActivity() {
                 baseFetchUrl.append("?query=${resultList.id}")
                 baseFetchUrl.append("&exchange")
 
-                service.getCurrencyExchangeResponse(baseFetchUrl.toString()).await().result
+                retrofit.getCurrencyExchangeResponse(baseFetchUrl.toString()).await().result
             }
         }
     }

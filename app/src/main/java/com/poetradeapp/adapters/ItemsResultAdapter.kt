@@ -10,11 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.request.ImageRequest
 import com.poetradeapp.R
 import com.poetradeapp.activities.ItemsSearchActivity
-import com.poetradeapp.models.ExchangeItemsResponseModel
+import com.poetradeapp.models.responsemodels.ExchangeItemsResponseModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+@ExperimentalCoroutinesApi
 class ItemsResultAdapter(private val items: List<ExchangeItemsResponseModel>) :
     RecyclerView.Adapter<ItemsResultViewHolder>() {
 
@@ -36,6 +38,7 @@ class ItemsResultAdapter(private val items: List<ExchangeItemsResponseModel>) :
     override fun getItemCount() = items.size
 }
 
+@ExperimentalCoroutinesApi
 class ItemsResultViewHolder(
     itemView: View,
     activity: ItemsSearchActivity,
@@ -61,7 +64,7 @@ class ItemsResultViewHolder(
                 .allowHardware(false)
                 .build()
             val dpi = itemView.context.resources.displayMetrics.density
-            imageLoader.getImageLoader().execute(request).drawable?.let {
+            imageLoader.execute(request).drawable?.let {
                 GlobalScope.launch(Dispatchers.Main) {
                     itemImage.minimumWidth = (it.intrinsicWidth * dpi).toInt()
                     itemImage.minimumHeight = (it.intrinsicHeight * dpi).toInt()

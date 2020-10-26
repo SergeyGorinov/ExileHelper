@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.TextView
-import com.poetradeapp.models.GenericEnum
+import com.poetradeapp.models.enums.IEnum
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -15,22 +15,22 @@ class DropDownAdapter(
     context: Context,
     private val resId: Int,
     private val tvId: Int,
-    items: List<GenericEnum>
-) : ArrayAdapter<GenericEnum>(context, resId, tvId, items) {
+    items: List<IEnum>
+) : ArrayAdapter<IEnum>(context, resId, tvId, items) {
 
-    internal val suggestions = ArrayList<GenericEnum>()
+    internal val suggestions = ArrayList<IEnum>()
     internal val itemsAll = ArrayList(items)
 
     private val filter = object : Filter() {
         override fun convertResultToString(resultValue: Any?): CharSequence {
-            return (resultValue as GenericEnum).text
+            return (resultValue as IEnum).text
         }
 
         override fun performFiltering(search: CharSequence?): FilterResults {
             return if (search != null) {
                 suggestions.clear()
                 itemsAll.forEach {
-                    if ((it as GenericEnum).text.toLowerCase(Locale.getDefault())
+                    if ((it as IEnum).text.toLowerCase(Locale.getDefault())
                             .contains(search.toString().toLowerCase(Locale.getDefault()))
                     ) {
                         suggestions.add(it)
@@ -50,7 +50,7 @@ class DropDownAdapter(
                 val filteredList = results.values as ArrayList<*>
                 clear()
                 filteredList.forEach {
-                    if (it is GenericEnum)
+                    if (it is IEnum)
                         add(it)
                 }
                 notifyDataSetChanged()

@@ -1,4 +1,4 @@
-package com.poetradeapp.models
+package com.poetradeapp.models.responsemodels
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -97,7 +97,7 @@ data class CurrencyPrice(
 @JsonInclude
 data class ExchangePay(
     val currency: String,
-    val amount: Int,
+    val amount: Int
 )
 
 @JsonInclude

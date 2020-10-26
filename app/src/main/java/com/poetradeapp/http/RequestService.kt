@@ -1,43 +1,29 @@
 package com.poetradeapp.http
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.poetradeapp.models.*
 import com.poetradeapp.models.requestmodels.ExchangeCurrencyRequestModel
 import com.poetradeapp.models.requestmodels.ItemRequestModel
+import com.poetradeapp.models.responsemodels.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import retrofit2.Call
-import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Url
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class RequestService @Inject constructor(baseUrl: String) {
-    private val requestService: RequestInstance = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(JacksonConverterFactory.create(jacksonObjectMapper()))
-        .build()
-        .create(RequestInstance::class.java)
-
-    fun getService() = requestService
-}
-
-interface RequestInstance {
+@ExperimentalCoroutinesApi
+interface RequestService {
 
     @GET
-    fun getLeagueData(@Url url: String): Call<GetLeaguesModel>
+    fun getLeagueData(@Url url: String): Call<LeaguesModel>
 
     @GET
-    fun getItemsData(@Url url: String): Call<GetItemsModel>
+    fun getItemsData(@Url url: String): Call<SearchItemsModel>
 
     @GET
-    fun getStatsData(@Url url: String): Call<GetStatsModel>
+    fun getStatsData(@Url url: String): Call<StatsModel>
 
     @GET
-    fun getCurrencyData(@Url url: String): Call<GetCurrenciesModel>
+    fun getStaticData(@Url url: String): Call<StaticModel>
 
     @POST
     fun getCurrencyExchangeList(
