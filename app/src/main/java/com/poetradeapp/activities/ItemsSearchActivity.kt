@@ -1,43 +1,41 @@
 package com.poetradeapp.activities
 
+import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.view.MotionEvent
 import android.view.View
-import android.widget.AdapterView
+import android.view.inputmethod.InputMethodManager
+import android.widget.AutoCompleteTextView
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
 import coil.ImageLoader
 import com.poetradeapp.R
 import com.poetradeapp.adapters.ItemsSearchFieldAdapter
 import com.poetradeapp.fragments.PreloadFragment
 import com.poetradeapp.fragments.item.ItemExchangeMainFragment
 import com.poetradeapp.fragments.item.ItemsSearchResultFragment
-import com.poetradeapp.http.RequestService
-import com.poetradeapp.models.responsemodels.ExchangeItemsResponseModel
-import com.poetradeapp.models.viewmodels.ItemsSearchViewModel
+import com.poetradeapp.models.enums.ViewState
+import com.poetradeapp.models.ui.SearchableItem
+import com.poetradeapp.models.view.ItemsSearchViewModel
 import com.poetradeapp.ui.SocketsTemplateLoader
+import com.poetradeapp.ui.hideKeyboard
 import kotlinx.android.synthetic.main.activity_item_search.*
 import kotlinx.android.synthetic.main.fragment_item_exchange_main.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import org.koin.android.ext.android.inject
-import retrofit2.await
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @ExperimentalCoroutinesApi
 class ItemsSearchActivity : FragmentActivity() {
-
-    private val viewModel by lazy {
-        ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory(this.application)
-        ).get(ItemsSearchViewModel::class.java)
-    }
 
     private val preloadFragment = PreloadFragment()
     private val itemExchangeMainFragment = ItemExchangeMainFragment()
     private val itemExchangeResultFragment = ItemsSearchResultFragment()
 
-    private val retrofit: RequestService by inject()
+    private val viewModel: ItemsSearchViewModel by viewModel()
+
     val imageLoader: ImageLoader by inject()
     val socketsTemplate: SocketsTemplateLoader by inject()
 
@@ -45,28 +43,34 @@ class ItemsSearchActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item_search)
 
+        items_toolbar.setOnClickListener {
+            showToolbarSearchLayout()
+        }
+
+        items_toolbar.setNavigationOnClickListener {
+            println("navigation click")
+            //TODO NAVIGATION MENU
+        }
+
         items_toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.accept -> {
-                    resultsLoading.visibility = View.VISIBLE
+                    this.hideKeyboard(items_toolbar)
+                    viewModel.loadingState.value = ViewState.ResultsLoading
                     GlobalScope.launch(Dispatchers.Default) {
-                        viewModel.setItemsResultData(getItemsExchangeData())
-                    }.invokeOnCompletion {
-                        GlobalScope.launch(Dispatchers.Main) {
-                            supportFragmentManager
-                                .beginTransaction()
-                                .add(
-                                    R.id.itemExchangeContainer,
-                                    itemExchangeResultFragment
+                        viewModel.fetchPartialResults(0)
+                        if (viewModel.fetchedItems.isNotEmpty()) {
+                            viewModel.loadingState.value = ViewState.ResultsLoaded
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(
+                                    this@ItemsSearchActivity,
+                                    "Items not found!",
+                                    Toast.LENGTH_LONG
                                 )
-                                .hide(itemExchangeMainFragment)
-                                .commit()
+                            }
                         }
                     }
-                    true
-                }
-                R.id.search -> {
-                    showToolbarSearchLayout()
                     true
                 }
                 else ->
@@ -84,154 +88,161 @@ class ItemsSearchActivity : FragmentActivity() {
             .commit()
 
         GlobalScope.launch(Dispatchers.Main) {
-            supportFragmentManager
-                .beginTransaction()
-                .add(R.id.itemExchangeContainer, itemExchangeMainFragment)
-                .commit()
-        }
-
-        toolbar_search_input.addTextChangedListener(object : TextWatcher {
-
-            private val founded = arrayListOf<Triple<Int, String, String?>>()
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (toolbar_search_input.isPerformingCompletion)
-                    return
-                GlobalScope.launch(Dispatchers.Default) {
-                    founded.clear()
-//                    staticDataInstance.getItemsData().forEach { items ->
-//                        val includedItems = items.entries.filter { item ->
-//                            item.text.toLowerCase(Locale.getDefault())
-//                                .contains(
-//                                    p0.toString().toLowerCase(
-//                                        Locale.getDefault()
-//                                    )
-//                                )
-//                        }
-//                        if (includedItems.isNotEmpty()) {
-//                            founded.add(Triple(0, items.label, null))
-//                            includedItems.forEach {
-//                                founded.add(Triple(1, it.type, it.name))
-//                            }
-//                        }
-//                    }
-                }.invokeOnCompletion {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        toolbar_search_input.setAdapter(
-                            ItemsSearchFieldAdapter(
-                                this@ItemsSearchActivity,
-                                R.layout.dropdown_item,
-                                R.id.itemText,
-                                founded
-                            )
+            viewModel.loadingState.collect { state ->
+                when (state) {
+                    ViewState.Loading -> {
+                        withContext(Dispatchers.IO) {
+                            viewModel.initData()
+                        }
+                        val adapter = ItemsSearchFieldAdapter(
+                            this@ItemsSearchActivity,
+                            R.layout.dropdown_item,
+                            viewModel.items
                         )
+                        adapter.setNotifyOnChange(true)
+                        toolbar_search_input.setAdapter(adapter)
+                        supportFragmentManager
+                            .beginTransaction()
+                            .add(R.id.itemExchangeContainer, itemExchangeMainFragment)
+                            .commit()
+                    }
+                    ViewState.Loaded -> {
+                        supportFragmentManager
+                            .beginTransaction()
+                            .remove(preloadFragment)
+                            .commit()
+                        items_toolbar.title =
+                            resources.getString(R.string.items_search_title, "None")
+                        appbar.visibility = View.VISIBLE
+                    }
+                    ViewState.ResultsLoading -> {
+                        resultsLoading.visibility = View.VISIBLE
+                    }
+                    ViewState.ResultsLoadingFailed -> {
+                        resultsLoading.visibility = View.GONE
+                    }
+                    ViewState.ResultsLoaded -> {
+                        supportFragmentManager
+                            .beginTransaction()
+                            .add(R.id.itemExchangeContainer, itemExchangeResultFragment)
+                            .hide(itemExchangeMainFragment)
+                            .commit()
+                        items_toolbar.visibility = View.GONE
+                        resultsLoading.visibility = View.GONE
                     }
                 }
             }
+        }
 
-            override fun afterTextChanged(p0: Editable?) = Unit
-        })
-
-        toolbar_search_input.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, i, _ ->
-                val selectedItem =
-                    (toolbar_search_input.adapter as ItemsSearchFieldAdapter).getItem(i)
-                selectedItem?.let {
-                    if (selectedItem.third != null)
-                        toolbar_search_input.setText("${selectedItem.third} ${selectedItem.second}")
-                    else
-                        toolbar_search_input.setText(selectedItem.second)
-
-                    viewModel.getItemRequestData().query.type = selectedItem.second
-                    viewModel.getItemRequestData().query.name = selectedItem.third
-                }
+        toolbar_search_input.setOnItemClickListener { adapterView, _, position, _ ->
+            val selectedItem = adapterView.getItemAtPosition(position)
+            val adapter = adapterView.adapter
+            if (selectedItem is SearchableItem) {
+                viewModel.setType(selectedItem.type)
+                viewModel.setName(selectedItem.name)
+                if (adapter is ItemsSearchFieldAdapter)
+                    adapter.selectedItem = selectedItem
+                this.hideKeyboard(toolbar_search_input)
+                hideToolbarSearchLayout()
+                items_toolbar.title =
+                    resources.getString(R.string.items_search_title, selectedItem.text)
             }
+        }
+
+        toolbar_search_input.setOnFocusChangeListener { view, focused ->
+            val adapter = (view as AutoCompleteTextView).adapter
+            if (focused && adapter is ItemsSearchFieldAdapter) {
+                view.hint = adapter.selectedItem?.text ?: "Search item"
+                view.setText("", false)
+            }
+        }
     }
 
     override fun onBackPressed() {
-        if (itemExchangeResultFragment.isVisible) {
-            supportFragmentManager
-                .beginTransaction()
-                .remove(itemExchangeResultFragment)
-                .show(itemExchangeMainFragment)
-                .commit()
-            return
+        when {
+            itemExchangeResultFragment.isVisible -> {
+                supportFragmentManager
+                    .beginTransaction()
+                    .remove(itemExchangeResultFragment)
+                    .show(itemExchangeMainFragment)
+                    .commit()
+                items_toolbar.visibility = View.VISIBLE
+            }
+            toolbar_search_layout.visibility == View.VISIBLE -> {
+                hideToolbarSearchLayout()
+            }
+            else ->
+                super.onBackPressed()
         }
-        if (toolbar_search_layout.visibility == View.VISIBLE) {
-            hideToolbarSearchLayout()
-            return
-        }
-        super.onBackPressed()
     }
 
-    fun closeLoader() {
-        supportFragmentManager
-            .beginTransaction()
-            .remove(preloadFragment)
-            .commit()
-    }
-
-    fun closeResultsLoader() {
-        resultsLoading.visibility = View.GONE
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        val focusedView = currentFocus
+        if (focusedView is AutoCompleteTextView && ev?.action == MotionEvent.ACTION_UP) {
+            val outRect = Rect()
+            focusedView.getGlobalVisibleRect(outRect)
+            if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                focusedView.clearFocus()
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(focusedView.windowToken, 0)
+            }
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun showToolbarSearchLayout() {
-        items_toolbar
+        items_toolbar.visibility = View.GONE
+        toolbar_search_layout.alpha = 0f
+        toolbar_search_layout.visibility = View.VISIBLE
+        toolbar_search_input.requestFocus()
+        toolbar_search_layout
             .animate()
-            .alpha(0f)
+            .alpha(1f)
             .setDuration(250L)
             .withEndAction {
-                items_toolbar.visibility = View.GONE
-                toolbar_search_layout.alpha = 0f
-                toolbar_search_layout.visibility = View.VISIBLE
-                toolbar_search_layout
-                    .animate()
-                    .alpha(1f)
-                    .setDuration(250L)
-                    .start()
+                toolbar_search_input.showDropDown()
             }
             .start()
+//        items_toolbar
+//            .animate()
+//            .alpha(0f)
+//            .setDuration(250L)
+//            .withEndAction {
+//                items_toolbar.visibility = View.GONE
+//                toolbar_search_layout.alpha = 0f
+//                toolbar_search_layout.visibility = View.VISIBLE
+//                toolbar_search_layout
+//                    .animate()
+//                    .alpha(1f)
+//                    .setDuration(250L)
+//                    .start()
+//            }
+//            .start()
     }
 
     private fun hideToolbarSearchLayout() {
-        toolbar_search_layout
+        toolbar_search_layout.visibility = View.GONE
+        items_toolbar.alpha = 0f
+        items_toolbar.visibility = View.VISIBLE
+        items_toolbar
             .animate()
-            .alpha(0f)
+            .alpha(1f)
             .setDuration(250L)
-            .withEndAction {
-                toolbar_search_layout.visibility = View.GONE
-                items_toolbar.alpha = 0f
-                items_toolbar.visibility = View.VISIBLE
-                items_toolbar
-                    .animate()
-                    .alpha(1f)
-                    .setDuration(250L)
-                    .start()
-            }
             .start()
-    }
-
-    private suspend fun getItemsExchangeData(): List<ExchangeItemsResponseModel> {
-        val baseFetchUrl = StringBuilder("/api/trade/fetch/")
-        val service = retrofit
-
-        return withContext(Dispatchers.Default) {
-            val resultList = service.getItemsExchangeList(
-                "api/trade/search/Heist", viewModel.getItemRequestData()
-            ).await()
-
-            resultList.result.let {
-                if (it.size > 20) {
-                    baseFetchUrl.append(it.subList(0, 10).joinToString(separator = ","))
-                } else {
-                    baseFetchUrl.append(it.joinToString(separator = ","))
-                }
-                baseFetchUrl.append("?query=${resultList.id}")
-
-                service.getItemExchangeResponse(baseFetchUrl.toString()).await().result
-            }
-        }
+//        toolbar_search_layout
+//            .animate()
+//            .alpha(0f)
+//            .setDuration(250L)
+//            .withEndAction {
+//                toolbar_search_layout.visibility = View.GONE
+//                items_toolbar.alpha = 0f
+//                items_toolbar.visibility = View.VISIBLE
+//                items_toolbar
+//                    .animate()
+//                    .alpha(1f)
+//                    .setDuration(250L)
+//                    .start()
+//            }
+//            .start()
     }
 }

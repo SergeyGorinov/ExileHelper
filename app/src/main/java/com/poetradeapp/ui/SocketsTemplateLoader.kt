@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.poetradeapp.R
-import com.poetradeapp.models.responsemodels.Socket
+import com.poetradeapp.models.response.Socket
 
 class SocketsTemplateLoader(private val context: Context) {
 

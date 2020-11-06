@@ -6,5 +6,6 @@ interface IEnum {
 }
 
 interface IFilter : IEnum {
-    val isDropDown: Boolean
+    val viewType: ViewType
+    val dropDownValues: Array<*>?
 }

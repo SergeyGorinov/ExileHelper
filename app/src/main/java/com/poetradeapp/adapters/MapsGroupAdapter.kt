@@ -11,7 +11,7 @@ import com.poetradeapp.flexbox.FlexDirection
 import com.poetradeapp.flexbox.FlexWrap
 import com.poetradeapp.flexbox.FlexboxLayoutManager
 import com.poetradeapp.flexbox.JustifyContent
-import com.poetradeapp.models.viewmodels.StaticItemViewData
+import com.poetradeapp.models.ui.StaticItemViewData
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi

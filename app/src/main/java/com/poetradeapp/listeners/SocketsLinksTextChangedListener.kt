@@ -2,45 +2,29 @@ package com.poetradeapp.listeners
 
 import android.text.Editable
 import android.text.TextWatcher
-import com.poetradeapp.models.enums.ViewFilters
-import com.poetradeapp.models.requestmodels.ItemRequestModelFields
+import com.poetradeapp.models.request.ItemsRequestModelFields
+import com.poetradeapp.models.ui.Field
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 class SocketsLinksTextChangedListener(
-    private val item: ViewFilters.SocketFilters,
-    private val type: ViewFilters.SocketTypes,
-    private val filters: ItemRequestModelFields.SocketFilters
+    private val data: Map<String, Editable?>,
+    private val field: Field
 ) : TextWatcher {
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        val value = p0?.toString()?.toIntOrNull()
-        val filter = when (item) {
-            ViewFilters.SocketFilters.Sockets -> filters.sockets
-            ViewFilters.SocketFilters.Links -> filters.links
-        }
-        when (type) {
-            ViewFilters.SocketTypes.R -> {
-                filter.r = value
-            }
-            ViewFilters.SocketTypes.G -> {
-                filter.g = value
-            }
-            ViewFilters.SocketTypes.B -> {
-                filter.b = value
-            }
-            ViewFilters.SocketTypes.W -> {
-                filter.w = value
-            }
-            ViewFilters.SocketTypes.MIN -> {
-                filter.min = value
-            }
-            ViewFilters.SocketTypes.MAX -> {
-                filter.max = value
-            }
-        }
+        field.value =
+            if (data.all { a -> a.value == null }) null
+            else ItemsRequestModelFields.Sockets(
+                data["r"]?.toString()?.toIntOrNull(),
+                data["g"]?.toString()?.toIntOrNull(),
+                data["b"]?.toString()?.toIntOrNull(),
+                data["w"]?.toString()?.toIntOrNull(),
+                data["min"]?.toString()?.toIntOrNull(),
+                data["max"]?.toString()?.toIntOrNull()
+            )
     }
 
     override fun afterTextChanged(p0: Editable?) = Unit

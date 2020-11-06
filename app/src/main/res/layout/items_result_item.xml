@@ -4,20 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#0A0A0A"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:paddingVertical="12dp">
+
+    <include layout="@layout/items_result_item_header" />
 
     <FrameLayout
         android:id="@+id/itemImageContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/itemExpicitMods"
+        app:layout_constraintEnd_toStartOf="@id/itemTextData"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/barrier">
 
         <ImageView
             android:id="@+id/itemImage"
@@ -27,19 +29,6 @@
             tools:ignore="ContentDescription" />
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/itemExpicitMods"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|center_vertical"
-        android:fontFamily="@font/fontinsmallcaps"
-        android:gravity="center|center_vertical"
-        android:paddingHorizontal="8dp"
-        android:textColor="@color/default_text_color"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="5"
-        app:layout_constraintStart_toEndOf="@id/itemImageContainer"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="SelectableText" />
+    <include layout="@layout/items_result_item_hybrid" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

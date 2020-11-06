@@ -1,155 +1,228 @@
 package com.poetradeapp.models.enums
 
 class ViewFilters {
-    enum class AllFilters(val text: String) {
-        WeaponFilter("Weapon Filters"),
-        ArmourFilter("Armour Filters"),
-        ReqFilter("Requirements"),
-        MapFilter("Map Filters"),
-        HeistFilter("Heist Filters"),
-        MiscFilter("Miscellaneous")
+    enum class AllFilters(val id: String, val text: String, val values: Array<*>) {
+        TypeFilter("type_filters", "Type Filters", TypeFilters.values() as Array<*>),
+        WeaponFilter("weapon_filters", "Weapon Filters", WeaponFilters.values() as Array<*>),
+        ArmourFilter("armour_filters", "Armour Filters", ArmourFilters.values() as Array<*>),
+        SocketFilter("socket_filters", "Socket Filters", SocketFilters.values() as Array<*>),
+        ReqFilter("req_filters", "Requirements", ReqFilters.values() as Array<*>),
+        MapFilter("map_filters", "Map Filters", MapFilters.values() as Array<*>),
+        HeistFilter("misc_filters", "Heist Filters", HeistFilters.values() as Array<*>),
+        MiscFilter("heist_filters", "Miscellaneous", MiscFilters.values() as Array<*>),
+        TradeFilter("trade_filters", "Trade Filters", TradeFilters.values() as Array<*>)
     }
 
     enum class TypeFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        Category("category", "Item Category", true),
-        Rarity("rarity", "Item Rarity", true)
+        Category("category", "Item Category", ViewType.Dropdown, Dropdowns.ItemCategory.values()),
+        Rarity("rarity", "Item Rarity", ViewType.Dropdown, Dropdowns.ItemRarity.values())
     }
 
     enum class WeaponFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        Damage("damage", "Damage", false),
-        APS("aps", "Attacks per Second", false),
-        CritChance("crit", "Critical Chance", false),
-        DPS("dps", "Damage per Second", false),
-        PDPS("pdps", "Physical DPS", false),
-        EDPS("edps", "Elemental DPS", false)
+        Damage("damage", "Damage", ViewType.Minmax, null),
+        APS("aps", "Attacks per Second", ViewType.Minmax, null),
+        CritChance("crit", "Critical Chance", ViewType.Minmax, null),
+        DPS("dps", "Damage per Second", ViewType.Minmax, null),
+        PDPS("pdps", "Physical DPS", ViewType.Minmax, null),
+        EDPS("edps", "Elemental DPS", ViewType.Minmax, null)
     }
 
     enum class ArmourFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        Armour("ar", "Armour", false),
-        Evasion("ev", "Evasion", false),
-        EnergyShield("es", "Energy Shield", false),
-        Block("block", "Block", false)
+        Armour("ar", "Armour", ViewType.Minmax, null),
+        Evasion("ev", "Evasion", ViewType.Minmax, null),
+        EnergyShield("es", "Energy Shield", ViewType.Minmax, null),
+        Block("block", "Block", ViewType.Minmax, null)
     }
 
     enum class SocketFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        Sockets("sockets", "Sockets", false),
-        Links("links", "Links", false)
-    }
-
-    enum class SocketTypes {
-        R,
-        G,
-        B,
-        W,
-        MIN,
-        MAX
+        Sockets("sockets", "Sockets", ViewType.Socket, null),
+        Links("links", "Links", ViewType.Socket, null)
     }
 
     enum class ReqFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        Level("lvl", "Level", false),
-        Strength("str", "Strength", false),
-        Dexterity("dex", "Dexterity", false),
-        Intelligence("int", "Intelligence", false)
+        Level("lvl", "Level", ViewType.Minmax, null),
+        Strength("str", "Strength", ViewType.Minmax, null),
+        Dexterity("dex", "Dexterity", ViewType.Minmax, null),
+        Intelligence("int", "Intelligence", ViewType.Minmax, null)
     }
 
     enum class MapFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        MapTier("map_tier", "Map Tier", false),
-        MapPacksize("map_packsize", "Map Packsize", false),
-        MapIIQ("map_iiq", "Map IIQ", false),
-        MapIIR("map_iir", "Map IIR", false),
-        ShapedMap("map_shaped", "Shaped Map", true),
-        ElderMap("map_elder", "Elder Map", true),
-        BlightedMap("map_blighted", "Blighted Map", true),
-        MapRegion("map_region", "Map Region", true),
-        MapSeries("map_series", "Map Series", true)
+        MapTier("map_tier", "Map Tier", ViewType.Minmax, null),
+        MapPacksize("map_packsize", "Map Packsize", ViewType.Minmax, null),
+        MapIIQ("map_iiq", "Map IIQ", ViewType.Minmax, null),
+        MapIIR("map_iir", "Map IIR", ViewType.Minmax, null),
+        ShapedMap("map_shaped", "Shaped Map", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        ElderMap("map_elder", "Elder Map", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        BlightedMap("map_blighted", "Blighted Map", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        MapRegion("map_region", "Map Region", ViewType.Dropdown, Dropdowns.MapRegion.values()),
+        MapSeries("map_series", "Map Series", ViewType.Dropdown, Dropdowns.MapSeries.values())
     }
 
     enum class HeistFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        ContractObjectiveValue("heist_objective_value", "Contract Objective Value", true),
-        WingsRevealed("heist_wings", "Wings Revealed", false),
-        TotalWings("heist_max_wings", "Total Wings", false),
-        EscapeRoutesRevealed("heist_escape_routes", "Escape Routes Revealed", false),
-        TotalEscapeRoutes("heist_max_escape_routes", "Total Escape Routes", false),
-        RewardRoomsRevealed("heist_reward_rooms", "Reward Rooms Revealed", false),
-        TotalRewardRooms("heist_max_reward_rooms", "Total Reward Rooms", false),
-        AreaLevel("area_level", "Area Level", false),
-        LockpickingLevel("heist_lockpicking", "Lockpicking Level", false),
-        BruteForceLevel("heist_brute_force", "Brute Force Level", false),
-        PerceptionLevel("heist_perception", "Perception Level", false),
-        DemolitionLevel("heist_demolition", "Demolition Level", false),
-        CounterThaumLevel("heist_counter_thaumaturgy", "Counter-Thaum. Level", false),
-        TrapDisarmamentLevel("heist_trap_disarmament", "Trap Disarmament Level", false),
-        AgilityLevel("heist_agility", "Agility Level", false),
-        DeceptionLevel("heist_deception", "Deception Level", false),
-        EngineeringLevel("heist_engineering", "Engineering Level", false)
+        ContractObjectiveValue(
+            "heist_objective_value",
+            "Contract Objective Value",
+            ViewType.Dropdown,
+            Dropdowns.ContractObjectiveValue.values()
+        ),
+        WingsRevealed("heist_wings", "Wings Revealed", ViewType.Minmax, null),
+        TotalWings("heist_max_wings", "Total Wings", ViewType.Minmax, null),
+        EscapeRoutesRevealed(
+            "heist_escape_routes",
+            "Escape Routes Revealed",
+            ViewType.Minmax,
+            null
+        ),
+        TotalEscapeRoutes("heist_max_escape_routes", "Total Escape Routes", ViewType.Minmax, null),
+        RewardRoomsRevealed("heist_reward_rooms", "Reward Rooms Revealed", ViewType.Minmax, null),
+        TotalRewardRooms("heist_max_reward_rooms", "Total Reward Rooms", ViewType.Minmax, null),
+        AreaLevel("area_level", "Area Level", ViewType.Minmax, null),
+        LockpickingLevel("heist_lockpicking", "Lockpicking Level", ViewType.Minmax, null),
+        BruteForceLevel("heist_brute_force", "Brute Force Level", ViewType.Minmax, null),
+        PerceptionLevel("heist_perception", "Perception Level", ViewType.Minmax, null),
+        DemolitionLevel("heist_demolition", "Demolition Level", ViewType.Minmax, null),
+        CounterThaumLevel(
+            "heist_counter_thaumaturgy",
+            "Counter-Thaum. Level",
+            ViewType.Minmax,
+            null
+        ),
+        TrapDisarmamentLevel(
+            "heist_trap_disarmament",
+            "Trap Disarmament Level",
+            ViewType.Minmax,
+            null
+        ),
+        AgilityLevel("heist_agility", "Agility Level", ViewType.Minmax, null),
+        DeceptionLevel("heist_deception", "Deception Level", ViewType.Minmax, null),
+        EngineeringLevel("heist_engineering", "Engineering Level", ViewType.Minmax, null)
     }
 
     enum class MiscFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        Quality("quality", "Quality", false),
-        ItemLevel("ilvl", "Item Level", false),
-        GemLevel("gem_level", "Gem Level", false),
-        GemExperience("gem_level_progress", "Gem Experience %", false),
-        GemQualityType("gem_alternate_quality", "Gem Quality Type", true),
-        ShaperInfluence("shaper_item", "Shaper Influence", true),
-        ElderInfluence("elder_item", "Elder Influence", true),
-        CrusaderInfluence("crusader_item", "Crusader Influence", true),
-        RedeemerInfluence("redeemer_item", "Redeemer Influence", true),
-        HunterInfluence("hunter_item", "Hunter Influence", true),
-        WarlordInfluence("warlord_item", "Warlord Influence", true),
-        FracturedItem("fractured_item", "Fractured Item", true),
-        SynthesisedItem("synthesised_item", "Synthesised Item", true),
-        AlternateArt("alternate_art", "Alternate Art", true),
-        Identified("identified", "Identified", true),
-        Corrupted("corrupted", "Corrupted", true),
-        Mirrored("mirrored", "Mirrored", true),
-        Crafted("crafted", "Crafted", true),
-        Veiled("veiled", "Veiled", true),
-        Enchanted("enchanted", "Enchanted", true),
-        TalismanTier("talisman_tier", "Talisman Tier", false),
-        StoredExperience("stored_experience", "Stored Experience", false),
-        StackSize("stack_size", "Stack Size", false)
+        Quality("quality", "Quality", ViewType.Minmax, null),
+        ItemLevel("ilvl", "Item Level", ViewType.Minmax, null),
+        GemLevel("gem_level", "Gem Level", ViewType.Minmax, null),
+        GemExperience("gem_level_progress", "Gem Experience %", ViewType.Minmax, null),
+        GemQualityType(
+            "gem_alternate_quality",
+            "Gem Quality Type",
+            ViewType.Dropdown,
+            Dropdowns.GemQualityType.values()
+        ),
+        ShaperInfluence(
+            "shaper_item",
+            "Shaper Influence",
+            ViewType.Dropdown,
+            Dropdowns.YesNo.values()
+        ),
+        ElderInfluence(
+            "elder_item",
+            "Elder Influence",
+            ViewType.Dropdown,
+            Dropdowns.YesNo.values()
+        ),
+        CrusaderInfluence(
+            "crusader_item",
+            "Crusader Influence",
+            ViewType.Dropdown,
+            Dropdowns.YesNo.values()
+        ),
+        RedeemerInfluence(
+            "redeemer_item",
+            "Redeemer Influence",
+            ViewType.Dropdown,
+            Dropdowns.YesNo.values()
+        ),
+        HunterInfluence(
+            "hunter_item",
+            "Hunter Influence",
+            ViewType.Dropdown,
+            Dropdowns.YesNo.values()
+        ),
+        WarlordInfluence(
+            "warlord_item",
+            "Warlord Influence",
+            ViewType.Dropdown,
+            Dropdowns.YesNo.values()
+        ),
+        FracturedItem(
+            "fractured_item",
+            "Fractured Item",
+            ViewType.Dropdown,
+            Dropdowns.YesNo.values()
+        ),
+        SynthesisedItem(
+            "synthesised_item",
+            "Synthesised Item",
+            ViewType.Dropdown,
+            Dropdowns.YesNo.values()
+        ),
+        AlternateArt(
+            "alternate_art",
+            "Alternate Art",
+            ViewType.Dropdown,
+            Dropdowns.GemQualityType.values()
+        ),
+        Identified("identified", "Identified", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        Corrupted("corrupted", "Corrupted", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        Mirrored("mirrored", "Mirrored", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        Crafted("crafted", "Crafted", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        Veiled("veiled", "Veiled", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        Enchanted("enchanted", "Enchanted", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        TalismanTier("talisman_tier", "Talisman Tier", ViewType.Minmax, null),
+        StoredExperience("stored_experience", "Stored Experience", ViewType.Minmax, null),
+        StackSize("stack_size", "Stack Size", ViewType.Minmax, null)
     }
 
     enum class TradeFilters(
         override val id: String?,
         override val text: String,
-        override val isDropDown: Boolean
+        override val viewType: ViewType,
+        override val dropDownValues: Array<*>?
     ) : IFilter {
-        SellerAccount("account", "Seller Account", false),
-        Listed("indexed", "Listed", true),
-        SaleType("sale_type", "Sale Type", true),
-        BuyoutPrice("price", "Buyout Price", true)
+        SellerAccount("account", "Seller Account", ViewType.Account, null),
+        Listed("indexed", "Listed", ViewType.Dropdown, Dropdowns.Listed.values()),
+        SaleType("sale_type", "Sale Type", ViewType.Dropdown, Dropdowns.SaleType.values()),
+        BuyoutPrice("price", "Buyout Price", ViewType.Buyout, Dropdowns.BuyoutPrice.values())
     }
 }

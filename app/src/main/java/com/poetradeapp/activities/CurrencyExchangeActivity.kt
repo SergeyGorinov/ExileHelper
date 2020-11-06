@@ -10,10 +10,10 @@ import com.poetradeapp.fragments.PreloadFragment
 import com.poetradeapp.fragments.currency.CurrencyExchangeMainFragment
 import com.poetradeapp.fragments.currency.CurrencyExchangeResultFragment
 import com.poetradeapp.http.RequestService
-import com.poetradeapp.models.requestmodels.Exchange
-import com.poetradeapp.models.requestmodels.ExchangeCurrencyRequestModel
-import com.poetradeapp.models.responsemodels.ExchangeCurrencyResponseModel
-import com.poetradeapp.models.viewmodels.CurrencyExchangeViewModel
+import com.poetradeapp.models.request.Exchange
+import com.poetradeapp.models.request.ExchangeCurrencyRequestModel
+import com.poetradeapp.models.response.ExchangeCurrencyResponseModel
+import com.poetradeapp.models.view.CurrencyExchangeViewModel
 import kotlinx.android.synthetic.main.activity_currency_exchange.*
 import kotlinx.android.synthetic.main.fragment_currency_exchange_main.*
 import kotlinx.coroutines.*

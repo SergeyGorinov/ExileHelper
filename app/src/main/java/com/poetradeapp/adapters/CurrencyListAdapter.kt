@@ -16,7 +16,7 @@ import com.poetradeapp.flexbox.FlexDirection
 import com.poetradeapp.flexbox.FlexWrap
 import com.poetradeapp.flexbox.FlexboxLayoutManager
 import com.poetradeapp.flexbox.JustifyContent
-import com.poetradeapp.models.viewmodels.StaticGroupViewData
+import com.poetradeapp.models.ui.StaticGroupViewData
 import com.poetradeapp.ui.SlideUpDownAnimator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*

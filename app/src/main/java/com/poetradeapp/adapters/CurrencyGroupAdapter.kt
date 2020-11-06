@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.request.ImageRequest
 import com.poetradeapp.R
 import com.poetradeapp.activities.CurrencyExchangeActivity
-import com.poetradeapp.models.viewmodels.CurrencyExchangeViewModel
-import com.poetradeapp.models.viewmodels.StaticItemViewData
+import com.poetradeapp.models.ui.StaticItemViewData
+import com.poetradeapp.models.view.CurrencyExchangeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope

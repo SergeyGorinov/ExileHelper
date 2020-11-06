@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.poetradeapp.R
 import com.poetradeapp.activities.CurrencyExchangeActivity
-import com.poetradeapp.models.responsemodels.ExchangeCurrencyResponseModel
+import com.poetradeapp.models.response.ExchangeCurrencyResponseModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi

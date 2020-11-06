@@ -1,78 +1,77 @@
 package com.poetradeapp.adapters
 
-import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageButton
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.poetradeapp.R
 import com.poetradeapp.activities.ItemsSearchActivity
-import com.poetradeapp.listeners.EnableDisableFilterListener
 import com.poetradeapp.models.enums.ViewFilters
-import com.poetradeapp.models.enums.getFilterByType
-import com.poetradeapp.models.requestmodels.Clearable
-import com.poetradeapp.models.viewmodels.ItemsSearchViewModel
+import com.poetradeapp.models.ui.Filter
+import com.poetradeapp.models.view.ItemsSearchViewModel
 import com.poetradeapp.ui.SlideUpDownAnimator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import com.poetradeapp.ui.hideKeyboard
+import com.poetradeapp.ui.measureForAnimator
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
-class ItemFiltersListAdapter(private val items: Array<ViewFilters.AllFilters>) :
-    RecyclerView.Adapter<ItemFiltersListRecyclerViewVH>() {
+class FilterListAdapter(
+    private val items: Array<ViewFilters.AllFilters>,
+    private val viewModel: ItemsSearchViewModel
+) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ItemFiltersListRecyclerViewVH {
+    ): RecyclerView.ViewHolder {
         val view =
             LayoutInflater
                 .from(parent.context)
-                .inflate(R.layout.filters_main_item, parent, false)
-
-        return ItemFiltersListRecyclerViewVH(view)
+                .inflate(R.layout.filters_header_item, parent, false)
+        return ViewHolderViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ItemFiltersListRecyclerViewVH, position: Int) {
-        holder.bind(items[position])
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is IBindableViewHolder) {
+            val filterType = items[position]
+
+            var filter = viewModel.getFilter(filterType.id)
+
+            if (filter == null) {
+                filter = Filter(filterType.id)
+                viewModel.addFilter(filter)
+            }
+
+            holder.bind(filterType, filter)
+        }
     }
 
     override fun getItemCount() = items.size
+
+    override fun getItemViewType(position: Int) = items[position].ordinal
+
+    override fun getItemId(position: Int) = items[position].hashCode().toLong()
 }
 
 @ExperimentalCoroutinesApi
-class ItemFiltersListRecyclerViewVH(itemView: View) :
-    RecyclerView.ViewHolder(itemView) {
+class ViewHolderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+    IBindableViewHolder {
     private val enabled: CheckBox = itemView.findViewById(R.id.filterEnabled)
     private val showHide: MaterialButton = itemView.findViewById(R.id.filterShowHideButton)
     private val filterItemsLayout: RecyclerView = itemView.findViewById(R.id.filterItemsLayout)
     private val clearAll: ImageButton = itemView.findViewById(R.id.filterClearAll)
     private val context = itemView.context as ItemsSearchActivity
     private val animator = SlideUpDownAnimator(filterItemsLayout)
-    internal val filters by lazy {
-        ViewModelProvider(
-            context,
-            ViewModelProvider.AndroidViewModelFactory(context.application)
-        ).get(ItemsSearchViewModel::class.java).getItemRequestData().query.filters
-    }
 
     init {
-        showHide.setOnClickListener {
-            if (filterItemsLayout.visibility == View.VISIBLE)
-                animator.slideUp()
-            else
-                animator.slideDown()
-        }
-
         val divider = DividerItemDecoration(context, RecyclerView.VERTICAL)
         ContextCompat.getDrawable(context, R.drawable.table_column_divider)
             ?.let { divider.setDrawable(it) }
@@ -82,40 +81,46 @@ class ItemFiltersListRecyclerViewVH(itemView: View) :
         filterItemsLayout.addItemDecoration(divider)
     }
 
-    fun bind(item: ViewFilters.AllFilters) {
+    override fun bind(item: ViewFilters.AllFilters, filter: Filter) {
+        enabled.isChecked = filter.isEnabled
         showHide.text = item.text
-        val filter = item.getFilterByType(filters)
-        enabled.isChecked = !filter.disabled
-        enabled.setOnCheckedChangeListener(EnableDisableFilterListener(filter))
 
-        if (filter is Clearable) {
-            clearAll.setOnClickListener {
-                filter.clearAll()
-                filterItemsLayout.adapter =
-                    ItemFilterAdapter(item)
-            }
-            GlobalScope.launch {
-                filter.isEmptyState.collect {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        clearAll.visibility = if (it) View.GONE else View.VISIBLE
-                    }
+        GlobalScope.launch {
+            filter.isFilterEmpty.collect {
+                withContext(Dispatchers.Main) {
+                    clearAll.visibility = if (it) View.GONE else View.VISIBLE
                 }
             }
         }
-        filterItemsLayout.adapter = ItemFilterAdapter(item)
 
-        val layoutParams = filterItemsLayout.layoutParams
-        layoutParams.height = 1
-        filterItemsLayout.layoutParams = layoutParams
+        clearAll.setOnClickListener {
+            filter.cleanFiler()
+            filterItemsLayout.adapter = ItemFilterAdapter(item.values, filter)
+            context.hideKeyboard(it)
+        }
 
-        filterItemsLayout.measure(
-            View.MeasureSpec.makeMeasureSpec(
-                Resources.getSystem().displayMetrics.widthPixels,
-                View.MeasureSpec.EXACTLY
-            ),
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-        )
+        enabled.setOnCheckedChangeListener { _, checked ->
+            if (!checked && filterItemsLayout.visibility == View.VISIBLE)
+                animator.slideUp()
+            if (checked && filterItemsLayout.visibility == View.GONE)
+                animator.slideDown()
+            filter.isEnabled = checked
+        }
 
-        animator.setHeight(filterItemsLayout.measuredHeight)
+        showHide.setOnClickListener {
+            if (filterItemsLayout.visibility == View.VISIBLE) {
+                animator.slideUp()
+            } else {
+                if (!filter.isEnabled) {
+                    filter.isEnabled = true
+                    enabled.isChecked = filter.isEnabled
+                }
+                animator.slideDown()
+            }
+        }
+
+        filterItemsLayout.adapter = ItemFilterAdapter(item.values, filter)
+
+        animator.setHeight(filterItemsLayout.measureForAnimator())
     }
 }

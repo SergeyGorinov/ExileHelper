@@ -7,22 +7,23 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.poetradeapp.R
-import com.poetradeapp.activities.ItemsSearchActivity
-import com.poetradeapp.adapters.ItemFiltersListAdapter
-import com.poetradeapp.adapters.SocketFiltersAdapter
-import com.poetradeapp.adapters.TradeFiltersAdapter
-import com.poetradeapp.adapters.TypeFiltersAdapter
+import com.poetradeapp.adapters.FilterListAdapter
 import com.poetradeapp.models.enums.ViewFilters
+import com.poetradeapp.models.enums.ViewState
+import com.poetradeapp.models.view.ItemsSearchViewModel
 import kotlinx.android.synthetic.main.fragment_item_exchange_filters.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 @ExperimentalCoroutinesApi
 class ItemsSearchFiltersFragment : Fragment() {
+
+    internal val viewModel: ItemsSearchViewModel by sharedViewModel()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,21 +41,19 @@ class ItemsSearchFiltersFragment : Fragment() {
         filtersList.viewTreeObserver.addOnGlobalLayoutListener(object :
             ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                (requireActivity() as ItemsSearchActivity).closeLoader()
+                viewModel.loadingState.value = ViewState.Loaded
                 filtersList.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
-        val typeAdapter = TypeFiltersAdapter()
-        val socketAdapter = SocketFiltersAdapter()
-        val tradeAdapter = TradeFiltersAdapter()
-        val itemAdapter = ItemFiltersListAdapter(ViewFilters.AllFilters.values())
+        val itemAdapter = FilterListAdapter(ViewFilters.AllFilters.values(), viewModel)
 
-        val concatAdapter = ConcatAdapter(typeAdapter, socketAdapter, itemAdapter, tradeAdapter)
+        itemAdapter.setHasStableIds(true)
 
+        filtersList.setHasFixedSize(true)
         filtersList.layoutManager = LinearLayoutManager(view.context)
-        filtersList.adapter = concatAdapter
-        filtersList.setItemViewCacheSize(10)
+        filtersList.adapter = itemAdapter
+        filtersList.setItemViewCacheSize(25)
         filtersList.addItemDecoration(divider)
     }
 }

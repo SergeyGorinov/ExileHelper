@@ -33,8 +33,7 @@ class ItemExchangeMainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val inflanter = TransitionInflater.from(requireContext())
-        exitTransition = inflanter.inflateTransition(R.transition.fragment_slide)
-        enterTransition = inflanter.inflateTransition(R.transition.fragment_slide)
+        enterTransition = inflanter.inflateTransition(R.transition.fragment_fade)
     }
 
     override fun onCreateView(

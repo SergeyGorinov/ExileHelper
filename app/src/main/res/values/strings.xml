@@ -39,4 +39,5 @@
     <string name="socket_filter_header">Socket Filters</string>
     <string name="trade_filter_header">Trade Filters</string>
     <string name="type_filter_header">Type Filters</string>
+    <string name="items_search_title">Selected item: %s</string>
 </resources>

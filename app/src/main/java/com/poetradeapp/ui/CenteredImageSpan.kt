@@ -1,12 +1,14 @@
 package com.poetradeapp.ui
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.text.style.ImageSpan
 import java.lang.ref.WeakReference
 
-class CenteredImageSpan(drawable: Drawable) : ImageSpan(drawable) {
+//class CenteredImageSpan(drawable: Drawable) : ImageSpan(drawable) {
+class CenteredImageSpan(context: Context, image: Int) : ImageSpan(context, image) {
 
     private var wrDrawable: WeakReference<Drawable>? = null
 

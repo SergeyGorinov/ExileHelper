@@ -19,11 +19,12 @@
             app:titleTextAppearance="@style/TitleFontStyle" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/main_background"
-        android:paddingTop="200dp"
+        android:orientation="vertical"
+        android:paddingTop="250dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.google.android.material.button.MaterialButton
@@ -35,11 +36,7 @@
             android:fontFamily="@font/fontinsmallcaps"
             android:text="@string/main_search_items_button"
             app:icon="@drawable/search_24"
-            app:iconPadding="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:iconPadding="0dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/goToCurrencyChange"
@@ -51,10 +48,7 @@
             android:fontFamily="@font/fontinsmallcaps"
             android:text="@string/main_exchange_currency_button"
             app:icon="@drawable/currency_exchange_24"
-            app:iconPadding="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/goToItemChange" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:iconPadding="0dp" />
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

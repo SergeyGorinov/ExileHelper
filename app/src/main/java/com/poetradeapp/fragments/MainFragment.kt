@@ -2,7 +2,6 @@ package com.poetradeapp.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +14,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 class MainFragment : Fragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val transitionInflanter = TransitionInflater.from(context)
-        enterTransition = transitionInflanter.inflateTransition(R.transition.fragment_fade)
-        exitTransition = transitionInflanter.inflateTransition(R.transition.fragment_fade)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

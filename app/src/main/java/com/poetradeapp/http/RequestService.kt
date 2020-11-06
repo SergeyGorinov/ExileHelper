@@ -1,8 +1,8 @@
 package com.poetradeapp.http
 
-import com.poetradeapp.models.requestmodels.ExchangeCurrencyRequestModel
-import com.poetradeapp.models.requestmodels.ItemRequestModel
-import com.poetradeapp.models.responsemodels.*
+import com.poetradeapp.models.request.ExchangeCurrencyRequestModel
+import com.poetradeapp.models.request.ItemsRequestModel
+import com.poetradeapp.models.response.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import retrofit2.Call
 import retrofit2.http.Body
@@ -34,7 +34,7 @@ interface RequestService {
     @POST
     fun getItemsExchangeList(
         @Url url: String,
-        @Body body: ItemRequestModel
+        @Body body: ItemsRequestModel
     ): Call<ItemsListResponseModel>
 
     @GET

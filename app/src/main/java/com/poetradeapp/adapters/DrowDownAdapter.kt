@@ -14,12 +14,13 @@ import kotlin.collections.ArrayList
 class DropDownAdapter(
     context: Context,
     private val resId: Int,
-    private val tvId: Int,
-    items: List<IEnum>
-) : ArrayAdapter<IEnum>(context, resId, tvId, items) {
+    items: List<Any?>
+) : ArrayAdapter<Any?>(context, resId, items) {
 
     internal val suggestions = ArrayList<IEnum>()
     internal val itemsAll = ArrayList(items)
+
+    var selectedItem: IEnum? = items.first() as IEnum?
 
     private val filter = object : Filter() {
         override fun convertResultToString(resultValue: Any?): CharSequence {
@@ -47,12 +48,8 @@ class DropDownAdapter(
 
         override fun publishResults(p0: CharSequence?, results: FilterResults?) {
             if (results != null && results.count > 0) {
-                val filteredList = results.values as ArrayList<*>
                 clear()
-                filteredList.forEach {
-                    if (it is IEnum)
-                        add(it)
-                }
+                addAll(results.values as ArrayList<*>)
                 notifyDataSetChanged()
             }
         }
@@ -61,9 +58,10 @@ class DropDownAdapter(
     override fun getFilter() = filter
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = convertView ?: LayoutInflater.from(context).inflate(resId, parent, false)
+        val view =
+            (convertView ?: LayoutInflater.from(context).inflate(resId, parent, false)) as TextView
         val item = getItem(position)
-        view.findViewById<TextView>(tvId).text = item?.text
+        view.text = (item as IEnum?)?.text
         return view
     }
 }

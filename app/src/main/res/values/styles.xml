@@ -10,5 +10,6 @@
     <style name="TitleFontStyle" parent="TextAppearance.AppCompat">
         <item name="fontFamily">@font/fontinsmallcaps</item>
         <item name="color">#fff8e1</item>
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>

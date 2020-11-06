@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.poetradeapp.R
 import com.poetradeapp.adapters.CurrencyListAdapter
-import com.poetradeapp.models.viewmodels.StaticGroupViewData
+import com.poetradeapp.models.ui.StaticGroupViewData
 import kotlinx.android.synthetic.main.fragment_currency_exchange_have.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 

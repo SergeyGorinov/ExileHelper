@@ -7,10 +7,12 @@ import coil.util.CoilUtils
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.poetradeapp.dl.DatabaseRepository
 import com.poetradeapp.http.RequestService
+import com.poetradeapp.models.view.ItemsSearchViewModel
 import com.poetradeapp.ui.SocketsTemplateLoader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -48,7 +50,7 @@ class PoeTradeApplication : Application() {
         }
     }
 
-    private val RepositoryModule = module {
+    private val repositoryModule = module {
         factory {
             Room.databaseBuilder(
                 androidContext(),
@@ -58,11 +60,26 @@ class PoeTradeApplication : Application() {
         }
     }
 
+    private val viewModelsModule = module {
+        viewModel {
+            ItemsSearchViewModel(get(), get(), androidContext())
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
+
         startKoin {
             androidContext(this@PoeTradeApplication)
-            modules(listOf(coilModule, retrofitModule, socketTemplateModule, RepositoryModule))
+            modules(
+                listOf(
+                    coilModule,
+                    retrofitModule,
+                    socketTemplateModule,
+                    repositoryModule,
+                    viewModelsModule
+                )
+            )
         }
     }
 }

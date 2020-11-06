@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.poetradeapp.R
 import com.poetradeapp.activities.CurrencyExchangeActivity
-import com.poetradeapp.models.viewmodels.CurrencyExchangeViewModel
-import com.poetradeapp.models.viewmodels.StaticItemViewData
+import com.poetradeapp.models.ui.StaticItemViewData
+import com.poetradeapp.models.view.CurrencyExchangeViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.poetradeapp.R
 import com.poetradeapp.activities.CurrencyExchangeActivity
 import com.poetradeapp.adapters.CurrencyListAdapter
-import com.poetradeapp.models.viewmodels.StaticGroupViewData
+import com.poetradeapp.models.ui.StaticGroupViewData
 import kotlinx.android.synthetic.main.fragment_currency_exchange_want.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 

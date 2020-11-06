@@ -84,4 +84,12 @@ abstract class RepositoryDao {
     @Transaction
     @Query("SELECT * FROM StaticGroupModel")
     abstract suspend fun getAllStaticItems(): List<StaticGroupWithItems>
+
+    @Transaction
+    @Query("SELECT * FROM ItemGroupModel INNER JOIN ItemModel ON itemGroupId = groupId WHERE text LIKE '%' || :text ||'%' ")
+    abstract fun getItems(text: String): List<ItemGroupWithItems>
+
+    @Transaction
+    @Query("SELECT StaticItemModel.id,StaticItemModel.label,StaticItemModel.image FROM StaticGroupModel INNER JOIN StaticItemModel ON staticGroupId = groupId WHERE StaticGroupModel.id = 'Currency'")
+    abstract fun getCurrencies(): List<StaticItemModel>
 }
