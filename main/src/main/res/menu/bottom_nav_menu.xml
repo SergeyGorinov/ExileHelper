@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/currencyExchangeMenu"
+        android:enabled="true"
+        android:icon="@drawable/exchange_24"
+        android:title="@string/main_exchange_currency_button" />
+    <item
+        android:id="@+id/itemsSearchMenu"
+        android:enabled="true"
+        android:icon="@drawable/search_24"
+        android:title="@string/main_search_items_button" />
+    <item
+        android:id="@+id/chartsMenu"
+        android:enabled="true"
+        android:icon="@drawable/charts_24"
+        android:title="@string/main_charts_button" />
+</menu>

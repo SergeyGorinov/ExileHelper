@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="want_currencies_header">The currencies you want:</string>
+    <string name="have_currencies_header">The currencies you have:</string>
+    <string name="add_wanted_currency_desc">Add wanted currency</string>
+    <string name="add_have_currency_desc">Add wanted currency</string>
+</resources>

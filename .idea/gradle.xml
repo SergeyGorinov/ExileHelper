@@ -12,7 +12,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/charts_feature" />
+            <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/currency_feature" />
+            <option value="$PROJECT_DIR$/exchange_feature" />
+            <option value="$PROJECT_DIR$/main" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
