@@ -16,15 +16,19 @@ import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.github.terrakok.cicerone.androidx.TransactionInfo
 import com.poe.tradeapp.MyFirebaseMessaging
 import com.poe.tradeapp.R
-import com.poe.tradeapp.charts_feature.presentation.ChartsMainFragment
+import com.poe.tradeapp.charts_feature.presentation.fragments.ChartsMainFragment
 import com.poe.tradeapp.core.DI
+import com.poe.tradeapp.core.presentation.IMainActivity
 import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
 import com.poe.tradeapp.databinding.ActivityMainBinding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.inject
 
 @ExperimentalCoroutinesApi
-class MainActivity : FragmentActivity() {
+class MainActivity : FragmentActivity(), IMainActivity {
+
+    private val viewModel by viewModel<MainActivityViewModel>()
 
     private val navigatorHolder by DI.inject<NavigatorHolder>()
     private val router by DI.inject<Router>()
@@ -131,6 +135,8 @@ class MainActivity : FragmentActivity() {
         }
     }
 
+    override val leagues by lazy { viewModel.leagues }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -139,7 +145,12 @@ class MainActivity : FragmentActivity() {
         viewBinding.bottomNavBar.setOnNavigationItemSelectedListener {
             return@setOnNavigationItemSelectedListener when (it.itemId) {
                 R.id.currencyExchangeMenu -> {
-                    router.newRootScreen(CurrencyExchangeMainFragment.newInstance())
+                    router.newRootScreen(
+                        CurrencyExchangeMainFragment.newInstance(
+                            viewModel.wantItemId,
+                            viewModel.haveItemId
+                        )
+                    )
                     true
                 }
                 R.id.chartsMenu -> {
@@ -181,9 +192,24 @@ class MainActivity : FragmentActivity() {
         super.onPause()
     }
 
-    fun showBottomNavBarIfNeeded() {
+    override fun showBottomNavBarIfNeeded() {
         if (viewBinding.bottomNavBar.visibility == View.GONE) {
             viewBinding.bottomNavBar.visibility = View.VISIBLE
+        }
+    }
+
+    override fun goToCurrencyExchange(wantItemId: String?, haveItemId: String?) {
+        viewModel.wantItemId = wantItemId
+        viewModel.haveItemId = haveItemId
+        if (viewBinding.bottomNavBar.selectedItemId == R.id.currencyExchangeMenu) {
+            router.newRootScreen(
+                CurrencyExchangeMainFragment.newInstance(
+                    viewModel.wantItemId,
+                    viewModel.haveItemId
+                )
+            )
+        } else {
+            viewBinding.bottomNavBar.selectedItemId = R.id.currencyExchangeMenu
         }
     }
 }

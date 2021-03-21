@@ -1,13 +1,11 @@
 package com.poe.tradeapp.currency.presentation.models
 
-import android.graphics.Bitmap
-
 data class CurrencyResultViewItem(
     val stock: Int,
     val pay: Int,
     val get: Int,
-    val payIcon: Bitmap?,
-    val getIcon: Bitmap?,
+    val payIcon: String?,
+    val getIcon: String?,
     val payLabel: String?,
     val getLabel: String?,
     val accountName: String,

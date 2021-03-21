@@ -5,6 +5,6 @@ import org.koin.dsl.module
 
 internal val presentationModule = module {
     viewModel {
-        ChartsViewModel(get(), get())
+        ChartsViewModel(get(), get(), get(), get(), get())
     }
 }

@@ -6,6 +6,7 @@ internal interface IFeatureRepository {
 
     suspend fun getCurrencyExchangeData(
         wantSelectedCurrencies: List<String>,
-        haveSelectedCurrencies: List<String>
-    ): JsonObject
+        haveSelectedCurrencies: List<String>,
+        league: String
+    ): JsonObject?
 }

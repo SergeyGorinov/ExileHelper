@@ -1,4 +1,4 @@
-package com.poe.tradeapp.currency.data.repository
+package com.poe.tradeapp.currency.data
 
 import com.poe.tradeapp.currency.domain.repository.IFeatureRepository
 

@@ -1,8 +1,6 @@
 package com.poe.tradeapp.currency.data
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.poe.tradeapp.currency.data.repository.FeatureRepository
-import com.poe.tradeapp.currency.data.services.ApiService
 import com.poe.tradeapp.currency.domain.repository.IFeatureRepository
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType

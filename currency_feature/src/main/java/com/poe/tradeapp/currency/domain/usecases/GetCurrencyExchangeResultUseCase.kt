@@ -11,13 +11,17 @@ internal class GetCurrencyExchangeResultUseCase(private val repository: IFeature
 
     suspend fun execute(
         wantSelectedCurrencies: List<String>,
-        haveSelectedCurrencies: List<String>
+        haveSelectedCurrencies: List<String>,
+        league: String
     ): List<CurrencyResultItem> {
-        val rawData =
-            repository.getCurrencyExchangeData(wantSelectedCurrencies, haveSelectedCurrencies)
-        val data = rawData.getValue("result").jsonArray
+        val rawData = repository.getCurrencyExchangeData(
+            wantSelectedCurrencies,
+            haveSelectedCurrencies,
+            league
+        )
+        val data = rawData?.getValue("result")?.jsonArray
 
-        return data.mapNotNull {
+        return data?.mapNotNull {
             try {
                 val value = it as JsonObject
                 val listing = value.getValue("listing").jsonObject
@@ -48,6 +52,6 @@ internal class GetCurrencyExchangeResultUseCase(private val repository: IFeature
             } catch (e: Exception) {
                 null
             }
-        }
+        } ?: listOf()
     }
 }

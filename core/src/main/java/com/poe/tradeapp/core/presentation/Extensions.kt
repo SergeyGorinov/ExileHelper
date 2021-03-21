@@ -1,13 +1,20 @@
 package com.poe.tradeapp.core.presentation
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxItemDecoration
@@ -46,6 +53,16 @@ fun Context.hideKeyboard(view: View) {
     inputManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
+fun Context.generateLinearDividerDecoration(): DividerItemDecoration {
+    return DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
+        ContextCompat.getDrawable(
+            this@generateLinearDividerDecoration, R.drawable.recyclerview_divider
+        )?.let {
+            setDrawable(it)
+        }
+    }
+}
+
 fun Context.generateFlexboxManager(): FlexboxLayoutManager {
     return FlexboxLayoutManager(this).apply {
         flexWrap = FlexWrap.WRAP
@@ -61,6 +78,29 @@ fun Context.generateFlexboxDecorator(): FlexboxItemDecoration {
                 R.drawable.recyclerview_divider
             )
         )
+    }
+}
+
+fun Context.getTransparentProgressDialog(): AlertDialog {
+    return AlertDialog.Builder(this).setView(
+        View.inflate(
+            this,
+            R.layout.progress_dialog,
+            null
+        )
+    ).create().apply {
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        setCancelable(false)
+    }
+}
+
+fun Bitmap.toDrawable(context: Context): Drawable {
+    val scale = if (height / 24.dp <= 0) 1 else height / 24.dp
+    return BitmapDrawable(
+        context.resources,
+        Bitmap.createScaledBitmap(this, width / scale, 24.dp, true)
+    ).apply {
+        setBounds(0, 0, intrinsicWidth, intrinsicHeight)
     }
 }
 

@@ -1,4 +1,4 @@
-package com.poe.tradeapp.currency.data.services
+package com.poe.tradeapp.currency.data
 
 import com.poe.tradeapp.currency.data.models.CurrencyListResponse
 import com.poe.tradeapp.currency.data.models.CurrencyRequest
@@ -15,7 +15,7 @@ internal interface ApiService {
     fun getCurrencyExchangeList(
         @Url url: String,
         @Body body: CurrencyRequest
-    ): Call<CurrencyListResponse>
+    ): Call<CurrencyListResponse?>
 
     @GET
     fun getCurrencyExchangeResponse(@Url url: String): Call<JsonObject>

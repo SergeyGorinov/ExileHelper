@@ -1,16 +1,15 @@
 package com.poe.tradeapp.currency.presentation.fragments
 
-import android.app.AlertDialog
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.poe.tradeapp.core.presentation.BaseFragment
 import com.poe.tradeapp.core.presentation.generateFlexboxDecorator
 import com.poe.tradeapp.core.presentation.generateFlexboxManager
+import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.FragmentCurrencyExchangeMainBinding
 import com.poe.tradeapp.currency.presentation.CurrencyExchangeViewModel
@@ -25,6 +24,9 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
     private lateinit var binding: FragmentCurrencyExchangeMainBinding
 
+    private val wantItemId by lazy { requireArguments().getString(WANT_ITEM_ID_KEY) }
+    private val haveItemId by lazy { requireArguments().getString(HAVE_ITEM_ID_KEY) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
@@ -35,15 +37,7 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val progressDialog = AlertDialog.Builder(requireActivity()).setView(
-            View.inflate(
-                requireActivity(),
-                R.layout.progress_dialog,
-                null
-            )
-        ).create().apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
+        val progressDialog = requireActivity().getTransparentProgressDialog()
 
         lifecycleScope.launchWhenCreated {
             viewModel.viewLoadingState.collect {
@@ -60,6 +54,9 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
         binding.toolbarLayout.toolbar.inflateMenu(R.menu.menu_currency)
         binding.toolbarLayout.toolbar.title = "Currency Exchange"
+        binding.toolbarLayout.toolbar.setNavigationOnClickListener {
+            showMenu()
+        }
         binding.toolbarLayout.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.accept -> {
@@ -76,7 +73,19 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         binding.haveAddCurrency.setOnClickListener {
             router.navigateTo(CurrencyExchangeGroupsFragment.newInstance(false))
         }
+        wantItemId?.let {
+            viewModel.wantCurrencies.clear()
+            viewModel.wantCurrencies.add(it)
+        }
+        haveItemId?.let {
+            viewModel.haveCurrencies.clear()
+            viewModel.haveCurrencies.add(it)
+        }
         restoreState()
+        if (wantItemId != null) {
+            requestResults()
+            requireArguments().clear()
+        }
     }
 
     private fun restoreState() {
@@ -120,25 +129,30 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             return
         }
         lifecycleScope.launch {
-            val progressDialog = AlertDialog.Builder(requireActivity()).setView(
-                View.inflate(
-                    requireActivity(),
-                    R.layout.progress_dialog,
-                    null
-                )
-            ).create().apply {
-                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            val progressDialog = requireActivity().getTransparentProgressDialog()
+            try {
+                progressDialog.show()
+                if (!viewModel.requestResult(settings.league)) {
+                    Toast.makeText(requireActivity(), "Nothing found!", Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                CurrencyExchangeResultFragment
+                    .newInstance()
+                    .showNow(parentFragmentManager, null)
+            } finally {
+                progressDialog.dismiss()
             }
-            progressDialog.show()
-            viewModel.requestResult()
-            CurrencyExchangeResultFragment
-                .newInstance()
-                .showNow(parentFragmentManager, null)
-            progressDialog.dismiss()
         }
     }
 
     companion object {
-        fun newInstance() = FragmentScreen { CurrencyExchangeMainFragment() }
+        private const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
+        private const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
+
+        fun newInstance(wantItemId: String?, haveItemId: String?) = FragmentScreen {
+            CurrencyExchangeMainFragment().apply {
+                arguments = bundleOf(WANT_ITEM_ID_KEY to wantItemId, HAVE_ITEM_ID_KEY to haveItemId)
+            }
+        }
     }
 }

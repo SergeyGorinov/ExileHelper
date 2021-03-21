@@ -11,7 +11,7 @@ import com.squareup.picasso.Picasso
 
 internal class ItemsGroupsAdapter(
     private val items: List<ItemGroup>,
-    private val onButtonClick: (String) -> Unit
+    private val onButtonClick: (String, Boolean) -> Unit
 ) : RecyclerView.Adapter<ItemsGroupsAdapter.CurrencyGroupsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = CurrencyGroupsViewHolder(
@@ -28,10 +28,10 @@ internal class ItemsGroupsAdapter(
 
         private val viewBinding = ItemGroupBinding.bind(itemView)
 
-        fun bind(group: ItemGroup, onButtonClick: (String) -> Unit) {
+        fun bind(group: ItemGroup, onButtonClick: (String, Boolean) -> Unit) {
             viewBinding.text.text = group.label
             viewBinding.root.setOnClickListener {
-//                onButtonClick(group.id)
+                onButtonClick(group.type, group.isCurrency)
             }
             Picasso.get().load(group.iconUrl).into(viewBinding.image)
         }

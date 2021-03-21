@@ -6,21 +6,24 @@ import androidx.lifecycle.lifecycleScope
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.poe.tradeapp.R
 import com.poe.tradeapp.core.presentation.BaseFragment
-import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 @ExperimentalCoroutinesApi
 class LoaderFragment : BaseFragment(R.layout.fragment_loader) {
+
+    private val viewModel by sharedViewModel<MainActivityViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch {
+            viewModel.getLeagues()
             delay(1500L)
-            router.newRootScreen(CurrencyExchangeMainFragment.newInstance())
-            (requireActivity() as MainActivity).showBottomNavBarIfNeeded()
+            getMainActivity()?.goToCurrencyExchange(null, null)
+            getMainActivity()?.showBottomNavBarIfNeeded()
         }
     }
 

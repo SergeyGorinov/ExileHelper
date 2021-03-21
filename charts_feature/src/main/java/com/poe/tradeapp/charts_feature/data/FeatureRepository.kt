@@ -1,15 +1,36 @@
 package com.poe.tradeapp.charts_feature.data
 
+import com.poe.tradeapp.charts_feature.data.models.CurrenciesOverviewResponse
+import com.poe.tradeapp.charts_feature.data.models.CurrencyHistoryModel
+import com.poe.tradeapp.charts_feature.data.models.GraphData
 import com.poe.tradeapp.charts_feature.data.models.ItemGroup
+import kotlinx.serialization.json.JsonObject
 import retrofit2.await
 
 internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatureRepository() {
+
+    override suspend fun getCurrenciesOverview(
+        league: String,
+        type: String
+    ): CurrenciesOverviewResponse {
+        return api.getCurrenciesOverview(league, type).await()
+    }
+
+    override suspend fun getItemsOverview(league: String, type: String): JsonObject {
+        return api.getItemsOverview(league, type).await()
+    }
 
     override suspend fun getCurrencyHistory(
         league: String,
         type: String,
         id: String
-    ) = api.getCurrencyHistory(league, type, id).await()
+    ): CurrencyHistoryModel {
+        return api.getCurrencyHistory(league, type, id).await()
+    }
+
+    override suspend fun getItemHistory(league: String, type: String, id: String): List<GraphData> {
+        return api.getItemHistory(league, type, id).await()
+    }
 
     override fun getItemsGroups() = listOf(
         ItemGroup(

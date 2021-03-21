@@ -38,7 +38,7 @@ internal class CurrencySelectedAdapter(
 
         fun bind(item: StaticItemViewData, onRemoveClick: () -> Unit) {
             if (item.imageUrl != null) {
-                Picasso.get().load(item.imageUrl).resize(48.dp, 48.dp).into(viewBinding.image)
+                Picasso.get().load(item.imageUrl).resize(36.dp, 36.dp).into(viewBinding.image)
             }
             viewBinding.label.text = item.label
             viewBinding.remove.setOnClickListener {

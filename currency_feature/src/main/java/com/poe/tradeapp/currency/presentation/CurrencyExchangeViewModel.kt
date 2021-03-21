@@ -2,12 +2,10 @@ package com.poe.tradeapp.currency.presentation
 
 import androidx.lifecycle.ViewModel
 import com.poe.tradeapp.core.domain.usecases.GetCurrencyItemsUseCase
-import com.poe.tradeapp.core.presentation.dp
 import com.poe.tradeapp.currency.domain.usecases.GetCurrencyExchangeResultUseCase
 import com.poe.tradeapp.currency.presentation.models.CurrencyResultViewItem
 import com.poe.tradeapp.currency.presentation.models.StaticGroupViewData
 import com.poe.tradeapp.currency.presentation.models.StaticItemViewData
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
@@ -41,7 +39,7 @@ internal class CurrencyExchangeViewModel(
     var currencyResultData: List<CurrencyResultViewItem> = listOf()
         private set
 
-    suspend fun requestItems() {
+    suspend fun requestItems() = withContext(Dispatchers.IO) {
         if (allCurrencies.isEmpty()) {
             viewLoadingState.emit(true)
             allCurrencies =
@@ -55,39 +53,32 @@ internal class CurrencyExchangeViewModel(
         }
     }
 
-    suspend fun requestResult() {
-        withContext(Dispatchers.IO) {
-            val result = getCurrencyResult.execute(wantCurrencies, haveCurrencies).map { result ->
-                val payItem = allCurrencies.flatMap {
-                    it.staticItems
-                }.firstOrNull {
-                    it.id == result.payCurrencyId
-                }
-                val getItem = allCurrencies.flatMap {
-                    it.staticItems
-                }.firstOrNull {
-                    it.id == result.getCurrencyId
-                }
-                val payIcon = payItem?.imageUrl?.let {
-                    Picasso.get().load(it).resize(24.dp, 24.dp).get()
-                }
-                val getIcon = getItem?.imageUrl?.let {
-                    Picasso.get().load(it).resize(24.dp, 24.dp).get()
-                }
-                CurrencyResultViewItem(
-                    result.stock,
-                    result.pay,
-                    result.get,
-                    payIcon,
-                    getIcon,
-                    payItem?.label,
-                    getItem?.label,
-                    result.accountName,
-                    result.lastCharacterName,
-                    result.status
-                )
+    suspend fun requestResult(league: String) = withContext(Dispatchers.IO) {
+        val result = getCurrencyResult.execute(wantCurrencies, haveCurrencies, league)
+        currencyResultData = result.map { item ->
+            val payItem = allCurrencies.flatMap {
+                it.staticItems
+            }.firstOrNull {
+                it.id == item.payCurrencyId
             }
-            currencyResultData = result
+            val getItem = allCurrencies.flatMap {
+                it.staticItems
+            }.firstOrNull {
+                it.id == item.getCurrencyId
+            }
+            CurrencyResultViewItem(
+                item.stock,
+                item.pay,
+                item.get,
+                payItem?.imageUrl,
+                getItem?.imageUrl,
+                payItem?.label,
+                getItem?.label,
+                item.accountName,
+                item.lastCharacterName,
+                item.status
+            )
         }
+        return@withContext currencyResultData.isNotEmpty()
     }
 }

@@ -33,7 +33,9 @@ internal class CurrencyExchangeResultFragment : BottomSheetDialogFragment() {
 
         binding?.let {
             it.results.layoutManager = LinearLayoutManager(view.context)
-            it.results.adapter = CurrencyResultAdapter(viewModel.currencyResultData)
+            it.results.adapter = CurrencyResultAdapter(viewModel.currencyResultData) { pos ->
+                it.results.post { it.results.adapter?.notifyDataSetChanged() }
+            }
         }
     }
 

@@ -1,7 +1,6 @@
 package com.poe.tradeapp.charts_feature.domain
 
-import com.poe.tradeapp.charts_feature.domain.usecases.GetCurrencyHistoryUseCase
-import com.poe.tradeapp.charts_feature.domain.usecases.GetItemsGroupsUseCase
+import com.poe.tradeapp.charts_feature.domain.usecases.*
 import org.koin.dsl.module
 
 internal val domainModule = module {
@@ -10,5 +9,14 @@ internal val domainModule = module {
     }
     single {
         GetItemsGroupsUseCase(get())
+    }
+    single {
+        GetCurrenciesOverviewUseCase(get())
+    }
+    single {
+        GetItemsOverviewUseCase(get())
+    }
+    single {
+        GetItemHistoryUseCase(get())
     }
 }
