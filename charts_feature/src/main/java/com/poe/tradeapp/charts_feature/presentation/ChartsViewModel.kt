@@ -1,14 +1,11 @@
 package com.poe.tradeapp.charts_feature.presentation
 
-import android.content.res.Resources
-import android.graphics.drawable.BitmapDrawable
 import androidx.lifecycle.ViewModel
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IFillFormatter
 import com.poe.tradeapp.charts_feature.domain.usecases.*
 import com.poe.tradeapp.charts_feature.presentation.models.*
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
@@ -30,31 +27,24 @@ internal class ChartsViewModel(
         }
     }
 
-    suspend fun getCurrenciesOverview(
-        league: String,
-        type: String,
-    ) = withContext(Dispatchers.IO) {
+    suspend fun getCurrenciesOverview(league: String, type: String) = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
         val result = getCurrenciesOverviewUseCase.execute(league, type).map {
-            val payGraphData = if (it.currencySparkLine != null) {
+            val sellingGraphData = mutableListOf<Entry>().apply {
+                for (i in it.sellingSparkLine.indices) {
+                    add(Entry(i.toFloat(), it.sellingSparkLine[i]))
+                }
+            }
+            val buyingGraphData = if (it.buyingSparkLine != null) {
                 mutableListOf<Entry>().apply {
-                    for (i in it.currencySparkLine.indices) {
-                        add(Entry(i.toFloat(), it.currencySparkLine[i]))
+                    for (i in it.buyingSparkLine.indices) {
+                        add(Entry(i.toFloat(), it.buyingSparkLine[i]))
                     }
                 }
             } else {
                 null
             }
-            val getGraphData = if (it.chaosEquivalentSparkLine != null) {
-                mutableListOf<Entry>().apply {
-                    for (i in it.chaosEquivalentSparkLine.indices) {
-                        add(Entry(i.toFloat(), it.chaosEquivalentSparkLine[i]))
-                    }
-                }
-            } else {
-                null
-            }
-            val payGraphDataSet = LineDataSet(payGraphData, "Pay graph").apply {
+            val sellingGraphDataSet = LineDataSet(sellingGraphData, "Pay graph").apply {
                 mode = LineDataSet.Mode.CUBIC_BEZIER
                 setDrawValues(false)
                 setDrawFilled(true)
@@ -63,7 +53,7 @@ internal class ChartsViewModel(
                 setDrawValues(false)
                 fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
             }
-            val getGraphDataSet = LineDataSet(getGraphData, "Get graph").apply {
+            val buyingGraphDataSet = LineDataSet(buyingGraphData, "Get graph").apply {
                 mode = LineDataSet.Mode.CUBIC_BEZIER
                 setDrawValues(false)
                 setDrawFilled(true)
@@ -72,35 +62,24 @@ internal class ChartsViewModel(
                 setDrawValues(false)
                 fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
             }
-            val payData = if (it.currencyData != null) {
-                CurrencyViewData(it.currencyData.listingCount, it.currencyData.value)
+            val sellingData =
+                ListingData(it.sellingListingData.listingCount, it.sellingListingData.value)
+            val buyingData = if (it.buyingListingData != null) {
+                ListingData(it.buyingListingData.listingCount, it.buyingListingData.value)
             } else {
                 null
             }
-            val getData = if (it.chaosEquivalentData != null) {
-                CurrencyViewData(it.chaosEquivalentData.listingCount, it.chaosEquivalentData.value)
-            } else {
-                null
-            }
-            CurrencyOverviewViewData(
+            OverviewViewData(
                 it.id,
-                it.currencyName,
-                it.currencyId,
-                it.currencyIcon,
-                BitmapDrawable(Resources.getSystem(), it.currencyIconForText).apply {
-                    setBounds(
-                        0,
-                        0,
-                        intrinsicWidth,
-                        intrinsicHeight
-                    )
-                },
-                payData,
-                getData,
-                payGraphDataSet,
-                getGraphDataSet,
-                it.currencyTotalChange,
-                it.chaosEquivalentTotalChange
+                it.name,
+                it.tradeId,
+                it.icon,
+                sellingData,
+                buyingData,
+                sellingGraphDataSet,
+                buyingGraphDataSet,
+                it.sellingTotalChange,
+                it.buyingTotalChange
             )
         }
         viewLoadingState.emit(false)
@@ -110,14 +89,10 @@ internal class ChartsViewModel(
     suspend fun getItemsOverview(league: String, type: String) = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
         val result = getItemsOverviewUseCase.execute(league, type).map {
-            val graphData = if (it.itemSparkLine != null) {
-                mutableListOf<Entry>().apply {
-                    for (i in it.itemSparkLine.indices) {
-                        add(Entry(i.toFloat(), it.itemSparkLine[i]))
-                    }
+            val graphData = mutableListOf<Entry>().apply {
+                for (i in it.sellingSparkLine.indices) {
+                    add(Entry(i.toFloat(), it.sellingSparkLine[i]))
                 }
-            } else {
-                null
             }
             val graphDataSet = LineDataSet(graphData, "Item graph").apply {
                 mode = LineDataSet.Mode.CUBIC_BEZIER
@@ -128,22 +103,17 @@ internal class ChartsViewModel(
                 setDrawValues(false)
                 fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
             }
-            val iconForText = Picasso.get().load(it.itemIcon).get()
-            ItemOverviewViewData(
+            OverviewViewData(
                 it.id,
-                it.itemName,
-                it.itemIcon,
-                BitmapDrawable(Resources.getSystem(), iconForText).apply {
-                    setBounds(
-                        0,
-                        0,
-                        intrinsicWidth,
-                        intrinsicHeight
-                    )
-                },
-                it.chaosEquivalentValue,
+                it.name,
+                it.tradeId,
+                it.icon,
+                ListingData(it.sellingListingData.listingCount, it.sellingListingData.value),
+                null,
                 graphDataSet,
-                it.totalChange
+                null,
+                it.sellingTotalChange,
+                it.buyingTotalChange
             )
         }
         viewLoadingState.emit(false)
@@ -165,23 +135,21 @@ internal class ChartsViewModel(
         )
         val receiveGraphDataSet = getFilteredGraphData(maxDay, data.receiveCurrencyGraphData, true)
         val payGraphDataSet = getFilteredGraphData(maxDay, data.payCurrencyGraphData, false)
-        val payValue = if (overViewData?.currencyData?.value != null) {
-            1 / overViewData.currencyData.value.toFloat()
+        val payValue = if (overViewData?.sellingListingData?.value != null) {
+            1 / overViewData.sellingListingData.value.toFloat()
         } else {
             null
         }
-        val receiveValue = overViewData?.chaosEquivalentData?.value?.toFloat() ?: 0f
+        val receiveValue = overViewData?.buyingListingData?.value?.toFloat() ?: 0f
         viewLoadingState.emit(false)
         return@withContext HistoryModel(
-            overViewData?.currencyName ?: "",
-            overViewData?.currencyIcon,
-            overViewData?.currencyId,
+            overViewData?.name ?: "",
+            overViewData?.icon,
+            overViewData?.tradeId,
             payGraphDataSet,
             receiveGraphDataSet,
             payValue,
-            receiveValue,
-            overViewData?.currencyIconForText,
-            overViewData?.currencyId
+            receiveValue
         )
     }
 
@@ -197,15 +165,13 @@ internal class ChartsViewModel(
         val graphData = getFilteredGraphData(data.maxOf { it.daysAgo }, data, true)
         viewLoadingState.emit(false)
         return@withContext HistoryModel(
-            overViewData?.itemName ?: "",
-            overViewData?.itemIcon,
+            overViewData?.name ?: "",
+            overViewData?.icon,
             overViewData?.tradeId,
             null,
             graphData,
             null,
-            overViewData?.chaosEquivalentValue ?: 0f,
-            overViewData?.itemIconForText,
-            overViewData?.itemName
+            overViewData?.sellingListingData?.value?.toFloat() ?: 0f
         )
     }
 

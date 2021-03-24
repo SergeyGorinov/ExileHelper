@@ -10,17 +10,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.poe.tradeapp.charts_feature.R
-import com.poe.tradeapp.charts_feature.databinding.FragmentCurrenciesOverviewBinding
+import com.poe.tradeapp.charts_feature.databinding.FragmentOverviewBinding
 import com.poe.tradeapp.charts_feature.presentation.ChartsViewModel
 import com.poe.tradeapp.charts_feature.presentation.adapters.CurrencyOverviewAdapter
 import com.poe.tradeapp.charts_feature.presentation.adapters.ItemOverviewAdapter
 import com.poe.tradeapp.core.presentation.BaseFragment
+import com.poe.tradeapp.core.presentation.HeaderItemDecoration
 import com.poe.tradeapp.core.presentation.generateLinearDividerDecoration
 import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class OverviewFragment : BaseFragment(R.layout.fragment_currencies_overview) {
+class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
 
     private val viewModel by sharedViewModel<ChartsViewModel>()
 
@@ -31,23 +32,28 @@ class OverviewFragment : BaseFragment(R.layout.fragment_currencies_overview) {
         requireArguments().getBoolean(IS_CURRENCY_KEY, false)
     }
 
-    private lateinit var binding: FragmentCurrenciesOverviewBinding
+    private lateinit var binding: FragmentOverviewBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val progressDialog = requireActivity().getTransparentProgressDialog()
 
-        viewBinding = FragmentCurrenciesOverviewBinding.bind(view)
+        viewBinding = FragmentOverviewBinding.bind(view)
         binding = getBinding()
 
         binding.toolbarLayout.toolbar.title = "Select currency"
-        binding.currenciesOverview.addItemDecoration(requireActivity().generateLinearDividerDecoration())
-        binding.currenciesOverview.layoutManager = LinearLayoutManager(requireActivity())
+
+        binding.currenciesOverview.apply {
+            addItemDecoration(requireActivity().generateLinearDividerDecoration())
+            addItemDecoration(HeaderItemDecoration(R.layout.overview_header))
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(requireActivity())
+        }
         lifecycleScope.launchWhenResumed {
-            if (isCurrency) {
+            binding.currenciesOverview.adapter = if (isCurrency) {
                 val items = viewModel.getCurrenciesOverview(settings.league, itemType)
-                binding.currenciesOverview.adapter = CurrencyOverviewAdapter(
+                CurrencyOverviewAdapter(
                     items,
                     false,
                     {
@@ -59,7 +65,7 @@ class OverviewFragment : BaseFragment(R.layout.fragment_currencies_overview) {
                 )
             } else {
                 val items = viewModel.getItemsOverview(settings.league, itemType)
-                binding.currenciesOverview.adapter = ItemOverviewAdapter(items) {
+                ItemOverviewAdapter(items) {
                     router.navigateTo(HistoryFragment.newInstance(it, itemType, isCurrency))
                 }
             }

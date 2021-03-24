@@ -26,7 +26,10 @@ import com.poe.tradeapp.charts_feature.R
 import com.poe.tradeapp.charts_feature.databinding.FragmentHistoryBinding
 import com.poe.tradeapp.charts_feature.presentation.ChartsViewModel
 import com.poe.tradeapp.charts_feature.presentation.models.HistoryModel
-import com.poe.tradeapp.core.presentation.*
+import com.poe.tradeapp.core.presentation.BaseFragment
+import com.poe.tradeapp.core.presentation.CenteredImageSpan
+import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
+import com.poe.tradeapp.core.presentation.toDrawable
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -74,23 +77,23 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
                 com.poe.tradeapp.core.R.font.fontinsmallcaps
             )
             if (isCurrency) {
-                setupChartData(data.payCurrencyGraphData, false, textColor, textFont)
+                setupChartData(data.sellingGraphData, false, textColor, textFont)
             }
-            setupChartData(data.receiveCurrencyGraphData, true, textColor, textFont)
+            setupChartData(data.buyingGraphData, true, textColor, textFont)
             setupChart(data, textColor, textFont)
             binding.toolbarLayout.toolbar.title = "Item history"
-            Picasso.get().load(data.itemIcon).into(binding.itemImage)
-            binding.itemLabel.text = data.itemName
+            Picasso.get().load(data.icon).into(binding.itemImage)
+            binding.itemLabel.text = data.name
             binding.buyText.text = createSpannableText(data, true)
             binding.buyButton.setOnClickListener {
-                getMainActivity()?.goToCurrencyExchange(data.itemTradeId, "chaos")
+                getMainActivity()?.goToCurrencyExchange(data.tradeId, "chaos")
             }
             if (isCurrency) {
                 binding.sellText.visibility = View.VISIBLE
                 binding.sellButton.visibility = View.VISIBLE
                 binding.sellText.text = createSpannableText(data, false)
                 binding.sellButton.setOnClickListener {
-                    getMainActivity()?.goToCurrencyExchange("chaos", data.itemTradeId)
+                    getMainActivity()?.goToCurrencyExchange("chaos", data.tradeId)
                 }
             }
         }
@@ -135,8 +138,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     }
 
     private fun setupChart(data: HistoryModel, textColor: Int, textFont: Typeface?) {
-        val xMax =
-            maxOf(data.payCurrencyGraphData?.xMax ?: 0f, data.receiveCurrencyGraphData.xMax)
+        val xMax = maxOf(data.sellingGraphData.xMax, data.buyingGraphData?.xMax ?: 0f)
         binding.chart.xAxis.apply {
             axisMinimum = 0f
             axisMaximum = xMax
@@ -165,10 +167,10 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
             legend.isEnabled = false
             axisRight.isEnabled = false
             setTouchEnabled(true)
-            this.data = if (data.payCurrencyGraphData != null) {
-                LineData(data.receiveCurrencyGraphData, data.payCurrencyGraphData)
+            this.data = if (data.buyingGraphData != null) {
+                LineData(data.buyingGraphData, data.sellingGraphData)
             } else {
-                LineData(data.receiveCurrencyGraphData)
+                LineData(data.sellingGraphData)
             }
             this.invalidate()
         }
@@ -176,9 +178,9 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
     private fun createSpannableText(data: HistoryModel, isBuy: Boolean): SpannableStringBuilder {
         val rightSideValue = if (isBuy) {
-            data.receiveValue
+            data.buyingValue
         } else {
-            data.payValue
+            data.sellingValue
         }
         val leftSideText = requireActivity().getString(
             if (isBuy) {
@@ -192,15 +194,15 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
             rightSideValue
         )
         return SpannableStringBuilder(leftSideText).apply {
-            if (data.iconForText != null) {
-                setSpan(
-                    CenteredImageSpan(data.iconForText.toDrawable(requireActivity())),
-                    length - 1,
-                    length,
-                    SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-            append(" ${data.itemName}")
+//            if (data.iconForText != null) {
+//                setSpan(
+//                    CenteredImageSpan(data.iconForText.toDrawable(requireActivity())),
+//                    length - 1,
+//                    length,
+//                    SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
+//                )
+//            }
+            append(" ${data.name}")
             if (rightSideValue != null) {
                 append(rightSideText)
                 setSpan(
