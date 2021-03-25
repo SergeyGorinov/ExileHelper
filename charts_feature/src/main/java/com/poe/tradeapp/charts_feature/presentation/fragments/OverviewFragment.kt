@@ -10,7 +10,6 @@ import com.poe.tradeapp.charts_feature.R
 import com.poe.tradeapp.charts_feature.databinding.FragmentOverviewBinding
 import com.poe.tradeapp.charts_feature.presentation.ChartsViewModel
 import com.poe.tradeapp.charts_feature.presentation.adapters.OverviewAdapter
-import com.poe.tradeapp.charts_feature.presentation.models.OverviewViewData
 import com.poe.tradeapp.core.presentation.BaseFragment
 import com.poe.tradeapp.core.presentation.HeaderItemDecoration
 import com.poe.tradeapp.core.presentation.generateLinearDividerDecoration
@@ -30,18 +29,24 @@ internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
     }
 
     private lateinit var binding: FragmentOverviewBinding
-    private var overviewItems = listOf<OverviewViewData>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val progressDialog = requireActivity().getTransparentProgressDialog()
-        val adapter = OverviewAdapter {
-            router.navigateTo(HistoryFragment.newInstance(it, itemType, isCurrency))
-        }
-
         viewBinding = FragmentOverviewBinding.bind(view)
         binding = getBinding()
+
+        val progressDialog = requireActivity().getTransparentProgressDialog()
+
+        val adapter = OverviewAdapter {
+            lifecycleScope.launchWhenResumed {
+                if (isCurrency) {
+                    viewModel.getCurrencyHistory(settings.league, itemType, it)
+                } else {
+                    viewModel.getItemHistory(settings.league, itemType, it)
+                }
+                router.navigateTo(HistoryFragment.newInstance(isCurrency))
+            }
+        }
 
         if (!isCurrency) {
             binding.buttonPanel.visibility = View.GONE
@@ -60,20 +65,19 @@ internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
             addItemDecoration(requireActivity().generateLinearDividerDecoration())
             addItemDecoration(HeaderItemDecoration(R.layout.overview_header))
             setHasFixedSize(true)
-            setItemViewCacheSize(20)
             layoutManager = LinearLayoutManager(requireActivity())
             binding.currenciesOverview.adapter = adapter
         }
         lifecycleScope.launchWhenResumed {
-            overviewItems = if (isCurrency) {
+            if (isCurrency) {
                 viewModel.getCurrenciesOverview(settings.league, itemType)
             } else {
                 adapter.selling = false
                 viewModel.getItemsOverview(settings.league, itemType)
             }
-            adapter.setData(overviewItems)
+            adapter.setData(viewModel.overviewData[itemType] ?: listOf())
         }
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launchWhenResumed {
             viewModel.viewLoadingState.collect {
                 if (it) {
                     progressDialog.show()

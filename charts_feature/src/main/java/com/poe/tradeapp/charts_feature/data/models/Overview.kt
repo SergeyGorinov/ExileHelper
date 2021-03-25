@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class OverviewResponse(
     val lines: List<Overview>,
-    val details: List<Detail>,
+    val currencyDetails: List<Detail>,
     val language: Language
 )
 

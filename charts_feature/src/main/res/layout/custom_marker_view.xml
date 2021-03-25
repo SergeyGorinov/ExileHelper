@@ -10,5 +10,6 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/fontinsmallcaps"
         android:textColor="@color/primaryTextColor"
+        android:textIsSelectable="false"
         android:textSize="14sp" />
 </LinearLayout>

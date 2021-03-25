@@ -4,4 +4,8 @@
     <string name="sell_chart_text">"Sell 1.0 %s"</string>
     <string name="receive_chart_text">"for %.1f Chaos Orbs"</string>
     <string name="open_wiki_button_text">Open Wiki</string>
+    <string name="overview_name_header">Name</string>
+    <string name="overview_header_pay">Pay</string>
+    <string name="overview_header_get">Get</string>
+    <string name="overview_metrics_header">Last 7 days</string>
 </resources>

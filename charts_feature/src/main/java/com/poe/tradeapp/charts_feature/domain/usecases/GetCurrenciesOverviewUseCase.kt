@@ -9,7 +9,7 @@ internal class GetCurrenciesOverviewUseCase(private val repository: IFeatureRepo
     suspend fun execute(league: String, type: String): List<OverviewData> {
         val result = repository.getCurrenciesOverview(league, type)
         val currenciesOverview = result.lines
-        val currenciesDetails = result.details
+        val currenciesDetails = result.currencyDetails
         return currenciesOverview.map { currencyOverview ->
             val sellingData = if (currencyOverview.pay != null) {
                 CurrencyData(currencyOverview.pay.listing_count, 1 / currencyOverview.pay.value)

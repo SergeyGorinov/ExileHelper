@@ -8,12 +8,14 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/label"
-        android:layout_width="102dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/fontinsmallcaps"
-        android:text="Name"
+        android:gravity="center"
+        android:text="@string/overview_name_header"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/exchangeText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,7 +36,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/fontinsmallcaps"
         android:gravity="center"
-        android:text="Pay"
+        android:text="@string/overview_header_pay"
         android:textColor="@color/primaryTextColor" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -43,18 +45,19 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/fontinsmallcaps"
         android:gravity="center"
-        android:text="Get"
+        android:text="@string/overview_header_get"
         android:textColor="@color/primaryTextColor" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/totalChange"
-        android:layout_width="137dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/fontinsmallcaps"
-        android:gravity="start"
-        android:text="Last 7 days"
+        android:gravity="center"
+        android:text="@string/overview_metrics_header"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/exchangeText"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

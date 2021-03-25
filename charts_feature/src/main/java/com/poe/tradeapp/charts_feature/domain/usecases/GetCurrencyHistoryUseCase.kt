@@ -8,13 +8,13 @@ internal class GetCurrencyHistoryUseCase(private val repository: IFeatureReposit
 
     suspend fun execute(league: String, type: String, id: String): CurrencyHistoryModel {
         return repository.getCurrencyHistory(league, type, id).run {
-            val payGraphData = this.payCurrencyGraphData.map {
+            val sellingGraphData = this.payCurrencyGraphData.map {
                 GraphData(it.count, it.value, it.daysAgo)
             }
-            val receiveGraphData = this.receiveCurrencyGraphData.map {
+            val buyingGraphData = this.receiveCurrencyGraphData.map {
                 GraphData(it.count, it.value, it.daysAgo)
             }
-            CurrencyHistoryModel(payGraphData, receiveGraphData)
+            CurrencyHistoryModel(buyingGraphData, sellingGraphData)
         }
     }
 }

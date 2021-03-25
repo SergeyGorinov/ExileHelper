@@ -33,7 +33,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/primaryTextColor"
-            android:textSize="24sp"
+            android:textSize="22sp"
             app:fontFamily="@font/fontinsmallcaps"
             app:layout_constraintBottom_toBottomOf="@id/itemImage"
             app:layout_constraintEnd_toStartOf="@id/goToWiki"
