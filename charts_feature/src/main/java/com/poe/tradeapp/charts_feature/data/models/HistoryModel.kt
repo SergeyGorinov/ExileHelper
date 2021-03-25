@@ -3,7 +3,7 @@ package com.poe.tradeapp.charts_feature.data.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class CurrencyHistoryModel(
+internal data class HistoryModel(
     val payCurrencyGraphData: List<GraphData>,
     val receiveCurrencyGraphData: List<GraphData>
 )

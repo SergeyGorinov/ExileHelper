@@ -1,9 +1,9 @@
 package com.poe.tradeapp.charts_feature.data
 
-import com.poe.tradeapp.charts_feature.data.models.CurrenciesOverviewResponse
-import com.poe.tradeapp.charts_feature.data.models.CurrencyHistoryModel
 import com.poe.tradeapp.charts_feature.data.models.GraphData
+import com.poe.tradeapp.charts_feature.data.models.HistoryModel
 import com.poe.tradeapp.charts_feature.data.models.ItemGroup
+import com.poe.tradeapp.charts_feature.data.models.OverviewResponse
 import kotlinx.serialization.json.JsonObject
 import retrofit2.await
 
@@ -12,7 +12,7 @@ internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatu
     override suspend fun getCurrenciesOverview(
         league: String,
         type: String
-    ): CurrenciesOverviewResponse {
+    ): OverviewResponse {
         return api.getCurrenciesOverview(league, type).await()
     }
 
@@ -24,7 +24,7 @@ internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatu
         league: String,
         type: String,
         id: String
-    ): CurrencyHistoryModel {
+    ): HistoryModel {
         return api.getCurrencyHistory(league, type, id).await()
     }
 

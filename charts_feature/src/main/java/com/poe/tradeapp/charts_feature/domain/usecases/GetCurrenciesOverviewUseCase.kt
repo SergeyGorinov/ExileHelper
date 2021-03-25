@@ -9,14 +9,14 @@ internal class GetCurrenciesOverviewUseCase(private val repository: IFeatureRepo
     suspend fun execute(league: String, type: String): List<OverviewData> {
         val result = repository.getCurrenciesOverview(league, type)
         val currenciesOverview = result.lines
-        val currenciesDetails = result.currencyDetails
+        val currenciesDetails = result.details
         return currenciesOverview.map { currencyOverview ->
-            val buyingData = if (currencyOverview.pay != null) {
-                CurrencyData(currencyOverview.pay.listing_count, currencyOverview.pay.value)
+            val sellingData = if (currencyOverview.pay != null) {
+                CurrencyData(currencyOverview.pay.listing_count, 1 / currencyOverview.pay.value)
             } else {
                 null
             }
-            val sellingData =
+            val buyingData =
                 CurrencyData(currencyOverview.receive.listing_count, currencyOverview.receive.value)
             val currencyDetail =
                 currenciesDetails.firstOrNull { it.id == currencyOverview.receive.get_currency_id }
@@ -28,12 +28,12 @@ internal class GetCurrenciesOverviewUseCase(private val repository: IFeatureRepo
                 sellingData,
                 buyingData,
                 if (currencyOverview.receiveSparkLine.data.any { it == null }) {
-                    listOf()
+                    null
                 } else {
                     currencyOverview.receiveSparkLine.data.filterNotNull()
                 },
                 if (currencyOverview.paySparkLine.data.any { it == null }) {
-                    null
+                    listOf()
                 } else {
                     currencyOverview.paySparkLine.data.filterNotNull()
                 },

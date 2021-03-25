@@ -33,6 +33,7 @@ internal class GetItemsOverviewUseCase(private val repository: IFeatureRepositor
                     name,
                     icon,
                     tradeId,
+                    null,
                     CurrencyData(listingCount, chaosValue),
                     null,
                     if (sparkLineData.any { it == null }) {
@@ -41,8 +42,7 @@ internal class GetItemsOverviewUseCase(private val repository: IFeatureRepositor
                         sparkLineData.filterNotNull()
                     },
                     null,
-                    totalChange,
-                    null
+                    totalChange
                 )
             } catch (e: Exception) {
                 null

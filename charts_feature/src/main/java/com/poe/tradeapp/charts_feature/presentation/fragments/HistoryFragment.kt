@@ -1,11 +1,11 @@
 package com.poe.tradeapp.charts_feature.presentation.fragments
 
+import android.app.AlertDialog
 import android.content.Context
-import android.graphics.BitmapFactory
+import android.content.Intent
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
-import android.text.SpannableStringBuilder
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -27,9 +27,7 @@ import com.poe.tradeapp.charts_feature.databinding.FragmentHistoryBinding
 import com.poe.tradeapp.charts_feature.presentation.ChartsViewModel
 import com.poe.tradeapp.charts_feature.presentation.models.HistoryModel
 import com.poe.tradeapp.core.presentation.BaseFragment
-import com.poe.tradeapp.core.presentation.CenteredImageSpan
 import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
-import com.poe.tradeapp.core.presentation.toDrawable
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -37,7 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
-class HistoryFragment : BaseFragment(R.layout.fragment_history) {
+internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
     private val viewModel by sharedViewModel<ChartsViewModel>()
 
@@ -46,6 +44,8 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     private val isCurrency by lazy { requireArguments().getBoolean(IS_CURRENCY_KEY, false) }
 
     private lateinit var binding: FragmentHistoryBinding
+
+    private val picassoInstance = Picasso.get()
 
     internal val formatter = SimpleDateFormat("MMM dd", Locale.getDefault())
 
@@ -76,26 +76,33 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
                 requireActivity(),
                 com.poe.tradeapp.core.R.font.fontinsmallcaps
             )
-            if (isCurrency) {
-                setupChartData(data.sellingGraphData, false, textColor, textFont)
-            }
-            setupChartData(data.buyingGraphData, true, textColor, textFont)
+            setupChartData(data.buyingGraphData, false, textColor, textFont)
+            setupChartData(data.sellingGraphData, true, textColor, textFont)
             setupChart(data, textColor, textFont)
             binding.toolbarLayout.toolbar.title = "Item history"
-            Picasso.get().load(data.icon).into(binding.itemImage)
             binding.itemLabel.text = data.name
-            binding.buyText.text = createSpannableText(data, true)
+            binding.goToWiki.setOnClickListener {
+                createWikiDialog(data.name).show()
+            }
             binding.buyButton.setOnClickListener {
                 getMainActivity()?.goToCurrencyExchange(data.tradeId, "chaos")
             }
+            binding.leftSideBuyText.text = getString(R.string.buy_chart_text, data.name)
+            binding.rightSideBuyText.text = getString(R.string.receive_chart_text, data.buyingValue)
             if (isCurrency) {
-                binding.sellText.visibility = View.VISIBLE
+                binding.sellData.visibility = View.VISIBLE
                 binding.sellButton.visibility = View.VISIBLE
-                binding.sellText.text = createSpannableText(data, false)
+                binding.leftSideSellText.text = getString(R.string.sell_chart_text, data.name)
+
+                binding.rightSideSellText.text =
+                    getString(R.string.receive_chart_text, data.sellingValue ?: 0f)
                 binding.sellButton.setOnClickListener {
                     getMainActivity()?.goToCurrencyExchange("chaos", data.tradeId)
                 }
+                picassoInstance.load(data.icon).fit().into(binding.leftSideSellImage)
             }
+            picassoInstance.load(data.icon).fit().into(binding.leftSideBuyImage)
+            picassoInstance.load(data.icon).fit().into(binding.itemImage)
         }
         lifecycleScope.launchWhenCreated {
             viewModel.viewLoadingState.collect {
@@ -110,14 +117,14 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
     private fun setupChartData(
         chartData: LineDataSet?,
-        isReceive: Boolean,
+        selling: Boolean,
         textColor: Int,
         textFont: Typeface?
     ) {
         chartData ?: return
         val currentColor = ContextCompat.getColor(
             requireActivity(),
-            if (isReceive) R.color.primaryLineChartColor else R.color.secondaryLineChartColor
+            if (selling) R.color.primaryLineChartColor else R.color.secondaryLineChartColor
         )
         chartData.apply {
             color = currentColor
@@ -138,7 +145,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     }
 
     private fun setupChart(data: HistoryModel, textColor: Int, textFont: Typeface?) {
-        val xMax = maxOf(data.sellingGraphData.xMax, data.buyingGraphData?.xMax ?: 0f)
+        val xMax = maxOf(data.sellingGraphData?.xMax ?: 0f, data.buyingGraphData.xMax)
         binding.chart.xAxis.apply {
             axisMinimum = 0f
             axisMaximum = xMax
@@ -167,60 +174,33 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
             legend.isEnabled = false
             axisRight.isEnabled = false
             setTouchEnabled(true)
-            this.data = if (data.buyingGraphData != null) {
+            this.data = if (data.sellingGraphData != null) {
                 LineData(data.buyingGraphData, data.sellingGraphData)
             } else {
-                LineData(data.sellingGraphData)
+                LineData(data.buyingGraphData)
             }
             this.invalidate()
         }
     }
 
-    private fun createSpannableText(data: HistoryModel, isBuy: Boolean): SpannableStringBuilder {
-        val rightSideValue = if (isBuy) {
-            data.buyingValue
-        } else {
-            data.sellingValue
-        }
-        val leftSideText = requireActivity().getString(
-            if (isBuy) {
-                R.string.buy_chart_text_left
-            } else {
-                R.string.sell_chart_text_left
+    private fun createWikiDialog(path: String): AlertDialog {
+        return AlertDialog.Builder(requireActivity())
+            .setPositiveButton("Yes") { _, _ ->
+                val uri = Uri.Builder()
+                    .scheme("https")
+                    .authority("pathofexile.gamepedia.com")
+                    .appendPath(path)
+                    .build()
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    data = uri
+                }
+                requireActivity().startActivity(intent)
             }
-        )
-        val rightSideText = requireActivity().getString(
-            R.string.chart_text_right,
-            rightSideValue
-        )
-        return SpannableStringBuilder(leftSideText).apply {
-//            if (data.iconForText != null) {
-//                setSpan(
-//                    CenteredImageSpan(data.iconForText.toDrawable(requireActivity())),
-//                    length - 1,
-//                    length,
-//                    SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
-//                )
-//            }
-            append(" ${data.name}")
-            if (rightSideValue != null) {
-                append(rightSideText)
-                setSpan(
-                    CenteredImageSpan(generateChaosIcon()),
-                    length - 1,
-                    length,
-                    SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                append(" Chaos Orbs")
+            .setNegativeButton("No") { _, _ ->
+                return@setNegativeButton
             }
-        }
-    }
-
-    private fun generateChaosIcon(): Drawable {
-        return BitmapFactory.decodeResource(
-            requireActivity().resources,
-            R.drawable.chaos_icon
-        ).toDrawable(requireActivity())
+            .setTitle("Open page on PoeWiki?")
+            .create()
     }
 
     private class CustomMarkerView(context: Context, resId: Int) : MarkerView(context, resId) {

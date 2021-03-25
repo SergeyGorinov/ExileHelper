@@ -7,7 +7,8 @@ import com.github.mikephil.charting.formatter.IFillFormatter
 import com.poe.tradeapp.charts_feature.domain.usecases.*
 import com.poe.tradeapp.charts_feature.presentation.models.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import kotlin.math.max
 
@@ -19,7 +20,10 @@ internal class ChartsViewModel(
     private val getItemHistoryUseCase: GetItemHistoryUseCase
 ) : ViewModel() {
 
-    val viewLoadingState = MutableStateFlow(true)
+    val viewLoadingState = MutableSharedFlow<Boolean>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_LATEST
+    )
 
     fun getItemsGroups(): List<ItemGroup> {
         return getItemsGroupsUseCase.execute().map {
@@ -30,19 +34,19 @@ internal class ChartsViewModel(
     suspend fun getCurrenciesOverview(league: String, type: String) = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
         val result = getCurrenciesOverviewUseCase.execute(league, type).map {
-            val sellingGraphData = mutableListOf<Entry>().apply {
-                for (i in it.sellingSparkLine.indices) {
-                    add(Entry(i.toFloat(), it.sellingSparkLine[i]))
-                }
-            }
-            val buyingGraphData = if (it.buyingSparkLine != null) {
+            val sellingGraphData = if (it.sellingSparkLine != null) {
                 mutableListOf<Entry>().apply {
-                    for (i in it.buyingSparkLine.indices) {
-                        add(Entry(i.toFloat(), it.buyingSparkLine[i]))
+                    for (i in it.sellingSparkLine.indices) {
+                        add(Entry(i.toFloat(), it.sellingSparkLine[i]))
                     }
                 }
             } else {
                 null
+            }
+            val buyingGraphData = mutableListOf<Entry>().apply {
+                for (i in it.buyingSparkLine.indices) {
+                    add(Entry(i.toFloat(), it.buyingSparkLine[i]))
+                }
             }
             val sellingGraphDataSet = LineDataSet(sellingGraphData, "Pay graph").apply {
                 mode = LineDataSet.Mode.CUBIC_BEZIER
@@ -62,13 +66,13 @@ internal class ChartsViewModel(
                 setDrawValues(false)
                 fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
             }
-            val sellingData =
+            val sellingData = if (it.sellingListingData != null) {
                 ListingData(it.sellingListingData.listingCount, it.sellingListingData.value)
-            val buyingData = if (it.buyingListingData != null) {
-                ListingData(it.buyingListingData.listingCount, it.buyingListingData.value)
             } else {
                 null
             }
+            val buyingData =
+                ListingData(it.buyingListingData.listingCount, it.buyingListingData.value)
             OverviewViewData(
                 it.id,
                 it.name,
@@ -90,8 +94,8 @@ internal class ChartsViewModel(
         viewLoadingState.emit(true)
         val result = getItemsOverviewUseCase.execute(league, type).map {
             val graphData = mutableListOf<Entry>().apply {
-                for (i in it.sellingSparkLine.indices) {
-                    add(Entry(i.toFloat(), it.sellingSparkLine[i]))
+                for (i in it.buyingSparkLine.indices) {
+                    add(Entry(i.toFloat(), it.buyingSparkLine[i]))
                 }
             }
             val graphDataSet = LineDataSet(graphData, "Item graph").apply {
@@ -108,10 +112,10 @@ internal class ChartsViewModel(
                 it.name,
                 it.tradeId,
                 it.icon,
-                ListingData(it.sellingListingData.listingCount, it.sellingListingData.value),
+                null,
+                ListingData(it.buyingListingData.listingCount, it.buyingListingData.value),
                 null,
                 graphDataSet,
-                null,
                 it.sellingTotalChange,
                 it.buyingTotalChange
             )
@@ -130,26 +134,22 @@ internal class ChartsViewModel(
             getCurrenciesOverviewUseCase.execute(league, type).firstOrNull { it.id == id }
         val data = getCurrencyHistoryUseCase.execute(league, type, id)
         val maxDay = max(
-            data.payCurrencyGraphData.firstOrNull()?.daysAgo ?: 0,
-            data.receiveCurrencyGraphData.first().daysAgo
+            data.buyingGraphData.firstOrNull()?.daysAgo ?: 0,
+            data.sellingGraphData.first().daysAgo
         )
-        val receiveGraphDataSet = getFilteredGraphData(maxDay, data.receiveCurrencyGraphData, true)
-        val payGraphDataSet = getFilteredGraphData(maxDay, data.payCurrencyGraphData, false)
-        val payValue = if (overViewData?.sellingListingData?.value != null) {
-            1 / overViewData.sellingListingData.value.toFloat()
-        } else {
-            null
-        }
-        val receiveValue = overViewData?.buyingListingData?.value?.toFloat() ?: 0f
+        val sellingGraphDataSet = getFilteredGraphData(maxDay, data.sellingGraphData, true)
+        val buyingGraphDataSet = getFilteredGraphData(maxDay, data.buyingGraphData, false)
+        val sellingValue = overViewData?.sellingListingData?.value?.toFloat() ?: 0f
+        val buyingValue = overViewData?.buyingListingData?.value?.toFloat() ?: 0f
         viewLoadingState.emit(false)
         return@withContext HistoryModel(
             overViewData?.name ?: "",
             overViewData?.icon,
             overViewData?.tradeId,
-            payGraphDataSet,
-            receiveGraphDataSet,
-            payValue,
-            receiveValue
+            sellingGraphDataSet,
+            buyingGraphDataSet,
+            sellingValue,
+            buyingValue
         )
     }
 

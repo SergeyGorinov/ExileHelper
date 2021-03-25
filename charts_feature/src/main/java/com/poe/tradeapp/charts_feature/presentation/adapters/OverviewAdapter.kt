@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.data.LineData
 import com.poe.tradeapp.charts_feature.R
@@ -13,14 +15,33 @@ import com.poe.tradeapp.charts_feature.presentation.models.OverviewViewData
 import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
 
-internal class CurrencyOverviewAdapter(
-    private val items: List<OverviewViewData>,
-    private val isBuy: Boolean,
-    private val onItemClick: (String) -> Unit,
-    private val onWikiClick: (String) -> Unit
-) : RecyclerView.Adapter<CurrencyOverviewAdapter.CurrencyOverviewViewHolder>() {
+internal class OverviewAdapter(private val onItemClick: (String) -> Unit) :
+    RecyclerView.Adapter<OverviewAdapter.CurrencyOverviewViewHolder>() {
+
+    var selling = true
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    private val diffUtilCallback = object : DiffUtil.ItemCallback<OverviewViewData>() {
+        override fun areItemsTheSame(
+            oldItem: OverviewViewData,
+            newItem: OverviewViewData
+        ): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(
+            oldItem: OverviewViewData,
+            newItem: OverviewViewData
+        ): Boolean {
+            return oldItem == newItem
+        }
+    }
 
     private val picassoInstance = Picasso.get()
+    private val asyncDiffer = AsyncListDiffer(this, diffUtilCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyOverviewViewHolder {
         return CurrencyOverviewViewHolder(
@@ -30,14 +51,18 @@ internal class CurrencyOverviewAdapter(
     }
 
     override fun onBindViewHolder(holder: CurrencyOverviewViewHolder, position: Int) {
-        val item = items[position]
-        holder.bind(item, isBuy, onWikiClick)
+        val item = asyncDiffer.currentList[position]
+        holder.bind(item, selling)
         holder.itemView.setOnClickListener {
             onItemClick(item.id)
         }
     }
 
-    override fun getItemCount() = items.size
+    override fun getItemCount() = asyncDiffer.currentList.size
+
+    fun setData(data: List<OverviewViewData>) {
+        asyncDiffer.submitList(data)
+    }
 
     internal class CurrencyOverviewViewHolder(
         itemView: View,
@@ -58,30 +83,31 @@ internal class CurrencyOverviewAdapter(
             }
         }
 
-        fun bind(item: OverviewViewData, selling: Boolean, onWikiClick: (String) -> Unit) {
+        fun bind(item: OverviewViewData, selling: Boolean) {
             val totalChangeValue = if (selling) {
-                item.buyingTotalChange?.roundToInt()
+                item.sellingTotalChange?.roundToInt()
             } else {
-                item.sellingTotalChange.roundToInt()
+                item.buyingTotalChange.roundToInt()
             } ?: 0
             setupChart(item, selling)
             viewBinding.label.text = item.name
-            if (selling) {
-                viewBinding.exchangeText.text = itemView.context.getString(
+            viewBinding.exchangeText.text = if (selling) {
+                itemView.context.getString(
                     R.string.exchange_text,
                     1f,
-                    item.sellingListingData.value.toFloat()
+                    item.sellingListingData?.value?.toFloat() ?: 0f
                 )
             } else {
-                val price = 1 / (item.buyingListingData?.value?.toFloat() ?: -1f)
-                viewBinding.exchangeText.text = itemView.context.getString(
-                    R.string.exchange_text, if (price > 0) price else 0f, 1f
+                itemView.context.getString(
+                    R.string.exchange_text,
+                    item.buyingListingData.value.toFloat(),
+                    1f
                 )
             }
-            viewBinding.totalChange.text = when {
-                totalChangeValue > 0 -> "+$totalChangeValue%"
-                totalChangeValue < 0 -> "-$totalChangeValue%"
-                else -> "$totalChangeValue%"
+            viewBinding.totalChange.text = if (totalChangeValue > 0) {
+                "+$totalChangeValue%"
+            } else {
+                "$totalChangeValue%"
             }
             viewBinding.totalChange.setTextColor(
                 when {
@@ -90,9 +116,6 @@ internal class CurrencyOverviewAdapter(
                     else -> Color.GRAY
                 }
             )
-            viewBinding.goToWiki.setOnClickListener {
-                onWikiClick(item.name)
-            }
             picassoInstance.load(item.icon).fit().into(
                 if (selling) viewBinding.leftSideImage else viewBinding.rightSideImage
             )
@@ -102,23 +125,10 @@ internal class CurrencyOverviewAdapter(
             picassoInstance.load(item.icon).fit().into(viewBinding.image)
         }
 
-        private fun setupChart(item: OverviewViewData, isBuying: Boolean) {
+        private fun setupChart(item: OverviewViewData, selling: Boolean) {
             when {
-                isBuying && item.buyingSparkLine == null -> {
-                    viewBinding.chart.visibility = View.INVISIBLE
-                }
-                isBuying && item.buyingSparkLine != null -> {
+                !selling -> {
                     viewBinding.chart.data = LineData(item.buyingSparkLine.apply {
-                        color =
-                            ContextCompat.getColor(itemView.context, R.color.primaryLineChartColor)
-                        fillColor = ContextCompat.getColor(
-                            itemView.context,
-                            R.color.primaryLineChartFillColor
-                        )
-                    })
-                }
-                !isBuying -> {
-                    viewBinding.chart.data = LineData(item.sellingSparkLine.apply {
                         color =
                             ContextCompat.getColor(
                                 itemView.context,
@@ -127,6 +137,22 @@ internal class CurrencyOverviewAdapter(
                         fillColor = ContextCompat.getColor(
                             itemView.context,
                             R.color.secondaryLineChartFillColor
+                        )
+                    })
+                }
+                selling && item.sellingSparkLine == null -> {
+                    viewBinding.chart.visibility = View.INVISIBLE
+                }
+                selling && item.sellingSparkLine != null -> {
+                    viewBinding.chart.data = LineData(item.sellingSparkLine.apply {
+                        color =
+                            ContextCompat.getColor(
+                                itemView.context,
+                                R.color.primaryLineChartColor
+                            )
+                        fillColor = ContextCompat.getColor(
+                            itemView.context,
+                            R.color.primaryLineChartFillColor
                         )
                     })
                 }

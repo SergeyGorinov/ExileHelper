@@ -3,14 +3,14 @@ package com.poe.tradeapp.charts_feature.data.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class CurrenciesOverviewResponse(
-    val lines: List<CurrencyOverview>,
-    val currencyDetails: List<CurrencyDetail>,
+internal data class OverviewResponse(
+    val lines: List<Overview>,
+    val details: List<Detail>,
     val language: Language
 )
 
 @Serializable
-internal data class CurrencyOverview(
+internal data class Overview(
     val currencyTypeName: String,
     val pay: Info?,
     val receive: Info,
@@ -43,7 +43,7 @@ internal data class SparkLine(
 )
 
 @Serializable
-internal data class CurrencyDetail(
+internal data class Detail(
     val id: Int,
     val icon: String,
     val name: String,

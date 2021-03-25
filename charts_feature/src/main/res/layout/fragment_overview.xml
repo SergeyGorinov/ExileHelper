@@ -9,11 +9,48 @@
         android:id="@+id/toolbar_layout"
         layout="@layout/toolbar" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/currenciesOverview"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/buttonPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="showSelling,showBuying"
+            app:flow_horizontalGap="2dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/showSelling"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/left_side_rounded_button"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center"
+            android:text="Sell"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/showBuying"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/right_side_rounded_button"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center"
+            android:text="Buy"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="16sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/currenciesOverview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonPanel" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

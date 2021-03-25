@@ -5,15 +5,10 @@ internal data class OverviewData(
     val name: String,
     val icon: String?,
     val tradeId: String?,
-    val sellingListingData: CurrencyData,
-    val buyingListingData: CurrencyData?,
-    val sellingSparkLine: List<Float>,
-    val buyingSparkLine: List<Float>?,
-    val sellingTotalChange: Float,
-    val buyingTotalChange: Float?
-)
-
-internal data class CurrencyData(
-    val listingCount: Int,
-    val value: Double
+    val sellingListingData: CurrencyData?,
+    val buyingListingData: CurrencyData,
+    val sellingSparkLine: List<Float>?,
+    val buyingSparkLine: List<Float>,
+    val sellingTotalChange: Float?,
+    val buyingTotalChange: Float
 )

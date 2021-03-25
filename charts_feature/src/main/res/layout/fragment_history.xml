@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primaryDarkColor">
@@ -12,7 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingVertical="8dp"
+        android:padding="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -28,27 +29,78 @@
             android:id="@+id/itemLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/primaryTextColor"
             android:textSize="24sp"
             app:fontFamily="@font/fontinsmallcaps"
             app:layout_constraintBottom_toBottomOf="@id/itemImage"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/goToWiki"
             app:layout_constraintStart_toEndOf="@id/itemImage"
             app:layout_constraintTop_toTopOf="@id/itemImage" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/buyText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/goToWiki"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@null"
+            android:drawableEnd="@drawable/open_link_24"
+            android:drawablePadding="4dp"
             android:fontFamily="@font/fontinsmallcaps"
             android:gravity="center"
-            android:padding="8dp"
+            android:padding="4dp"
+            android:text="@string/open_wiki_button_text"
+            android:textColor="@color/primaryTextColor"
+            app:layout_constraintBottom_toBottomOf="@id/itemImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/itemImage"
+            tools:ignore="ContentDescription" />
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/buyData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            app:constraint_referenced_ids="leftSideBuyText,leftSideBuyImage,rightSideBuyText,rightSideBuyImage"
+            app:flow_horizontalGap="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemImage" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/leftSideBuyText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center"
             android:textColor="@color/primaryTextColor"
             android:textSize="14sp"
-            app:fontFamily="@font/fontinsmallcaps"
-            app:layout_constraintTop_toBottomOf="@id/itemImage" />
+            app:fontFamily="@font/fontinsmallcaps" />
+
+        <ImageView
+            android:id="@+id/rightSideBuyImage"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/chaos_icon"
+            tools:ignore="ContentDescription" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/rightSideBuyText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="14sp"
+            app:fontFamily="@font/fontinsmallcaps" />
+
+        <ImageView
+            android:id="@+id/leftSideBuyImage"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            tools:ignore="ContentDescription" />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/buyButton"
@@ -57,20 +109,52 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/rounded_button"
             android:src="@drawable/exchange_24"
-            app:layout_constraintTop_toBottomOf="@id/buyText" />
+            app:layout_constraintTop_toBottomOf="@id/buyData" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/sellText"
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/sellData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
             android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:constraint_referenced_ids="leftSideSellText,leftSideSellImage,rightSideSellText,rightSideSellImage"
+            app:flow_horizontalGap="8dp"
+            app:flow_wrapMode="aligned"
+            app:layout_constraintTop_toBottomOf="@id/buyButton" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/leftSideSellText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/fontinsmallcaps"
             android:gravity="center"
-            android:padding="8dp"
             android:textColor="@color/primaryTextColor"
             android:textSize="14sp"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/buyButton" />
+            app:fontFamily="@font/fontinsmallcaps" />
+
+        <ImageView
+            android:id="@+id/leftSideSellImage"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/rightSideSellImage"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/chaos_icon"
+            tools:ignore="ContentDescription" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/rightSideSellText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="14sp"
+            app:fontFamily="@font/fontinsmallcaps" />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/sellButton"
@@ -80,7 +164,7 @@
             android:background="@drawable/rounded_button"
             android:src="@drawable/exchange_24"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/sellText" />
+            app:layout_constraintTop_toBottomOf="@id/sellData" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart"

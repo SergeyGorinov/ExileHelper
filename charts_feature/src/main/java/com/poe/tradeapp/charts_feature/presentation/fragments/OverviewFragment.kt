@@ -1,8 +1,5 @@
 package com.poe.tradeapp.charts_feature.presentation.fragments
 
-import android.app.AlertDialog
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
@@ -12,8 +9,8 @@ import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.poe.tradeapp.charts_feature.R
 import com.poe.tradeapp.charts_feature.databinding.FragmentOverviewBinding
 import com.poe.tradeapp.charts_feature.presentation.ChartsViewModel
-import com.poe.tradeapp.charts_feature.presentation.adapters.CurrencyOverviewAdapter
-import com.poe.tradeapp.charts_feature.presentation.adapters.ItemOverviewAdapter
+import com.poe.tradeapp.charts_feature.presentation.adapters.OverviewAdapter
+import com.poe.tradeapp.charts_feature.presentation.models.OverviewViewData
 import com.poe.tradeapp.core.presentation.BaseFragment
 import com.poe.tradeapp.core.presentation.HeaderItemDecoration
 import com.poe.tradeapp.core.presentation.generateLinearDividerDecoration
@@ -21,7 +18,7 @@ import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
+internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
 
     private val viewModel by sharedViewModel<ChartsViewModel>()
 
@@ -33,14 +30,29 @@ class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
     }
 
     private lateinit var binding: FragmentOverviewBinding
+    private var overviewItems = listOf<OverviewViewData>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val progressDialog = requireActivity().getTransparentProgressDialog()
+        val adapter = OverviewAdapter {
+            router.navigateTo(HistoryFragment.newInstance(it, itemType, isCurrency))
+        }
 
         viewBinding = FragmentOverviewBinding.bind(view)
         binding = getBinding()
+
+        if (!isCurrency) {
+            binding.buttonPanel.visibility = View.GONE
+        } else {
+            binding.showBuying.setOnClickListener {
+                adapter.selling = false
+            }
+            binding.showSelling.setOnClickListener {
+                adapter.selling = true
+            }
+        }
 
         binding.toolbarLayout.toolbar.title = "Select currency"
 
@@ -48,27 +60,18 @@ class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
             addItemDecoration(requireActivity().generateLinearDividerDecoration())
             addItemDecoration(HeaderItemDecoration(R.layout.overview_header))
             setHasFixedSize(true)
+            setItemViewCacheSize(20)
             layoutManager = LinearLayoutManager(requireActivity())
+            binding.currenciesOverview.adapter = adapter
         }
         lifecycleScope.launchWhenResumed {
-            binding.currenciesOverview.adapter = if (isCurrency) {
-                val items = viewModel.getCurrenciesOverview(settings.league, itemType)
-                CurrencyOverviewAdapter(
-                    items,
-                    false,
-                    {
-                        router.navigateTo(HistoryFragment.newInstance(it, itemType, isCurrency))
-                    },
-                    {
-                        createWikiDialog(it).show()
-                    }
-                )
+            overviewItems = if (isCurrency) {
+                viewModel.getCurrenciesOverview(settings.league, itemType)
             } else {
-                val items = viewModel.getItemsOverview(settings.league, itemType)
-                ItemOverviewAdapter(items) {
-                    router.navigateTo(HistoryFragment.newInstance(it, itemType, isCurrency))
-                }
+                adapter.selling = false
+                viewModel.getItemsOverview(settings.league, itemType)
             }
+            adapter.setData(overviewItems)
         }
         lifecycleScope.launchWhenCreated {
             viewModel.viewLoadingState.collect {
@@ -79,26 +82,6 @@ class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
                 }
             }
         }
-    }
-
-    private fun createWikiDialog(path: String): AlertDialog {
-        return AlertDialog.Builder(requireActivity())
-            .setPositiveButton("Yes") { _, _ ->
-                val uri = Uri.Builder()
-                    .scheme("https")
-                    .authority("pathofexile.gamepedia.com")
-                    .appendPath(path)
-                    .build()
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    data = uri
-                }
-                requireActivity().startActivity(intent)
-            }
-            .setNegativeButton("No") { _, _ ->
-                return@setNegativeButton
-            }
-            .setTitle("Open page on PoeWiki?")
-            .create()
     }
 
     companion object {

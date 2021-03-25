@@ -1,6 +1,6 @@
 package com.poe.tradeapp.charts_feature.domain.models
 
-data class ItemGroup(
+internal data class ItemGroup(
     val label: String,
     val iconUrl: String,
     val isCurrency: Boolean,

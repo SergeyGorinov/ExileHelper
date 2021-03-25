@@ -1,6 +1,7 @@
 <resources>
     <string name="exchange_text">"%.1f -> %.1f"</string>
-    <string name="buy_chart_text_left">"Buy 1.0  "</string>
-    <string name="sell_chart_text_left">"Sell 1.0  "</string>
-    <string name="chart_text_right">" for %.1f  "</string>
+    <string name="buy_chart_text">"Buy 1.0 %s"</string>
+    <string name="sell_chart_text">"Sell 1.0 %s"</string>
+    <string name="receive_chart_text">"for %.1f Chaos Orbs"</string>
+    <string name="open_wiki_button_text">Open Wiki</string>
 </resources>

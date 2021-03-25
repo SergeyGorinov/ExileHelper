@@ -1,8 +1,8 @@
 package com.poe.tradeapp.charts_feature.data
 
-import com.poe.tradeapp.charts_feature.data.models.CurrenciesOverviewResponse
-import com.poe.tradeapp.charts_feature.data.models.CurrencyHistoryModel
 import com.poe.tradeapp.charts_feature.data.models.GraphData
+import com.poe.tradeapp.charts_feature.data.models.HistoryModel
+import com.poe.tradeapp.charts_feature.data.models.OverviewResponse
 import kotlinx.serialization.json.JsonObject
 import retrofit2.Call
 import retrofit2.http.GET
@@ -14,7 +14,7 @@ internal interface PoeNinjaChartsApi {
     fun getCurrenciesOverview(
         @Query("league") league: String,
         @Query("type") type: String
-    ): Call<CurrenciesOverviewResponse>
+    ): Call<OverviewResponse>
 
     @GET("api/data/ItemOverview")
     fun getItemsOverview(
@@ -27,7 +27,7 @@ internal interface PoeNinjaChartsApi {
         @Query("league") league: String,
         @Query("type") type: String,
         @Query("currencyId") id: String
-    ): Call<CurrencyHistoryModel>
+    ): Call<HistoryModel>
 
     @GET("api/data/ItemHistory")
     fun getItemHistory(
