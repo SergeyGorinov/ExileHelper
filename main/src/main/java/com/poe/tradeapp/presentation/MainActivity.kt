@@ -21,6 +21,7 @@ import com.poe.tradeapp.core.DI
 import com.poe.tradeapp.core.presentation.IMainActivity
 import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
 import com.poe.tradeapp.databinding.ActivityMainBinding
+import com.poe.tradeapp.exchange.presentation.fragments.ItemsSearchMainFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.inject
@@ -150,6 +151,12 @@ class MainActivity : FragmentActivity(), IMainActivity {
                             viewModel.wantItemId,
                             viewModel.haveItemId
                         )
+                    )
+                    true
+                }
+                R.id.itemsSearchMenu -> {
+                    router.newRootScreen(
+                        ItemsSearchMainFragment.newInstance()
                     )
                     true
                 }

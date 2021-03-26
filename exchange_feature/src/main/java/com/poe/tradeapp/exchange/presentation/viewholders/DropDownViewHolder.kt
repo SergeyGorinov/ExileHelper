@@ -1,24 +1,31 @@
-package com.poe.tradeapp.exchange.presentation.adapters
+package com.poe.tradeapp.exchange.presentation.viewholders
 
 import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
+import com.poe.tradeapp.exchange.presentation.adapters.DropDownAdapter
 import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IEnum
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 class DropDownViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
+
     private val filterName: TextView = itemView.findViewById(R.id.filterName)
     private val filterDropDown: AutoCompleteTextView = itemView.findViewById(R.id.filterDropDown)
+    private val textFont = ResourcesCompat.getFont(
+        itemView.context,
+        com.poe.tradeapp.core.R.font.fontinsmallcaps
+    )
 
     override fun bind(item: IFilter, filter: Filter) {
         val field = filter.getField(item.id ?: "")
+
+        filterDropDown.typeface = textFont
 
         filterName.text = item.text
 

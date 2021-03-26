@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.presentation.models.enums.ItemDataType
+import com.poe.tradeapp.exchange.presentation.viewholders.ItemTextViewHolder
 
 class ItemTextDataAdapter(private val items: List<Pair<ItemDataType, Any?>>) :
     RecyclerView.Adapter<ItemTextViewHolder>() {

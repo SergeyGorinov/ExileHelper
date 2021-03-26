@@ -10,6 +10,7 @@
     <color name="secondaryTextColor">#fff8e1</color>
     <color name="transparent">#00000000</color>
     <color name="half_transparent">#80000000</color>
+    <color name="white">#FFFFFFFF</color>
 
     <color name="items_search_suggestions_header">#999999</color>
     <color name="items_search_suggestions_header_text">#000000</color>

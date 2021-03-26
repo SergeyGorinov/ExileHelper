@@ -1,4 +1,4 @@
-package com.poe.tradeapp.exchange.presentation.adapters
+package com.poe.tradeapp.exchange.presentation.viewholders
 
 import android.graphics.Color
 import android.text.Spannable

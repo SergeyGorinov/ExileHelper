@@ -5,43 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/filterHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/filter_button_default"
+        app:constraint_referenced_ids="filterEnabled,filterShowHideButton,filterClearAll"
+        app:flow_horizontalGap="8dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <CheckBox
         android:id="@+id/filterEnabled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="2dp"
-        android:buttonTint="#FFF"
+        android:buttonTint="@color/white"
         android:checked="true"
         android:elevation="8dp"
         android:minWidth="0dp"
-        android:minHeight="0dp"
-        app:layout_constraintBottom_toTopOf="@id/filterItemsLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:minHeight="0dp" />
 
-    <com.google.android.material.button.MaterialButton
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/filterShowHideButton"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:layout_marginBottom="2dp"
-        android:background="@drawable/filter_button_default"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:fontFamily="@font/fontinsmallcaps"
         android:gravity="start|center_vertical"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:minHeight="0dp"
-        android:paddingStart="52dp"
         android:textAllCaps="false"
         android:textColor="@color/primaryTextColor"
-        android:textStyle="bold"
-        app:backgroundTint="@null"
-        app:layout_constraintBottom_toTopOf="@id/filterItemsLayout"
-        app:layout_constraintEnd_toStartOf="@id/filterClearAll"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="RtlSymmetry" />
+        android:textStyle="bold" />
 
     <ImageButton
         android:id="@+id/filterClearAll"
@@ -54,21 +46,17 @@
         android:elevation="8dp"
         android:padding="0dp"
         android:src="@drawable/clear_24"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/filterItemsLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/filterItemsLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
         android:descendantFocusability="blocksDescendants"
-        android:paddingStart="32dp"
-        android:paddingTop="4dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filterHeader"
         tools:ignore="RtlSymmetry" />
 </androidx.constraintlayout.widget.ConstraintLayout>

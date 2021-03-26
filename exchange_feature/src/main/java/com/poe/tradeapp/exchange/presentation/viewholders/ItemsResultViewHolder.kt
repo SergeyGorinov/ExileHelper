@@ -1,4 +1,4 @@
-package com.poe.tradeapp.exchange.presentation.adapters
+package com.poe.tradeapp.exchange.presentation.viewholders
 
 import android.os.Build
 import android.view.View
@@ -9,16 +9,13 @@ import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
-import com.poe.tradeapp.exchange.presentation.ItemsSearchActivity
 import com.poe.tradeapp.exchange.presentation.SeparatorHelper.getSeparator
+import com.poe.tradeapp.exchange.presentation.SocketsTemplateLoader
 import com.poe.tradeapp.exchange.presentation.models.FetchedItem
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.squareup.picasso.Picasso
 
-@ExperimentalCoroutinesApi
-class ItemsResultViewHolder(
-    itemView: View,
-    activity: ItemsSearchActivity
-) : RecyclerView.ViewHolder(itemView) {
+class ItemsResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
     private val leftHeaderPart = itemView.findViewById<ImageView>(R.id.leftHeaderPart)
     private val leftHeaderSymbol = itemView.findViewById<ImageView>(R.id.leftHeaderSymbol)
     private val middleHeaderPart = itemView.findViewById<TextView>(R.id.middleHeaderPart)
@@ -38,7 +35,7 @@ class ItemsResultViewHolder(
     private val hybridItemTextHeader = itemView.findViewById<TextView>(R.id.hybridItemTextHeader)
     private val hybridItemTextData = itemView.findViewById<TextView>(R.id.hybridItemTextData)
 
-    private val socketsTemplate = activity.socketsTemplate
+    private val socketsTemplate = SocketsTemplateLoader(itemView.context)
 
     fun bind(item: FetchedItem) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -86,23 +83,10 @@ class ItemsResultViewHolder(
             middleHeaderPart.text = if (hasName) "${item.name}\n${item.typeLine}" else item.typeLine
         }
 
-//        GlobalScope.launch(Dispatchers.Default) {
-//            val request = ImageRequest.Builder(itemView.context)
-//                .data(item.iconUrl)
-//                .allowHardware(false)
-//                .build()
-//            val dpi = itemView.context.resources.displayMetrics.density
-//            imageLoader.execute(request).drawable?.let { icon ->
-//                GlobalScope.launch(Dispatchers.Main) {
-//                    itemImage.minimumWidth = (icon.intrinsicWidth * dpi).toInt()
-//                    itemImage.minimumHeight = (icon.intrinsicHeight * dpi).toInt()
-//                    itemImage.setImageDrawable(icon)
-//                    item.sockets?.let {
-//                        itemImageContainer.addView(socketsTemplate.prepareTemplate(it))
-//                    }
-//                }
-//            }
-//        }
+        Picasso.get().load(item.iconUrl).fit().into(itemImage)
+        item.sockets?.let {
+            itemImageContainer.addView(socketsTemplate.prepareTemplate(it))
+        }
     }
 
     private fun setFrame(frameType: Int?, hasName: Boolean) {

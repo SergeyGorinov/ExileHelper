@@ -25,11 +25,11 @@
     <style name="AppTheme.MainFontStyle" parent="TextAppearance.AppCompat.Body1">
         <item name="android:fontFamily">@font/fontinsmallcaps</item>
         <item name="fontFamily">@font/fontinsmallcaps</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
     </style>
 
     <style name="TitleFontStyle" parent="AppTheme.MainFontStyle">
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/primaryTextColor</item>
     </style>
 
     <style name="AppTheme.DialogMenu" parent="Theme.MaterialComponents.DayNight.Dialog">
@@ -40,4 +40,7 @@
         <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
     </style>
+
+    <!-- Workaround for removing default vertical padding. -->
+    <dimen name="mtrl_exposed_dropdown_menu_popup_vertical_padding">0dp</dimen>
 </resources>

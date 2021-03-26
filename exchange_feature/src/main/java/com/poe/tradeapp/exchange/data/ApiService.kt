@@ -1,24 +1,22 @@
 package com.poe.tradeapp.exchange.data
 
-import com.poe.tradeapp.exchange.data.models.ExchangeResponse
 import com.poe.tradeapp.exchange.data.models.ItemsListResponseModel
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.serialization.json.JsonObject
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Url
+import retrofit2.http.*
 
-@ExperimentalCoroutinesApi
 internal interface ApiService {
 
-    @POST
+    @POST("api/trade/search/{league}")
     fun getItemsExchangeList(
-        @Url url: String,
+        @Path("league") league: String,
         @Body body: ItemsRequestModel
     ): Call<ItemsListResponseModel>
 
-    @GET
-    fun getItemExchangeResponse(@Url url: String): Call<ExchangeResponse>
+    @GET("/api/trade/fetch/{data}")
+    fun getItemExchangeResponse(
+        @Path("data") data: String,
+        @Query("query") query: String
+    ): Call<JsonObject>
 }

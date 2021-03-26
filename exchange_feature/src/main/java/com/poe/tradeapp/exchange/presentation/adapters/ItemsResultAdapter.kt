@@ -2,53 +2,55 @@ package com.poe.tradeapp.exchange.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
-import com.poe.tradeapp.exchange.presentation.ItemsSearchActivity
 import com.poe.tradeapp.exchange.presentation.models.FetchedItem
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.poe.tradeapp.exchange.presentation.viewholders.ItemsResultViewHolder
 
-@ExperimentalCoroutinesApi
-class ItemsResultAdapter(initItems: List<FetchedItem>) :
-    RecyclerView.Adapter<ItemsResultViewHolder>() {
+class ItemsResultAdapter : RecyclerView.Adapter<ItemsResultViewHolder>() {
 
-    private val items = arrayListOf<FetchedItem?>()
+    private val diffUtilCallback = object : DiffUtil.ItemCallback<FetchedItem>() {
+        override fun areItemsTheSame(oldItem: FetchedItem, newItem: FetchedItem): Boolean {
+            return oldItem.name == newItem.name
+        }
 
-    init {
-        items.addAll(initItems)
+        override fun areContentsTheSame(oldItem: FetchedItem, newItem: FetchedItem): Boolean {
+            return oldItem == newItem
+        }
     }
+
+    private val asyncDiffer = AsyncListDiffer(this, diffUtilCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemsResultViewHolder {
         val viewLayout =
             if (viewType == 0) R.layout.items_result_loading else R.layout.items_result_item
-        val activity = parent.context as ItemsSearchActivity
-        val view = LayoutInflater.from(activity).inflate(viewLayout, parent, false)
-        return ItemsResultViewHolder(view, activity)
+        val view = LayoutInflater.from(parent.context).inflate(viewLayout, parent, false)
+        return ItemsResultViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ItemsResultViewHolder, position: Int) {
-        val item = items.getOrNull(position)
+        val item = asyncDiffer.currentList.getOrNull(position)
         if (item != null) {
             holder.bind(item)
         }
     }
 
-    override fun getItemCount() = items.size
+    override fun getItemCount() = asyncDiffer.currentList.size
 
     override fun getItemViewType(position: Int) =
-        if (items.getOrNull(position) == null) 0 else 1
+        if (asyncDiffer.currentList.getOrNull(position) == null) 0 else 1
 
     fun addLoader() {
-        items.add(null)
-        notifyItemInserted(items.size - 1)
+        asyncDiffer.currentList.add(null)
+        notifyItemInserted(asyncDiffer.currentList.size - 1)
     }
 
     fun addFetchedItems(fetchedItems: List<FetchedItem>) {
-        items.remove(null)
-        items.addAll(fetchedItems)
-        notifyItemRangeChanged(items.size, fetchedItems.size)
+        asyncDiffer.currentList.remove(null)
+        asyncDiffer.currentList.addAll(fetchedItems)
+        notifyItemRangeChanged(asyncDiffer.currentList.size, fetchedItems.size)
         notifyDataSetChanged()
     }
-
-    override fun getItemId(position: Int) = items.getOrNull(position).hashCode().toLong()
 }

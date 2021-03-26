@@ -4,19 +4,19 @@ import com.poe.tradeapp.currency.data.models.CurrencyListResponse
 import com.poe.tradeapp.currency.data.models.CurrencyRequest
 import kotlinx.serialization.json.JsonObject
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Url
+import retrofit2.http.*
 
 internal interface ApiService {
 
-    @POST
+    @POST("api/trade/exchange/{league}")
     fun getCurrencyExchangeList(
-        @Url url: String,
+        @Path("league") league: String,
         @Body body: CurrencyRequest
     ): Call<CurrencyListResponse?>
 
-    @GET
-    fun getCurrencyExchangeResponse(@Url url: String): Call<JsonObject>
+    @GET("/api/trade/fetch/")
+    fun getCurrencyExchangeResponse(
+        @Query("query") query: String,
+        @Query("exchange") exchange: String
+    ): Call<JsonObject>
 }

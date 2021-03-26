@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,21 +12,18 @@ import com.poe.tradeapp.core.presentation.CenteredImageSpan
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.data.models.ResponseModel
 import com.poe.tradeapp.exchange.databinding.FragmentResultBinding
-import com.poe.tradeapp.exchange.domain.ItemsSearchViewModel
+import com.poe.tradeapp.exchange.presentation.ItemsSearchViewModel
 import com.poe.tradeapp.exchange.presentation.SeparatorHelper
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsResultAdapter
 import com.poe.tradeapp.exchange.presentation.models.FetchedItem
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-@ExperimentalCoroutinesApi
 class ItemsSearchResultFragment : BaseFragment(R.layout.fragment_result) {
 
-    private val viewModel by activityViewModels<ItemsSearchViewModel>()
+    private val viewModel by sharedViewModel<ItemsSearchViewModel>()
 
     private lateinit var binding: FragmentResultBinding
 
@@ -38,7 +34,7 @@ class ItemsSearchResultFragment : BaseFragment(R.layout.fragment_result) {
         binding = getBinding()
 
         val layoutManager = LinearLayoutManager(context)
-        val adapter = ItemsResultAdapter(listOf())
+        val adapter = ItemsResultAdapter()
 
         adapter.setHasStableIds(true)
 
@@ -74,9 +70,9 @@ class ItemsSearchResultFragment : BaseFragment(R.layout.fragment_result) {
             }
         })
 
-        viewModel.responseItems.onEach {
-            adapter.addFetchedItems(populateResponse(it))
-        }.launchIn(lifecycleScope)
+//        viewModel.responseItems.onEach {
+//            adapter.addFetchedItems(populateResponse(it))
+//        }.launchIn(lifecycleScope)
     }
 
     private fun populateResponse(items: List<ResponseModel>): List<FetchedItem> {

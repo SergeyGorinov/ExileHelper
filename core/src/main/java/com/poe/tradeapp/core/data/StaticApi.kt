@@ -6,19 +6,18 @@ import com.poe.tradeapp.core.data.models.StaticModel
 import com.poe.tradeapp.core.data.models.StatsModel
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Url
 
 interface StaticApi {
 
-    @GET
-    fun getLeagueData(@Url url: String): Call<LeaguesModel>
+    @GET("api/trade/data/leagues")
+    fun getLeagueData(): Call<LeaguesModel>
 
-    @GET
-    fun getItemsData(@Url url: String): Call<SearchItemsModel>
+    @GET("api/trade/data/items")
+    fun getItemsData(): Call<SearchItemsModel>
 
-    @GET
-    fun getStatsData(@Url url: String): Call<StatsModel>
+    @GET("api/trade/data/stats")
+    fun getStatsData(): Call<StatsModel>
 
-    @GET
-    fun getStaticData(@Url url: String): Call<StaticModel>
+    @GET("api/trade/data/static")
+    fun getStaticData(): Call<StaticModel>
 }

@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/groupSocket"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,7 +18,8 @@
             android:id="@+id/socket1"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/connector1_2"
@@ -25,14 +27,16 @@
             android:layout_height="14dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="-6dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription,NegativeMargin" />
 
         <ImageView
             android:id="@+id/socket2"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginStart="-6dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription,NegativeMargin" />
     </LinearLayout>
 
     <ImageView
@@ -41,7 +45,8 @@
         android:layout_height="31dp"
         android:layout_marginStart="27dp"
         android:layout_marginTop="-6dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:ignore="ContentDescription,NegativeMargin" />
 
     <LinearLayout
         android:id="@+id/middleSocketGroup"
@@ -49,13 +54,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="-6dp"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:ignore="NegativeMargin">
 
         <ImageView
             android:id="@+id/socket4"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/connector4_3"
@@ -63,14 +70,16 @@
             android:layout_height="14dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="-6dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription,NegativeMargin" />
 
         <ImageView
             android:id="@+id/socket3"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginStart="-6dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription,NegativeMargin" />
     </LinearLayout>
 
     <ImageView
@@ -79,7 +88,8 @@
         android:layout_height="31dp"
         android:layout_marginTop="-6dp"
         android:layout_marginEnd="29dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:ignore="ContentDescription,NegativeMargin" />
 
     <LinearLayout
         android:id="@+id/bottomSocketGroup"
@@ -87,13 +97,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="-6dp"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:ignore="NegativeMargin">
 
         <ImageView
             android:id="@+id/socket5"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/connector5_6"
@@ -101,13 +113,15 @@
             android:layout_height="14dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="-6dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription,NegativeMargin" />
 
         <ImageView
             android:id="@+id/socket6"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginStart="-6dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription,NegativeMargin" />
     </LinearLayout>
 </LinearLayout>

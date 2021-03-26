@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/filterName"
         android:layout_width="match_parent"
         android:layout_height="32dp"
@@ -43,13 +43,12 @@
             android:id="@+id/filterDropDown"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#1E2124"
-            android:fontFamily="@font/fontinsmallcaps"
+            android:background="@color/primaryLightColor"
             android:gravity="center|center_vertical"
             android:inputType="textNoSuggestions"
             android:padding="0dp"
-            android:textColor="@android:color/white"
-            android:textColorHint="#999999"
+            android:textColor="@color/primaryTextColor"
+            android:textColorHint="@color/secondaryLightColor"
             android:textSize="13sp"
             android:textStyle="bold"
             tools:ignore="LabelFor" />
@@ -73,14 +72,14 @@
             android:id="@+id/minValue"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#1E2124"
+            android:background="@color/primaryLightColor"
             android:fontFamily="@font/fontinsmallcaps"
             android:gravity="center|center_vertical"
             android:hint="@string/min_hint"
             android:inputType="textNoSuggestions"
             android:padding="0dp"
-            android:textColor="@android:color/white"
-            android:textColorHint="#999999"
+            android:textColor="@color/primaryTextColor"
+            android:textColorHint="@color/secondaryLightColor"
             android:textSize="13sp"
             android:textStyle="bold" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -104,14 +103,14 @@
             android:id="@+id/maxValue"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#1E2124"
+            android:background="@color/primaryLightColor"
             android:fontFamily="@font/fontinsmallcaps"
             android:gravity="center|center_vertical"
             android:hint="@string/max_hint"
             android:inputType="textNoSuggestions"
             android:padding="0dp"
-            android:textColor="@android:color/white"
-            android:textColorHint="#999999"
+            android:textColor="@color/primaryTextColor"
+            android:textColorHint="@color/secondaryLightColor"
             android:textSize="13sp"
             android:textStyle="bold" />
     </com.google.android.material.textfield.TextInputLayout>

@@ -1,4 +1,4 @@
-package com.poe.tradeapp.exchange.presentation.adapters
+package com.poe.tradeapp.exchange.presentation.viewholders
 
 import android.view.View
 import android.widget.TextView
@@ -9,9 +9,7 @@ import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
 import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 class MinMaxViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
     private val filterName: TextView = itemView.findViewById(R.id.filterName)

@@ -1,6 +1,5 @@
 package com.poe.tradeapp.exchange.presentation.adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,15 +8,16 @@ import android.widget.ArrayAdapter
 import android.widget.Filter
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.poe.tradeapp.core.presentation.toLowerCaseLocalized
 import com.poe.tradeapp.exchange.R
+import com.poe.tradeapp.exchange.presentation.models.ItemGroupViewData
+import com.poe.tradeapp.exchange.presentation.models.ItemViewData
 import com.poe.tradeapp.exchange.presentation.models.SearchableItem
-import java.util.*
 
-@Suppress("UNCHECKED_CAST")
-class ItemsSearchFieldAdapter(
+internal class ItemsSearchFieldAdapter(
     context: Context,
     resId: Int,
-    private val allItems: List<Void>,
+    private val allItems: List<ItemGroupViewData>,
     private val items: ArrayList<SearchableItem> = arrayListOf()
 ) : ArrayAdapter<SearchableItem>(context, resId, items) {
 
@@ -31,48 +31,7 @@ class ItemsSearchFieldAdapter(
 
     override fun getCount(): Int = items.size
 
-    override fun getFilter() = customFilter
-
-    private val customFilter = object : Filter() {
-        @SuppressLint("SyntheticAccessor")
-        override fun performFiltering(constraint: CharSequence?): FilterResults {
-            val filterResults = FilterResults()
-            if (!constraint.isNullOrBlank()) {
-                suggestions.clear()
-                val normalizedConstraint = constraint.toString().toLowerCase(Locale.getDefault())
-                allItems.forEach { group ->
-                    val filtered = arrayListOf<SearchableItem>()
-//                    group.items.forEach { item ->
-//                        if (item.text.toLowerCase(Locale.getDefault())
-//                                .contains(normalizedConstraint)
-//                        )
-//                            filtered.add(SearchableItem(false, item.text, item.type, item.name))
-//                    }
-//                    if (filtered.isNotEmpty()) {
-//                        suggestions.add(SearchableItem(true, group.group.label, group.group.label))
-//                        suggestions.addAll(filtered)
-//                    }
-                }
-                filterResults.values = suggestions
-                filterResults.count = suggestions.size
-            }
-            return filterResults
-        }
-
-        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-            if (results != null && results.count > 0) {
-                clear()
-                addAll(results.values as ArrayList<SearchableItem>)
-            }
-        }
-
-        override fun convertResultToString(resultValue: Any?): CharSequence {
-            return if (resultValue is SearchableItem)
-                resultValue.text
-            else
-                ""
-        }
-    }
+    override fun getFilter() = CustomFilter(suggestions, allItems, items)
 
     override fun isEnabled(position: Int) = getItemViewType(position) != 0
 
@@ -104,5 +63,60 @@ class ItemsSearchFieldAdapter(
         view.setBackgroundColor(backgroundColor)
         view.setTextColor(textColor)
         return view
+    }
+
+    internal class CustomFilter(
+        private val suggestions: ArrayList<SearchableItem>,
+        private val allItems: List<ItemGroupViewData>,
+        private val items: ArrayList<SearchableItem>
+    ) : Filter() {
+
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val filterResults = FilterResults()
+            if (!constraint.isNullOrBlank()) {
+                suggestions.clear()
+                val normalizedConstraint = constraint.toString().toLowerCaseLocalized()
+                allItems.forEach { group ->
+                    val filteredItems = arrayListOf<SearchableItem>()
+                    group.entries.forEach { item ->
+                        if (item.text.toLowerCaseLocalized().contains(normalizedConstraint)) {
+                            filteredItems.add(
+                                SearchableItem(
+                                    false,
+                                    item.text,
+                                    item.type,
+                                    item.name
+                                )
+                            )
+                        }
+                    }
+                    if (filteredItems.isNotEmpty()) {
+                        suggestions.add(SearchableItem(true, group.label, group.label))
+                        suggestions.addAll(filteredItems)
+                    }
+                }
+                filterResults.values = suggestions
+                filterResults.count = suggestions.size
+            }
+            return filterResults
+        }
+
+        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+            if (results != null && results.count > 0) {
+                items.clear()
+                (results.values as? List<*>)?.forEach {
+                    if (it is SearchableItem) {
+                        items.add(it)
+                    }
+                }
+            }
+        }
+
+        override fun convertResultToString(resultValue: Any?): CharSequence {
+            return if (resultValue is ItemViewData)
+                resultValue.text
+            else
+                ""
+        }
     }
 }

@@ -1,49 +1,42 @@
 package com.poe.tradeapp.exchange.presentation.models
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
-@ExperimentalCoroutinesApi
-class Filter(val name: String) {
-    val isFilterEmpty = MutableStateFlow(true)
-    var isEnabled: Boolean = false
+class Filter(val name: String, private val onFieldsChanged: (Boolean) -> Unit) {
 
+    var isEnabled: Boolean = false
     val fields: MutableList<Field> = mutableListOf()
+
+    private val isFieldsEmpty
+        get() = fields.isEmpty() || fields.all { it.value == null }
 
     fun getField(id: String): Field {
         var field = fields.singleOrNull { s -> s.name == id }
         if (field == null) {
-            field = Field(id)
-            fields.add(field)
-            GlobalScope.launch {
-                field.isFieldEmpty.collect {
-                    isFilterEmpty.value = isEmpty()
-                }
+            field = Field(id) {
+                onFieldsChanged(isFieldsEmpty)
             }
+            addField(field)
         }
         return field
     }
 
-    fun cleanFiler() {
-        fields.forEach {
-            it.value = null
-        }
+    fun cleanFilter() {
+        fields.clear()
+        onFieldsChanged(isFieldsEmpty)
     }
 
-    private fun isEmpty(): Boolean {
-        return fields.all { a -> a.value == null }
+    private fun addField(field: Field) {
+        fields.add(field)
+        onFieldsChanged(isFieldsEmpty)
     }
 }
 
-@ExperimentalCoroutinesApi
-class Field(val name: String) {
-    val isFieldEmpty: MutableStateFlow<Boolean> = MutableStateFlow(true)
-
-    var value: Any? by Delegates.observable(null) { _, _, new ->
-        isFieldEmpty.value = new == null
+data class Field(
+    val name: String,
+    val onValueChange: () -> Unit
+) {
+    var value by Delegates.observable<Any?>(null) { _, _, _ ->
+        onValueChange()
     }
 }

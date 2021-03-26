@@ -14,9 +14,8 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
         haveSelectedCurrencies: List<String>,
         league: String
     ): JsonObject? {
-        val baseFetchUrl = StringBuilder("/api/trade/fetch/")
         val resultList = getCurrencyExchangeList(
-            "api/trade/exchange/$league", CurrencyRequest(
+            league, CurrencyRequest(
                 Exchange(
                     status = Status("online"),
                     want = wantSelectedCurrencies,
@@ -27,26 +26,26 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
                 )
             )
         ) ?: return null
-        if (resultList.result.size > 20) {
-            baseFetchUrl.append(resultList.result.subList(0, 20).joinToString(separator = ","))
-        } else {
-            baseFetchUrl.append(resultList.result.joinToString(separator = ","))
-        }
-        baseFetchUrl.append("?query=${resultList.id}")
-        baseFetchUrl.append("&exchange")
+
         return try {
-            apiService.getCurrencyExchangeResponse(baseFetchUrl.toString()).await()
+            apiService.getCurrencyExchangeResponse(
+                if (resultList.result.size > 20) {
+                    resultList.result.subList(0, 20).joinToString(separator = ",")
+                } else {
+                    resultList.result.joinToString(separator = ",")
+                }, ""
+            ).await()
         } catch (e: Exception) {
             null
         }
     }
 
     private suspend fun getCurrencyExchangeList(
-        url: String,
+        league: String,
         body: CurrencyRequest
     ): CurrencyListResponse? {
         return try {
-            apiService.getCurrencyExchangeList(url, body).await()
+            apiService.getCurrencyExchangeList(league, body).await()
         } catch (e: Exception) {
             null
         }

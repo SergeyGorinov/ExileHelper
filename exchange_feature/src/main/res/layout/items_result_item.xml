@@ -7,28 +7,30 @@
     android:orientation="horizontal"
     android:paddingVertical="12dp">
 
-    <include layout="@layout/items_result_item_header" />
+    <include
+        android:id="@+id/itemsResultItemHeader"
+        layout="@layout/items_result_item_header" />
 
     <FrameLayout
         android:id="@+id/itemImageContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="12dp"
-        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/itemTextData"
-        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintEnd_toStartOf="@id/itemsResultItemHeader"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barrier">
+        app:layout_constraintTop_toBottomOf="@id/itemsResultItemHybrid">
 
         <ImageView
             android:id="@+id/itemImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center|center_vertical"
             tools:ignore="ContentDescription" />
     </FrameLayout>
 
-    <include layout="@layout/items_result_item_hybrid" />
+    <include
+        android:id="@+id/itemsResultItemHybrid"
+        layout="@layout/items_result_item_hybrid" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import com.poe.tradeapp.charts_feature.chartsFeatureModules
 import com.poe.tradeapp.core.DI
 import com.poe.tradeapp.core.coreModules
 import com.poe.tradeapp.currency.currencyFeatureModules
+import com.poe.tradeapp.exchange.exchangeFeatureModules
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Suppress("unused")
@@ -18,6 +19,7 @@ class PoeTradeApplication : Application() {
             mainModules +
                     coreModules +
                     currencyFeatureModules +
+                    exchangeFeatureModules +
                     chartsFeatureModules
         )
     }

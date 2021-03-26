@@ -3,9 +3,10 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
+    tools:showIn="@layout/items_result_item">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/itemTextData"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -34,7 +35,7 @@
         app:layout_constraintStart_toEndOf="@id/itemImageContainer"
         tools:ignore="ContentDescription" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/hybridItemTextHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -63,7 +64,7 @@
         app:layout_constraintTop_toBottomOf="@id/hybridItemTextHeader"
         tools:ignore="ContentDescription" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/hybridItemTextData"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -79,7 +80,6 @@
         app:layout_constraintStart_toEndOf="@id/itemImageContainer"
         app:layout_constraintTop_toBottomOf="@id/bottomHybridItemTextSeparator"
         tools:ignore="SelectableText" />
-
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/hybridItemGroup"

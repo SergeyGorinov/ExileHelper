@@ -21,6 +21,7 @@ import com.google.android.flexbox.FlexboxItemDecoration
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.poe.tradeapp.core.R
+import java.util.*
 
 fun FragmentManager.addFragment(resId: Int, fragment: Fragment) {
     val visibleFragments = this.fragments.filter { it.isVisible }
@@ -103,6 +104,8 @@ fun Bitmap.toDrawable(context: Context): Drawable {
         setBounds(0, 0, intrinsicWidth, intrinsicHeight)
     }
 }
+
+fun String.toLowerCaseLocalized() = this.toLowerCase(Locale.getDefault())
 
 val Int.dp: Int
     get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()

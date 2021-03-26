@@ -1,10 +1,8 @@
-package com.poe.tradeapp.exchange.presentation.adapters
+package com.poe.tradeapp.exchange.presentation.viewholders
 
 import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 internal interface IBindableFieldViewHolder {
     fun bind(item: IFilter, filter: Filter)
 }

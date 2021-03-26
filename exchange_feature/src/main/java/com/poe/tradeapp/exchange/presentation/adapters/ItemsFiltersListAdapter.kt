@@ -4,17 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
-import com.poe.tradeapp.exchange.domain.ItemsSearchViewModel
 import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.poe.tradeapp.exchange.presentation.viewholders.FilterViewHolder
+import com.poe.tradeapp.exchange.presentation.viewholders.IBindableViewHolder
 
-@ExperimentalCoroutinesApi
 internal class ItemsFiltersListAdapter(
     private val items: Array<ViewFilters.AllFilters>,
-    private val viewModel: ItemsSearchViewModel,
-    private val scope: CoroutineScope
+    private val filters: MutableList<Filter>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -25,21 +22,12 @@ internal class ItemsFiltersListAdapter(
             LayoutInflater
                 .from(parent.context)
                 .inflate(R.layout.filters_header_item, parent, false)
-        return FilterViewHolder(view, scope)
+        return FilterViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is IBindableViewHolder) {
-            val filterType = items[position]
-
-            var filter = viewModel.getFilter(filterType.id)
-
-            if (filter == null) {
-                filter = Filter(filterType.id)
-                viewModel.addFilter(filter)
-            }
-
-            holder.bind(filterType, filter)
+            holder.bind(items[position], filters)
         }
     }
 

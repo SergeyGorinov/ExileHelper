@@ -6,7 +6,3 @@ enum class PropertyDisplayType {
     Progressbar,
     Placeholder
 }
-
-fun PropertyDisplayType.getText() {
-
-}
