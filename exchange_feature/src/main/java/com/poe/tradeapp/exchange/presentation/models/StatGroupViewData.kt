@@ -1,18 +1,18 @@
 package com.poe.tradeapp.exchange.presentation.models
 
-data class StatGroupViewData(
+internal data class StatGroupViewData(
     val label: String,
     val entries: List<StatViewData>
 )
 
-data class StatViewData(
+internal data class StatViewData(
     val id: String,
     val text: String,
     val type: String,
     val option: List<Option>?
 )
 
-data class Option(
+internal data class Option(
     val id: Int,
     val text: String
 )

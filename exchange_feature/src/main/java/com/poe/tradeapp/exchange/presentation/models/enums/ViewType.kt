@@ -1,6 +1,6 @@
 package com.poe.tradeapp.exchange.presentation.models.enums
 
-enum class ViewType {
+internal enum class ViewType {
     Dropdown,
     Minmax,
     Socket,

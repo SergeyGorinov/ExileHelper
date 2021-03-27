@@ -14,7 +14,8 @@ import com.poe.tradeapp.exchange.presentation.adapters.ItemsFilterAdapter
 import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 
-class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), IBindableViewHolder {
+internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+    IBindableViewHolder {
 
     private val viewBinding = FiltersHeaderItemBinding.bind(itemView)
     private val animator = SlideUpDownAnimator(viewBinding.filterItemsLayout)

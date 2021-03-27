@@ -1,6 +1,5 @@
-package com.poe.tradeapp.data.repository
+package com.poe.tradeapp.data
 
-import com.poe.tradeapp.data.PoeTradeApi
 import com.poe.tradeapp.data.models.UserRequest
 
 internal class MainRepository(private val api: PoeTradeApi) : BaseMainRepository() {

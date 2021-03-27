@@ -12,7 +12,7 @@ import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IEnum
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 
-class DropDownViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+internal class DropDownViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
 
     private val filterName: TextView = itemView.findViewById(R.id.filterName)

@@ -2,7 +2,7 @@ package com.poe.tradeapp.exchange.presentation.models
 
 import kotlin.properties.Delegates
 
-class Filter(val name: String, private val onFieldsChanged: (Boolean) -> Unit) {
+internal class Filter(val name: String, private val onFieldsChanged: (Boolean) -> Unit) {
 
     var isEnabled: Boolean = false
     val fields: MutableList<Field> = mutableListOf()
@@ -32,7 +32,7 @@ class Filter(val name: String, private val onFieldsChanged: (Boolean) -> Unit) {
     }
 }
 
-data class Field(
+internal data class Field(
     val name: String,
     val onValueChange: () -> Unit
 ) {

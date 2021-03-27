@@ -9,7 +9,7 @@ import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 
-class AccountViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+internal class AccountViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
     private val filterName: TextView = itemView.findViewById(R.id.filterName)
     private val filterAccount: TextInputEditText = itemView.findViewById(R.id.filterAccount)

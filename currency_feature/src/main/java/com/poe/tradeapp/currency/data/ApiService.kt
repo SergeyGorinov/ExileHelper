@@ -14,9 +14,10 @@ internal interface ApiService {
         @Body body: CurrencyRequest
     ): Call<CurrencyListResponse?>
 
-    @GET("/api/trade/fetch/")
+    @GET("/api/trade/fetch/{data}")
     fun getCurrencyExchangeResponse(
+        @Path("data") data: String,
         @Query("query") query: String,
-        @Query("exchange") exchange: String
+        @QueryName queryName: String
     ): Call<JsonObject>
 }

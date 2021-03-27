@@ -9,7 +9,7 @@ import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewType
 import com.poe.tradeapp.exchange.presentation.viewholders.*
 
-class ItemsFilterAdapter(private val items: Array<*>, private val filter: Filter) :
+internal class ItemsFilterAdapter(private val items: Array<*>, private val filter: Filter) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =

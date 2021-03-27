@@ -3,7 +3,9 @@ package com.poe.tradeapp.exchange.presentation.fragments
 import android.os.Bundle
 import android.view.View
 import android.widget.AutoCompleteTextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,7 +15,7 @@ import com.poe.tradeapp.core.presentation.BaseFragment
 import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
 import com.poe.tradeapp.core.presentation.hideKeyboard
 import com.poe.tradeapp.exchange.R
-import com.poe.tradeapp.exchange.databinding.FragmentItemExchangeMainBinding
+import com.poe.tradeapp.exchange.databinding.FragmentItemsSearchMainBinding
 import com.poe.tradeapp.exchange.presentation.ItemsSearchViewModel
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsFiltersListAdapter
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsSearchFieldAdapter
@@ -23,16 +25,16 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_item_exchange_main) {
+class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main) {
 
     private val viewModel by sharedViewModel<ItemsSearchViewModel>()
 
-    private lateinit var binding: FragmentItemExchangeMainBinding
+    private lateinit var binding: FragmentItemsSearchMainBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewBinding = FragmentItemExchangeMainBinding.bind(view)
+        viewBinding = FragmentItemsSearchMainBinding.bind(view)
         binding = getBinding()
 
         val progressBar = requireActivity().getTransparentProgressDialog()
@@ -49,16 +51,19 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_item_exchange_mai
                 R.id.accept -> {
                     requireActivity().hideKeyboard(binding.itemsToolbar)
                     lifecycleScope.launch {
-                        viewModel.fetchPartialResults(0)
-//                        if (viewModel.responseItems.value.isNotEmpty()) {
-//                            viewModel.loadingState.value = ViewState.ResultsLoaded
-//                        } else {
-//                            Toast.makeText(
-//                                this@ItemsSearchActivity,
-//                                "Items not found!",
-//                                Toast.LENGTH_LONG
-//                            ).show()
-//                        }
+                        viewModel.fetchPartialResults(settings.league, 0)
+                        if (viewModel.itemsResultData?.second?.isNotEmpty() == true) {
+                            ItemsSearchResultFragment.newInstance().show(
+                                parentFragmentManager,
+                                null
+                            )
+                        } else {
+                            Toast.makeText(
+                                requireActivity(),
+                                "Items not found!",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                     true
                 }
@@ -71,12 +76,15 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_item_exchange_mai
             hideToolbarSearchLayout()
         }
 
+        binding.toolbarSearchInput.typeface =
+            ResourcesCompat.getFont(requireActivity(), R.font.fontinsmallcaps)
+
         binding.toolbarSearchInput.setOnItemClickListener { adapterView, _, position, _ ->
             val selectedItem = adapterView.getItemAtPosition(position)
             val adapter = adapterView.adapter
             if (selectedItem is SearchableItem) {
-                viewModel.setType(selectedItem.type)
-                viewModel.setName(selectedItem.name)
+                viewModel.type = selectedItem.type
+                viewModel.name = selectedItem.name
                 if (adapter is ItemsSearchFieldAdapter)
                     adapter.selectedItem = selectedItem
                 requireActivity().hideKeyboard(binding.toolbarSearchInput)
@@ -86,11 +94,11 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_item_exchange_mai
             }
         }
 
-        binding.toolbarSearchInput.setOnFocusChangeListener { view, focused ->
-            val adapter = (view as AutoCompleteTextView).adapter
+        binding.toolbarSearchInput.setOnFocusChangeListener { focusedView, focused ->
+            val adapter = (focusedView as AutoCompleteTextView).adapter
             if (focused && adapter is ItemsSearchFieldAdapter) {
-                view.hint = adapter.selectedItem?.text ?: "Search item"
-                view.setText("", false)
+                focusedView.hint = adapter.selectedItem?.text ?: "Search item"
+                focusedView.setText("", false)
             }
         }
 

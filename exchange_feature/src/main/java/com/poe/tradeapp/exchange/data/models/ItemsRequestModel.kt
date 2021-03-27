@@ -1,42 +1,39 @@
 package com.poe.tradeapp.exchange.data.models
 
-//@ExperimentalCoroutinesApi
-//class CustomSerializer :
-//    StdSerializer<ItemsRequestModelFields.FilterFields>(ItemsRequestModelFields.FilterFields::class.java) {
-//    override fun serialize(
-//        value: ItemsRequestModelFields.FilterFields?,
-//        gen: JsonGenerator?,
-//        provider: SerializerProvider?
-//    ) {
-//        if (value != null && gen != null) {
-//            gen.writeStartObject()
-//            value.fields.forEach { field ->
-//                if (field.value != null) {
-//                    gen.writeObjectField(field.name, field.value)
-//                }
-//            }
-//            gen.writeEndObject()
-//        }
-//    }
-//}
+import kotlinx.serialization.*
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonEncoder
+import kotlinx.serialization.json.JsonObject
 
-data class ItemsRequestModel(
+@Serializable
+internal data class ItemsRequestModel(
+    @Required
     val query: ItemsRequestModelFields.Query = ItemsRequestModelFields.Query(),
+    @Required
     val sort: ItemsRequestModelFields.Sorting = ItemsRequestModelFields.Sorting()
 )
 
-class ItemsRequestModelFields {
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
+internal class ItemsRequestModelFields {
+
+    @Serializable
     data class Query(
+        @Required
         var status: Status = Status(),
+        @Required
         val stats: MutableList<Stat> = mutableListOf(Stat()),
         var name: String? = null,
         var type: String? = null,
-        var filters: Filters? = null
+        @Required
+        var filters: Filters = Filters()
     )
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Serializable
     data class Sorting(
+        @Required
         var price: String? = "asc",
         var quality: String? = null,
         var pdamage: String? = null,
@@ -53,52 +50,54 @@ class ItemsRequestModelFields {
         var block: String? = null
     )
 
+    @Serializable
     data class Status(
+        @Required
         var option: String = "online"
     )
 
+    @Serializable
     data class Stat(
+        @Required
         var type: String = "and",
+        @Required
         var filters: MutableList<StatFilter> = mutableListOf()
     )
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Serializable
     data class StatFilter(
         var id: String,
-        var value: MinMax?,
+        var value: MinMax? = null,
         var disabled: Boolean
     )
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    data class Filters(@JsonIgnore val map: Map<String, Filter?>) {
-    data class Filters(val map: Map<String, Filter?>) {
-        val type_filters: Filter? by map
-        val weapon_filters: Filter? by map
-        val armour_filters: Filter? by map
-        val socket_filters: Filter? by map
-        val req_filters: Filter? by map
-        val map_filters: Filter? by map
-        val misc_filters: Filter? by map
-        val heist_filters: Filter? by map
-        val trade_filters: Filter? by map
-    }
+    @Serializable(with = FiltersSerializer::class)
+    data class Filters(
+        @Required
+        val map: Map<String, Filter?> = mapOf()
+    )
 
+    @Serializable
     data class Filter(
+        @Required
         var disabled: Boolean = true,
-//        @JsonSerialize(using = CustomSerializer::class)
+        @Required
         var filters: FilterFields? = null
     )
 
+    @Serializable(with = FilterFieldsSerializer::class)
     data class FilterFields(
         val fields: List<FilterField>
     )
 
+    @Serializable
     data class FilterField(
         val name: String,
+        @Contextual
         val value: Any?
     )
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Serializable
     data class Sockets(
         var r: Int? = null,
         var g: Int? = null,
@@ -110,7 +109,7 @@ class ItemsRequestModelFields {
         fun isEmpty() = listOfNotNull(r, g, b, w, min, max).isEmpty()
     }
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Serializable
     data class MinMax(
         var min: Int? = null,
         var max: Int? = null
@@ -118,17 +117,96 @@ class ItemsRequestModelFields {
         fun isEmpty() = listOfNotNull(min, max).isEmpty()
     }
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Serializable
     data class DropDown(
         var option: String? = null
     )
 
-    //    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Serializable
     data class Price(
         var min: Int? = null,
         var max: Int? = null,
         var option: String? = null
     ) {
         fun isEmpty() = listOfNotNull(min, max, option).isEmpty()
+    }
+
+    private object AnySerializer : KSerializer<Any> {
+
+        @Suppress("UNCHECKED_CAST")
+        private val anyDataTypeSerializers = mapOf(
+            "String" to serializer<String>(),
+            "Int" to serializer<Int>(),
+            "Sockets" to Sockets.serializer(),
+            "MinMax" to MinMax.serializer(),
+            "DropDown" to DropDown.serializer()
+        ).mapValues { (_, v) ->
+            v as KSerializer<Any>
+        }
+
+        private fun getValueSerializer(dataType: String): KSerializer<Any> {
+            return anyDataTypeSerializers[dataType]
+                ?: throw SerializationException("Serializer for class $dataType is not registered in PacketSerializer")
+        }
+
+        override val descriptor = buildClassSerialDescriptor("Any")
+
+        override fun deserialize(decoder: Decoder): Any {
+            return ""
+        }
+
+        override fun serialize(encoder: Encoder, value: Any) {
+            val dataType = when (value) {
+                is String -> "String"
+                is Int -> "Int"
+                is Sockets -> "Sockets"
+                is MinMax -> "MinMax"
+                is DropDown -> "DropDown"
+                else -> "Any"
+            }
+            encoder.encodeSerializableValue(getValueSerializer(dataType), value)
+        }
+    }
+
+    private object FilterFieldsSerializer : KSerializer<FilterFields> {
+
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("FilterFields")
+
+        override fun deserialize(decoder: Decoder): FilterFields {
+            return FilterFields(listOf())
+        }
+
+        override fun serialize(encoder: Encoder, value: FilterFields) {
+            val jsonEncoder = encoder as JsonEncoder
+            val fieldsMap = mutableMapOf<String, JsonElement>()
+            value.fields.forEach { field ->
+                field.value?.let {
+                    val element = jsonEncoder.json.encodeToJsonElement(AnySerializer, it)
+                    fieldsMap[field.name] = element
+                }
+            }
+            jsonEncoder.encodeJsonElement(JsonObject(fieldsMap))
+        }
+    }
+
+    private object FiltersSerializer : KSerializer<Filters> {
+
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Filters")
+
+        override fun deserialize(decoder: Decoder): Filters {
+            return Filters()
+        }
+
+        override fun serialize(encoder: Encoder, value: Filters) {
+            val jsonEncoder = encoder as JsonEncoder
+            val filtersMap = mutableMapOf<String, JsonElement>()
+            value.map.forEach { filter ->
+                filter.value?.let {
+                    val element = jsonEncoder.json.encodeToJsonElement(Filter.serializer(), it)
+                    filtersMap[filter.key] = element
+                }
+            }
+            jsonEncoder.encodeJsonElement(JsonObject(filtersMap))
+        }
     }
 }

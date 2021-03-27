@@ -10,7 +10,7 @@ import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
 import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 
-class SocketViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+internal class SocketViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
     private val filterName: TextView = itemView.findViewById(R.id.filterName)
     private val filterRed: TextInputEditText = itemView.findViewById(R.id.filterRed)

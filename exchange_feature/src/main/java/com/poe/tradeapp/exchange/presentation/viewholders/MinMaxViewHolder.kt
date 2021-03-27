@@ -10,7 +10,7 @@ import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
 import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 
-class MinMaxViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+internal class MinMaxViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
     private val filterName: TextView = itemView.findViewById(R.id.filterName)
     private val filterMin: TextInputEditText = itemView.findViewById(R.id.filterMin)

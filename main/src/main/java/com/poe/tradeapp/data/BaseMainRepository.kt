@@ -1,4 +1,4 @@
-package com.poe.tradeapp.data.repository
+package com.poe.tradeapp.data
 
 import com.poe.tradeapp.domain.IMainRepository
 

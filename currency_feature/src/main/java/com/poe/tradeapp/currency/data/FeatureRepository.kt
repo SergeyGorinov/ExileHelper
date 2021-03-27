@@ -33,7 +33,9 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
                     resultList.result.subList(0, 20).joinToString(separator = ",")
                 } else {
                     resultList.result.joinToString(separator = ",")
-                }, ""
+                },
+                resultList.id,
+                "exchange"
             ).await()
         } catch (e: Exception) {
             null
@@ -45,7 +47,8 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
         body: CurrencyRequest
     ): CurrencyListResponse? {
         return try {
-            apiService.getCurrencyExchangeList(league, body).await()
+            val test = apiService.getCurrencyExchangeList(league, body).await()
+            return test
         } catch (e: Exception) {
             null
         }

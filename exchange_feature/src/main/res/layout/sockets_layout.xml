@@ -1,11 +1,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/groupSocket"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
     android:gravity="center|center_vertical"
     android:orientation="vertical"
-    android:padding="12dp">
+    app:layout_constraintBottom_toBottomOf="@id/itemImage"
+    app:layout_constraintEnd_toEndOf="@id/itemImage"
+    app:layout_constraintStart_toStartOf="@id/itemImage"
+    app:layout_constraintTop_toTopOf="@id/itemImage">
 
     <LinearLayout
         android:id="@+id/topSocketGroup"

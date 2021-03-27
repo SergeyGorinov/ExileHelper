@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import com.poe.tradeapp.core.domain.usecases.GetCurrencyItemsUseCase
 import com.poe.tradeapp.core.domain.usecases.GetItemsUseCase
 import com.poe.tradeapp.core.domain.usecases.GetStatsUseCase
-import com.poe.tradeapp.exchange.data.models.ItemsListResponseModel
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModel
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
+import com.poe.tradeapp.exchange.domain.usecases.GetItemsDataListUseCase
+import com.poe.tradeapp.exchange.domain.usecases.GetItemsListUseCase
 import com.poe.tradeapp.exchange.presentation.models.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,8 @@ internal class ItemsSearchViewModel(
     private val getCurrencyItemsUseCase: GetCurrencyItemsUseCase,
     private val getItemsUseCase: GetItemsUseCase,
     private val getStatsUseCase: GetStatsUseCase,
+    private val getItemsListUseCase: GetItemsListUseCase,
+    private val getItemsDataListUseCase: GetItemsDataListUseCase
 ) : ViewModel() {
 
     val viewLoadingState = MutableStateFlow(true)
@@ -29,13 +32,14 @@ internal class ItemsSearchViewModel(
     var currencies: List<CurrencyViewData> = listOf()
         private set
 
-    var itemsResultData: ItemsListResponseModel? = null
+    var itemsResultData: Pair<String, List<String>>? = null
         private set
 
-    val filters = mutableListOf<Filter>()
+    val itemsResultFetchedData = mutableListOf<ItemResultViewData>()
 
-    private var type: String? = null
-    private var name: String? = null
+    val filters = mutableListOf<Filter>()
+    var type: String? = null
+    var name: String? = null
 
     suspend fun requestItems() {
         withContext(Dispatchers.IO) {
@@ -78,42 +82,133 @@ internal class ItemsSearchViewModel(
         viewLoadingState.emit(false)
     }
 
-    fun setType(type: String) {
-        this.type = type
+    suspend fun fetchPartialResults(league: String, position: Int) {
+        withContext(Dispatchers.IO) {
+            if (position == 0) {
+                itemsResultFetchedData.clear()
+                fetchAllEntries(league)
+            }
+
+            val subList = getResultsSubList(position)
+
+            if (subList.isNotEmpty()) {
+                val result = getItemsDataListUseCase.execute(
+                    subList.joinToString(","),
+                    itemsResultData?.first ?: ""
+                ).map { itemData ->
+                    val hybridData = if (itemData.hybridData != null) {
+                        HybridData(
+                            itemData.hybridData.isVaalGem,
+                            itemData.hybridData.properties.map { property ->
+                                val values = property.values.map {
+                                    PropertyData(
+                                        it.propertyValue,
+                                        it.propertyColor
+                                    )
+                                }
+                                Property(
+                                    property.name,
+                                    values,
+                                    property.displayMode,
+                                    property.progress,
+                                    property.type,
+                                    property.suffix
+                                )
+                            },
+                            itemData.hybridData.requirements.map { property ->
+                                val values = property.values.map {
+                                    PropertyData(
+                                        it.propertyValue,
+                                        it.propertyColor
+                                    )
+                                }
+                                Property(
+                                    property.name,
+                                    values,
+                                    property.displayMode,
+                                    property.progress,
+                                    property.type,
+                                    property.suffix
+                                )
+                            },
+                            itemData.hybridData.secDescrText,
+                            itemData.hybridData.implicitMods,
+                            itemData.hybridData.explicitMods,
+                            null
+                        )
+                    } else {
+                        null
+                    }
+                    ItemResultViewData(
+                        itemData.name,
+                        itemData.typeLine,
+                        itemData.iconUrl,
+                        itemData.frameType,
+                        itemData.synthesised,
+                        itemData.replica,
+                        itemData.corrupted,
+                        itemData.sockets?.map { Socket(it.group, it.attr, it.sColour) },
+                        itemData.hybridTypeLine,
+                        Influences(
+                            itemData.influences.elder,
+                            itemData.influences.shaper,
+                            itemData.influences.warlord,
+                            itemData.influences.hunter,
+                            itemData.influences.redeemer,
+                            itemData.influences.crusader
+                        ),
+                        ItemData(
+                            itemData.itemData.properties.map { property ->
+                                val values = property.values.map {
+                                    PropertyData(
+                                        it.propertyValue,
+                                        it.propertyColor
+                                    )
+                                }
+                                Property(
+                                    property.name,
+                                    values,
+                                    property.displayMode,
+                                    property.progress,
+                                    property.type,
+                                    property.suffix
+                                )
+                            },
+                            itemData.itemData.requirements.map { property ->
+                                val values = property.values.map {
+                                    PropertyData(
+                                        it.propertyValue,
+                                        it.propertyColor
+                                    )
+                                }
+                                Property(
+                                    property.name,
+                                    values,
+                                    property.displayMode,
+                                    property.progress,
+                                    property.type,
+                                    property.suffix
+                                )
+                            },
+                            itemData.itemData.secDescrText,
+                            itemData.itemData.implicitMods,
+                            itemData.itemData.explicitMods,
+                            itemData.itemData.note
+                        ),
+                        hybridData
+                    )
+                }
+                itemsResultFetchedData.addAll(result)
+            }
+        }
     }
 
-    fun setName(name: String?) {
-        this.name = name
-    }
-
-    suspend fun fetchPartialResults(position: Int) {
-
-        if (itemsResultData == null || position == 0)
-            fetchAllEntries()
-
-        val subList = getResultsSubList(position)
-
-//        if (subList.isNotEmpty()) {
-//            featureRetrofit.getItemExchangeResponse(
-//                subList.joinToString(","),
-//                itemsResultData?.id ?: ""
-//            ).await()
-//        }
-    }
-
-    private suspend fun fetchAllEntries() {
-//        itemsResultData = try {
-//            featureRetrofit.getItemsExchangeList(
-//                "api/trade/search/Heist", populateRequest()
-//            ).await()
-//        } catch (e: Exception) {
-//            Log.e("ITEMS FETCHING ERROR", e.message ?: "ERROR")
-//            null
-//        }
+    private suspend fun fetchAllEntries(league: String) {
+        itemsResultData = getItemsListUseCase.execute(league, populateRequest())
     }
 
     private fun getResultsSubList(position: Int): List<String> {
-        val itemsEntries = itemsResultData?.result ?: listOf()
+        val itemsEntries = itemsResultData?.second ?: listOf()
         return if (itemsEntries.size - position > 10) {
             itemsEntries.subList(position, position + 10)
         } else

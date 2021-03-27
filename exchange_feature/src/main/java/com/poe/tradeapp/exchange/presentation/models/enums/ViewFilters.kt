@@ -1,6 +1,8 @@
 package com.poe.tradeapp.exchange.presentation.models.enums
 
-class ViewFilters {
+internal class ViewFilters {
+
+    @Suppress("unused")
     enum class AllFilters(val id: String, val text: String, val values: Array<*>) {
         TypeFilter("type_filters", "Type Filters", TypeFilters.values() as Array<*>),
         WeaponFilter("weapon_filters", "Weapon Filters", WeaponFilters.values() as Array<*>),
@@ -19,8 +21,8 @@ class ViewFilters {
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?
     ) : IFilter {
-        Category("category", "Item Category", ViewType.Dropdown, Dropdowns.ItemCategory.values()),
-        Rarity("rarity", "Item Rarity", ViewType.Dropdown, Dropdowns.ItemRarity.values())
+        Category("category", "Item Category", ViewType.Dropdown, DropDowns.ItemCategory.values()),
+        Rarity("rarity", "Item Rarity", ViewType.Dropdown, DropDowns.ItemRarity.values())
     }
 
     enum class WeaponFilters(
@@ -81,11 +83,11 @@ class ViewFilters {
         MapPacksize("map_packsize", "Map Packsize", ViewType.Minmax, null),
         MapIIQ("map_iiq", "Map IIQ", ViewType.Minmax, null),
         MapIIR("map_iir", "Map IIR", ViewType.Minmax, null),
-        ShapedMap("map_shaped", "Shaped Map", ViewType.Dropdown, Dropdowns.YesNo.values()),
-        ElderMap("map_elder", "Elder Map", ViewType.Dropdown, Dropdowns.YesNo.values()),
-        BlightedMap("map_blighted", "Blighted Map", ViewType.Dropdown, Dropdowns.YesNo.values()),
-        MapRegion("map_region", "Map Region", ViewType.Dropdown, Dropdowns.MapRegion.values()),
-        MapSeries("map_series", "Map Series", ViewType.Dropdown, Dropdowns.MapSeries.values())
+        ShapedMap("map_shaped", "Shaped Map", ViewType.Dropdown, DropDowns.YesNo.values()),
+        ElderMap("map_elder", "Elder Map", ViewType.Dropdown, DropDowns.YesNo.values()),
+        BlightedMap("map_blighted", "Blighted Map", ViewType.Dropdown, DropDowns.YesNo.values()),
+        MapRegion("map_region", "Map Region", ViewType.Dropdown, DropDowns.MapRegion.values()),
+        MapSeries("map_series", "Map Series", ViewType.Dropdown, DropDowns.MapSeries.values())
     }
 
     enum class HeistFilters(
@@ -98,7 +100,7 @@ class ViewFilters {
             "heist_objective_value",
             "Contract Objective Value",
             ViewType.Dropdown,
-            Dropdowns.ContractObjectiveValue.values()
+            DropDowns.ContractObjectiveValue.values()
         ),
         WingsRevealed("heist_wings", "Wings Revealed", ViewType.Minmax, null),
         TotalWings("heist_max_wings", "Total Wings", ViewType.Minmax, null),
@@ -147,68 +149,68 @@ class ViewFilters {
             "gem_alternate_quality",
             "Gem Quality Type",
             ViewType.Dropdown,
-            Dropdowns.GemQualityType.values()
+            DropDowns.GemQualityType.values()
         ),
         ShaperInfluence(
             "shaper_item",
             "Shaper Influence",
             ViewType.Dropdown,
-            Dropdowns.YesNo.values()
+            DropDowns.YesNo.values()
         ),
         ElderInfluence(
             "elder_item",
             "Elder Influence",
             ViewType.Dropdown,
-            Dropdowns.YesNo.values()
+            DropDowns.YesNo.values()
         ),
         CrusaderInfluence(
             "crusader_item",
             "Crusader Influence",
             ViewType.Dropdown,
-            Dropdowns.YesNo.values()
+            DropDowns.YesNo.values()
         ),
         RedeemerInfluence(
             "redeemer_item",
             "Redeemer Influence",
             ViewType.Dropdown,
-            Dropdowns.YesNo.values()
+            DropDowns.YesNo.values()
         ),
         HunterInfluence(
             "hunter_item",
             "Hunter Influence",
             ViewType.Dropdown,
-            Dropdowns.YesNo.values()
+            DropDowns.YesNo.values()
         ),
         WarlordInfluence(
             "warlord_item",
             "Warlord Influence",
             ViewType.Dropdown,
-            Dropdowns.YesNo.values()
+            DropDowns.YesNo.values()
         ),
         FracturedItem(
             "fractured_item",
             "Fractured Item",
             ViewType.Dropdown,
-            Dropdowns.YesNo.values()
+            DropDowns.YesNo.values()
         ),
         SynthesisedItem(
             "synthesised_item",
             "Synthesised Item",
             ViewType.Dropdown,
-            Dropdowns.YesNo.values()
+            DropDowns.YesNo.values()
         ),
         AlternateArt(
             "alternate_art",
             "Alternate Art",
             ViewType.Dropdown,
-            Dropdowns.GemQualityType.values()
+            DropDowns.GemQualityType.values()
         ),
-        Identified("identified", "Identified", ViewType.Dropdown, Dropdowns.YesNo.values()),
-        Corrupted("corrupted", "Corrupted", ViewType.Dropdown, Dropdowns.YesNo.values()),
-        Mirrored("mirrored", "Mirrored", ViewType.Dropdown, Dropdowns.YesNo.values()),
-        Crafted("crafted", "Crafted", ViewType.Dropdown, Dropdowns.YesNo.values()),
-        Veiled("veiled", "Veiled", ViewType.Dropdown, Dropdowns.YesNo.values()),
-        Enchanted("enchanted", "Enchanted", ViewType.Dropdown, Dropdowns.YesNo.values()),
+        Identified("identified", "Identified", ViewType.Dropdown, DropDowns.YesNo.values()),
+        Corrupted("corrupted", "Corrupted", ViewType.Dropdown, DropDowns.YesNo.values()),
+        Mirrored("mirrored", "Mirrored", ViewType.Dropdown, DropDowns.YesNo.values()),
+        Crafted("crafted", "Crafted", ViewType.Dropdown, DropDowns.YesNo.values()),
+        Veiled("veiled", "Veiled", ViewType.Dropdown, DropDowns.YesNo.values()),
+        Enchanted("enchanted", "Enchanted", ViewType.Dropdown, DropDowns.YesNo.values()),
         TalismanTier("talisman_tier", "Talisman Tier", ViewType.Minmax, null),
         StoredExperience("stored_experience", "Stored Experience", ViewType.Minmax, null),
         StackSize("stack_size", "Stack Size", ViewType.Minmax, null)
@@ -221,8 +223,8 @@ class ViewFilters {
         override val dropDownValues: Array<*>?
     ) : IFilter {
         SellerAccount("account", "Seller Account", ViewType.Account, null),
-        Listed("indexed", "Listed", ViewType.Dropdown, Dropdowns.Listed.values()),
-        SaleType("sale_type", "Sale Type", ViewType.Dropdown, Dropdowns.SaleType.values()),
-        BuyoutPrice("price", "Buyout Price", ViewType.Buyout, Dropdowns.BuyoutPrice.values())
+        Listed("indexed", "Listed", ViewType.Dropdown, DropDowns.Listed.values()),
+        SaleType("sale_type", "Sale Type", ViewType.Dropdown, DropDowns.SaleType.values()),
+        BuyoutPrice("price", "Buyout Price", ViewType.Buyout, DropDowns.BuyoutPrice.values())
     }
 }

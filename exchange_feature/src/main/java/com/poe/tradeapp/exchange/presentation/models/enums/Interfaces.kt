@@ -1,11 +1,11 @@
 package com.poe.tradeapp.exchange.presentation.models.enums
 
-interface IEnum {
+internal interface IEnum {
     val id: String?
     val text: String
 }
 
-interface IFilter : IEnum {
+internal interface IFilter : IEnum {
     val viewType: ViewType
     val dropDownValues: Array<*>?
 }

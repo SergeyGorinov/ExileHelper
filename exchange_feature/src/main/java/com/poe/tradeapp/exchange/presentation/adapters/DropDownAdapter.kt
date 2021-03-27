@@ -11,7 +11,7 @@ import com.poe.tradeapp.exchange.presentation.models.enums.IEnum
 import java.util.*
 import kotlin.collections.ArrayList
 
-class DropDownAdapter(
+internal class DropDownAdapter(
     context: Context,
     private val resId: Int,
     items: List<Any?>

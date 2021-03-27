@@ -1,6 +1,7 @@
 package com.poe.tradeapp.exchange.presentation.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -9,9 +10,9 @@ import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.presentation.models.FetchedItem
 import com.poe.tradeapp.exchange.presentation.viewholders.ItemsResultViewHolder
 
-class ItemsResultAdapter : RecyclerView.Adapter<ItemsResultViewHolder>() {
+internal class ItemsResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val diffUtilCallback = object : DiffUtil.ItemCallback<FetchedItem>() {
+    private val diffUtilCallback = object : DiffUtil.ItemCallback<FetchedItem?>() {
         override fun areItemsTheSame(oldItem: FetchedItem, newItem: FetchedItem): Boolean {
             return oldItem.name == newItem.name
         }
@@ -23,17 +24,17 @@ class ItemsResultAdapter : RecyclerView.Adapter<ItemsResultViewHolder>() {
 
     private val asyncDiffer = AsyncListDiffer(this, diffUtilCallback)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemsResultViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val viewLayout =
             if (viewType == 0) R.layout.items_result_loading else R.layout.items_result_item
         val view = LayoutInflater.from(parent.context).inflate(viewLayout, parent, false)
-        return ItemsResultViewHolder(view)
+        return if (viewType == 0) LoaderViewHolder(view) else ItemsResultViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ItemsResultViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = asyncDiffer.currentList.getOrNull(position)
-        if (item != null) {
-            holder.bind(item)
+        if (item != null && holder is ItemsResultViewHolder) {
+            holder.bind(item, position % 2 == 0)
         }
     }
 
@@ -42,15 +43,14 @@ class ItemsResultAdapter : RecyclerView.Adapter<ItemsResultViewHolder>() {
     override fun getItemViewType(position: Int) =
         if (asyncDiffer.currentList.getOrNull(position) == null) 0 else 1
 
-    fun addLoader() {
-        asyncDiffer.currentList.add(null)
-        notifyItemInserted(asyncDiffer.currentList.size - 1)
+    fun addFetchedItems(fetchedItems: List<FetchedItem?>) {
+        asyncDiffer.submitList(fetchedItems)
     }
 
-    fun addFetchedItems(fetchedItems: List<FetchedItem>) {
-        asyncDiffer.currentList.remove(null)
-        asyncDiffer.currentList.addAll(fetchedItems)
-        notifyItemRangeChanged(asyncDiffer.currentList.size, fetchedItems.size)
-        notifyDataSetChanged()
+    fun addLoader() {
+        val currentList = asyncDiffer.currentList + null
+        asyncDiffer.submitList(currentList)
     }
+
+    internal class LoaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }

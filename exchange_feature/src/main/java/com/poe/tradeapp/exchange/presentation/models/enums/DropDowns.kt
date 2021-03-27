@@ -1,6 +1,7 @@
 package com.poe.tradeapp.exchange.presentation.models.enums
 
-class Dropdowns {
+@Suppress("unused")
+internal class DropDowns {
     enum class YesNo(override val id: String?, override val text: String) : IEnum {
         Any(null, "Any"),
         Yes("true", "Yes"),

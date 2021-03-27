@@ -6,12 +6,13 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import com.poe.tradeapp.exchange.R
-import com.poe.tradeapp.exchange.data.models.Influences
-import com.poe.tradeapp.exchange.data.models.Item
-import com.poe.tradeapp.exchange.data.models.Property
+import com.poe.tradeapp.exchange.presentation.models.Influences
+import com.poe.tradeapp.exchange.presentation.models.ItemResultViewData
+import com.poe.tradeapp.exchange.presentation.models.Property
 import com.poe.tradeapp.exchange.presentation.models.enums.PropertyDisplayType
 
-object SeparatorHelper {
+internal object SeparatorHelper {
+
     fun getSeparator(frameType: Int?): Int {
         return when (frameType) {
             0 -> R.drawable.seperator_normal
@@ -24,9 +25,9 @@ object SeparatorHelper {
         }
     }
 
-    fun getInfluenceIcons(item: Item): List<Int?> {
+    fun getInfluenceIcons(item: ItemResultViewData): List<Int?> {
         return when {
-            item.influences != null -> {
+            !item.influences.isEmpty() -> {
                 item.influences.getInfluenceIcons()
             }
             item.synthesised ?: false -> {
@@ -58,11 +59,11 @@ object SeparatorHelper {
                 if (property.values.isNotEmpty()) {
                     propertyGroupSpan.append(": ")
                     property.values.joinTo(propertyGroupSpan, transform = { prop ->
-                        val spannableProp = SpannableString(prop.first)
+                        val spannableProp = SpannableString(prop.propertyValue)
                         spannableProp.setSpan(
-                            ForegroundColorSpan(getPropertyColor(prop.second)),
+                            ForegroundColorSpan(getPropertyColor(prop.propertyColor)),
                             0,
-                            prop.first.length,
+                            prop.propertyValue.length,
                             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
                         )
                         spannableProp
@@ -72,11 +73,11 @@ object SeparatorHelper {
             PropertyDisplayType.ValuesName.ordinal -> {
                 if (property.values.isNotEmpty()) {
                     property.values.joinTo(propertyGroupSpan, transform = { prop ->
-                        val spannableProp = SpannableString(prop.first)
+                        val spannableProp = SpannableString(prop.propertyValue)
                         spannableProp.setSpan(
-                            ForegroundColorSpan(getPropertyColor(prop.second)),
+                            ForegroundColorSpan(getPropertyColor(prop.propertyColor)),
                             0,
-                            prop.first.length,
+                            prop.propertyValue.length,
                             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
                         )
                         spannableProp
@@ -89,7 +90,7 @@ object SeparatorHelper {
                 propertyGroupSpan.append(property.name)
                 if (property.values.isNotEmpty()) {
                     for (i in property.values.indices) {
-                        val spannableProp = property.values[i].first
+                        val spannableProp = property.values[i].propertyValue
                         val pattern = "{$i}"
                         val replaceIndexPos = propertyGroupSpan.indexOf(pattern)
                         propertyGroupSpan.delete(
@@ -98,9 +99,9 @@ object SeparatorHelper {
                         )
                         propertyGroupSpan.insert(replaceIndexPos, spannableProp)
                         propertyGroupSpan.setSpan(
-                            ForegroundColorSpan(getPropertyColor(property.values[i].second)),
+                            ForegroundColorSpan(getPropertyColor(property.values[i].propertyColor)),
                             replaceIndexPos,
-                            replaceIndexPos + property.values[i].first.length,
+                            replaceIndexPos + property.values[i].propertyValue.length,
                             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
                         )
                     }

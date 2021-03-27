@@ -13,7 +13,7 @@ import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IEnum
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 
-class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
     private val filterName: TextView = itemView.findViewById(R.id.filterName)
     private val filterDropDown: AutoCompleteTextView = itemView.findViewById(R.id.filterDropDown)

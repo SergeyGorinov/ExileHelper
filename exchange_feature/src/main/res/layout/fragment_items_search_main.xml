@@ -39,24 +39,22 @@
                     android:layout_height="match_parent"
                     android:hint="@string/empty_hint"
                     app:endIconMode="clear_text"
-                    app:endIconTint="#999999"
+                    app:endIconTint="@color/primaryTextColor"
                     app:hintTextColor="@android:color/transparent">
 
                     <AutoCompleteTextView
                         android:id="@+id/toolbar_search_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="#1e2124"
-                        android:backgroundTint="@android:color/transparent"
+                        android:background="@color/primaryColor"
                         android:completionThreshold="0"
                         android:dropDownWidth="match_parent"
-                        android:fontFamily="@font/fontinsmallcaps"
                         android:gravity="center_vertical"
                         android:hint="@string/toolbar_search_item_hint"
                         android:inputType="textNoSuggestions"
                         android:paddingVertical="0dp"
-                        android:textColor="@android:color/white"
-                        android:textColorHint="#999999"
+                        android:textColor="@color/primaryTextColor"
+                        android:textColorHint="@color/secondaryColor"
                         android:textCursorDrawable="@color/primaryTextColor"
                         android:textStyle="bold"
                         tools:ignore="LabelFor" />

@@ -1,6 +1,5 @@
 package com.poe.tradeapp.exchange.data
 
-import com.poe.tradeapp.exchange.data.models.ItemsListResponseModel
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModel
 import kotlinx.serialization.json.JsonObject
 import retrofit2.Call
@@ -12,7 +11,7 @@ internal interface ApiService {
     fun getItemsExchangeList(
         @Path("league") league: String,
         @Body body: ItemsRequestModel
-    ): Call<ItemsListResponseModel>
+    ): Call<JsonObject>
 
     @GET("/api/trade/fetch/{data}")
     fun getItemExchangeResponse(
