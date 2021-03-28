@@ -9,6 +9,5 @@ internal val presentationModule = module {
     single { Cicerone.create() }
     single { get<Cicerone<Router>>().router }
     single { get<Cicerone<Router>>().getNavigatorHolder() }
-    single { ScreensRepository() }
     single { ApplicationSettings(androidContext()) }
 }

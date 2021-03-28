@@ -1,5 +1,6 @@
 package com.poe.tradeapp.currency.presentation.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -34,6 +35,11 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        getMainActivity()?.showBottomNavBarIfNeeded()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -54,9 +60,6 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
         binding.toolbarLayout.toolbar.inflateMenu(R.menu.menu_currency)
         binding.toolbarLayout.toolbar.title = "Currency Exchange"
-        binding.toolbarLayout.toolbar.setNavigationOnClickListener {
-            showMenu()
-        }
         binding.toolbarLayout.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.accept -> {
@@ -149,7 +152,7 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         private const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
         private const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
 
-        fun newInstance(wantItemId: String?, haveItemId: String?) = FragmentScreen {
+        fun newInstance(wantItemId: String? = null, haveItemId: String? = null) = FragmentScreen {
             CurrencyExchangeMainFragment().apply {
                 arguments = bundleOf(WANT_ITEM_ID_KEY to wantItemId, HAVE_ITEM_ID_KEY to haveItemId)
             }

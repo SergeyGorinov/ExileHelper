@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sign_in_text">Sign in</string>
+    <string name="sign_up_text">Sign up</string>
+    <string name="enter_password_text">Enter password…</string>
+    <string name="password_header_text">Password:</string>
+    <string name="enter_email_text">Enter email…</string>
+    <string name="email_header_text">Email:</string>
+    <string name="email_verification_text">Please check Your email and follow the link for verify Your account.</string>
+    <string name="password_not_match_alert_text">Password doesn\'t have valid format! Allowed characters: any letters, numbers, !@#\$%^&amp;+=. Allowed length: from 6 to 20 characters</string>
+    <string name="email_not_match_alert_text">Email doesn\'t have valid format!</string>
+    <string name="resend_email_verification_link_text">Resend email verification link</string>
+    <string name="resend_timeout_text">You can resend verification link after %d seconds</string>
+</resources>

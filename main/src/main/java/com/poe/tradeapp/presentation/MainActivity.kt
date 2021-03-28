@@ -14,6 +14,8 @@ import com.github.terrakok.cicerone.*
 import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.github.terrakok.cicerone.androidx.TransactionInfo
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.poe.tradeapp.MyFirebaseMessaging
 import com.poe.tradeapp.R
 import com.poe.tradeapp.charts_feature.presentation.fragments.ChartsMainFragment
@@ -22,6 +24,8 @@ import com.poe.tradeapp.core.presentation.IMainActivity
 import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
 import com.poe.tradeapp.databinding.ActivityMainBinding
 import com.poe.tradeapp.exchange.presentation.fragments.ItemsSearchMainFragment
+import com.poe.tradeapp.presentation.fragments.LoaderFragment
+import com.poe.tradeapp.presentation.fragments.StartFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.inject
@@ -203,6 +207,11 @@ class MainActivity : FragmentActivity(), IMainActivity {
         if (viewBinding.bottomNavBar.visibility == View.GONE) {
             viewBinding.bottomNavBar.visibility = View.VISIBLE
         }
+    }
+
+    override fun signOut() {
+        Firebase.auth.signOut()
+        router.newRootScreen(StartFragment.newInstance())
     }
 
     override fun goToCurrencyExchange(wantItemId: String?, haveItemId: String?) {

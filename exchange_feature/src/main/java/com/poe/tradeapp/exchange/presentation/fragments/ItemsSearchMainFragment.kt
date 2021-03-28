@@ -39,17 +39,17 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 
         val progressBar = requireActivity().getTransparentProgressDialog()
 
-        binding.itemsToolbar.title =
+        binding.toolbar.title =
             resources.getString(R.string.items_search_title, "None")
         binding.appbar.visibility = View.VISIBLE
-        binding.itemsToolbar.setOnClickListener {
+        binding.toolbar.setOnClickListener {
             showToolbarSearchLayout()
         }
 
-        binding.itemsToolbar.setOnMenuItemClickListener { item ->
+        binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.accept -> {
-                    requireActivity().hideKeyboard(binding.itemsToolbar)
+                    requireActivity().hideKeyboard(binding.toolbar)
                     lifecycleScope.launch {
                         viewModel.viewLoadingState.emit(true)
                         viewModel.fetchPartialResults(settings.league, 0)
@@ -91,7 +91,7 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
                     adapter.selectedItem = selectedItem
                 requireActivity().hideKeyboard(binding.toolbarSearchInput)
                 hideToolbarSearchLayout()
-                binding.itemsToolbar.title =
+                binding.toolbar.title =
                     resources.getString(R.string.items_search_title, selectedItem.text)
             }
         }
@@ -164,7 +164,7 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 //    }
 
     private fun showToolbarSearchLayout() {
-        binding.itemsToolbar.visibility = View.GONE
+        binding.toolbar.visibility = View.GONE
         binding.toolbarSearchLayout.alpha = 0f
         binding.toolbarSearchLayout.visibility = View.VISIBLE
         binding.toolbarSearchInput.requestFocus()
@@ -180,9 +180,9 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 
     private fun hideToolbarSearchLayout() {
         binding.toolbarSearchLayout.visibility = View.GONE
-        binding.itemsToolbar.alpha = 0f
-        binding.itemsToolbar.visibility = View.VISIBLE
-        binding.itemsToolbar
+        binding.toolbar.alpha = 0f
+        binding.toolbar.visibility = View.VISIBLE
+        binding.toolbar
             .animate()
             .alpha(1f)
             .setDuration(250L)

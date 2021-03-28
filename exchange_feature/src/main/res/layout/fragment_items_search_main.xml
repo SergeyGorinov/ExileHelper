@@ -31,7 +31,8 @@
                     android:layout_gravity="center|center_vertical"
                     android:layout_marginEnd="24dp"
                     android:backgroundTint="@android:color/transparent"
-                    android:src="@drawable/back_24" />
+                    android:src="@drawable/back_24"
+                    tools:ignore="ContentDescription" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
@@ -62,7 +63,7 @@
             </LinearLayout>
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/items_toolbar"
+                android:id="@+id/toolbar"
                 style="@style/Widget.MaterialComponents.Toolbar.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

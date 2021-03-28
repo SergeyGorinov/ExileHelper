@@ -6,17 +6,17 @@ import android.view.View
 import android.view.Window
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.github.terrakok.cicerone.Router
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.poe.tradeapp.core.DI
 import com.poe.tradeapp.core.R
 import com.poe.tradeapp.core.databinding.MenuLayoutBinding
 import org.koin.core.component.inject
-
-interface IBaseFragment {
-    var viewBinding: ViewBinding?
-}
 
 abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
@@ -27,6 +27,16 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
     override var viewBinding: ViewBinding? = null
 
+    private var toolbar: MaterialToolbar? = null
+
+    override fun onResume() {
+        super.onResume()
+        toolbar = viewBinding?.root?.findViewById(R.id.toolbar)
+        toolbar?.setNavigationOnClickListener {
+            showMenu()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         viewBinding = null
@@ -36,7 +46,7 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
     protected fun getMainActivity() = requireActivity() as? IMainActivity
 
-    protected fun showMenu() {
+    private fun showMenu() {
         val leagues = getMainActivity()?.leagues ?: listOf()
         val view = View.inflate(requireActivity(), R.layout.menu_layout, null)
         val binding = MenuLayoutBinding.bind(view)
@@ -56,11 +66,34 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
                 override fun onNothingSelected(parent: AdapterView<*>?) = Unit
             }
+
         menuDialog = Dialog(requireActivity(), R.style.AppTheme_DialogMenu)
+
+        Firebase.auth.currentUser?.let {
+            binding.signOut.visibility = View.VISIBLE
+            binding.signedInEmail.visibility = View.VISIBLE
+            binding.signedInEmail.text = it.email
+            binding.signOut.setOnClickListener {
+                AlertDialog.Builder(requireActivity(), R.style.AppTheme_AlertDialog)
+                    .setPositiveButton("Yes") { dialog, _ ->
+                        dialog.dismiss()
+                        menuDialog.dismiss()
+                        getMainActivity()?.signOut()
+                    }
+                    .setNegativeButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .setTitle("Sign out")
+                    .setMessage("Are You really want to sign out from account?")
+                    .show()
+            }
+        }
+
         menuDialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
         menuDialog.setContentView(view)
         menuDialog.window?.setGravity(Gravity.TOP or Gravity.START)
         menuDialog.window?.attributes?.height = requireActivity().window.attributes.height
+        menuDialog.window?.attributes?.width = 300.dp
         menuDialog.window?.attributes?.dimAmount = 0f
         menuDialog.show()
     }

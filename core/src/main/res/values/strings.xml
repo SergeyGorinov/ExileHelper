@@ -42,4 +42,5 @@
     <string name="exchange_get_text">"You will get %d x  "</string>
     <string name="exchange_pay_text">"You will pay %d x  "</string>
     <string name="account_text">"%s (%s)"</string>
+    <string name="select_league_text">Select league:</string>
 </resources>

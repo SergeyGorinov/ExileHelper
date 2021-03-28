@@ -130,6 +130,11 @@ subprojects {
         implementation "com.squareup.picasso:picasso:$picasso_version"
         implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
 
+        implementation platform('com.google.firebase:firebase-bom:26.7.0')
+        implementation 'com.google.firebase:firebase-messaging'
+        implementation 'com.google.firebase:firebase-auth-ktx'
+        implementation 'com.google.firebase:firebase-analytics-ktx'
+
         kapt "androidx.room:room-compiler:$room_version"
 
         if (name != "core") {
@@ -140,11 +145,6 @@ subprojects {
             implementation project(":currency_feature")
             implementation project(":exchange_feature")
             implementation project(":charts_feature")
-            // Import the BoM for the Firebase platform
-            implementation platform('com.google.firebase:firebase-bom:26.7.0')
-            implementation 'com.google.firebase:firebase-messaging'
-            implementation 'com.google.firebase:firebase-analytics-ktx'
-            implementation 'com.google.firebase:firebase-auth-ktx'
         }
     }
 }

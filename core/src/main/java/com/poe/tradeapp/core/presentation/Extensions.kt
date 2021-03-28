@@ -3,17 +3,11 @@ package com.poe.tradeapp.core.presentation
 import android.app.AlertDialog
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexWrap
@@ -22,16 +16,6 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.poe.tradeapp.core.R
 import java.util.*
-
-fun FragmentManager.addFragment(resId: Int, fragment: Fragment) {
-    val visibleFragments = this.fragments.filter { it.isVisible }
-    val transaction = this.beginTransaction()
-    visibleFragments.forEach {
-        transaction.hide(it)
-    }
-    transaction.add(resId, fragment)
-    transaction.commit()
-}
 
 fun RecyclerView.measureForAnimator(): Int {
     val layoutParams = this.layoutParams
@@ -95,23 +79,7 @@ fun Context.getTransparentProgressDialog(): AlertDialog {
     }
 }
 
-fun Bitmap.toDrawable(context: Context): Drawable {
-    val scale = if (height / 24.dp <= 0) 1 else height / 24.dp
-    return BitmapDrawable(
-        context.resources,
-        Bitmap.createScaledBitmap(this, width / scale, 24.dp, true)
-    ).apply {
-        setBounds(0, 0, intrinsicWidth, intrinsicHeight)
-    }
-}
-
 fun String.toLowerCaseLocalized() = this.toLowerCase(Locale.getDefault())
 
 val Int.dp: Int
     get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()
-val Float.spf: Float
-    get() = TypedValue.applyDimension(
-        TypedValue.COMPLEX_UNIT_SP,
-        this,
-        Resources.getSystem().displayMetrics
-    )
