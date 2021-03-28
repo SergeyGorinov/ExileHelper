@@ -12,22 +12,22 @@ import com.poe.tradeapp.core.presentation.toLowerCaseLocalized
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.presentation.models.ItemGroupViewData
 import com.poe.tradeapp.exchange.presentation.models.ItemViewData
-import com.poe.tradeapp.exchange.presentation.models.SearchableItem
+import com.poe.tradeapp.exchange.presentation.models.SuggestionItem
 import java.util.concurrent.CopyOnWriteArrayList
 
 internal class ItemsSearchFieldAdapter(
     context: Context,
     resId: Int,
     private val allItems: List<ItemGroupViewData>,
-    private val items: CopyOnWriteArrayList<SearchableItem> = CopyOnWriteArrayList()
-) : ArrayAdapter<SearchableItem>(context, resId, items) {
+    private val items: CopyOnWriteArrayList<SuggestionItem> = CopyOnWriteArrayList()
+) : ArrayAdapter<SuggestionItem>(context, resId, items) {
 
-    var selectedItem: SearchableItem? = null
+    var selectedItem: SuggestionItem? = null
     private var currentCount = 0
 
-    private val suggestions: CopyOnWriteArrayList<SearchableItem> = CopyOnWriteArrayList()
+    private val suggestions: CopyOnWriteArrayList<SuggestionItem> = CopyOnWriteArrayList()
 
-    override fun getItem(position: Int): SearchableItem? = items.getOrNull(position)
+    override fun getItem(position: Int): SuggestionItem? = items.getOrNull(position)
 
     override fun getItemId(position: Int): Long = position.toLong()
 
@@ -74,9 +74,9 @@ internal class ItemsSearchFieldAdapter(
     }
 
     internal class CustomFilter(
-        private val suggestions: CopyOnWriteArrayList<SearchableItem>,
+        private val suggestions: CopyOnWriteArrayList<SuggestionItem>,
         private val allItems: List<ItemGroupViewData>,
-        private val items: CopyOnWriteArrayList<SearchableItem>,
+        private val items: CopyOnWriteArrayList<SuggestionItem>,
         private val adapter: ItemsSearchFieldAdapter
     ) : Filter() {
 
@@ -88,9 +88,9 @@ internal class ItemsSearchFieldAdapter(
                 val filteredItems = allItems.mapNotNull { group ->
                     val entries = group.entries.filter {
                         it.text.toLowerCaseLocalized().contains(normalizedConstraint)
-                    }.map { SearchableItem(false, it.text, it.type, it.name) }
+                    }.map { SuggestionItem(false, it.text, it.type, it.name) }
                     if (entries.isNotEmpty()) {
-                        listOf(SearchableItem(true, group.label, group.label)) + entries
+                        listOf(SuggestionItem(true, group.label, group.label)) + entries
                     } else {
                         null
                     }
@@ -110,7 +110,7 @@ internal class ItemsSearchFieldAdapter(
             items.clear()
             if (results != null && results.count > 0) {
                 (results.values as? List<*>)?.forEach {
-                    if (it is SearchableItem) {
+                    if (it is SuggestionItem) {
                         items.add(it)
                     }
                 }

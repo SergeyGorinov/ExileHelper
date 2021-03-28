@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.presentation.models.Filter
+import com.poe.tradeapp.exchange.presentation.models.enums.IBindableFieldViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewType
 import com.poe.tradeapp.exchange.presentation.viewholders.*

@@ -8,6 +8,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
 import com.poe.tradeapp.exchange.presentation.models.Filter
+import com.poe.tradeapp.exchange.presentation.models.enums.IBindableFieldViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 
 internal class SocketViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -21,7 +22,9 @@ internal class SocketViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
     private val filterMax: TextInputEditText = itemView.findViewById(R.id.filterMax)
 
     override fun bind(item: IFilter, filter: Filter) {
-        val field = filter.getField(item.id ?: "")
+        val fieldId = item.id ?: return
+        val field = filter.getField(fieldId)
+
         filterName.text = item.text
 
         filterRed.doOnTextChanged { _, _, _, _ ->

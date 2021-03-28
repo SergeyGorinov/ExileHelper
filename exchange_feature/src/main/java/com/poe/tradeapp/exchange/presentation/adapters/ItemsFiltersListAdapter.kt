@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.presentation.models.Filter
+import com.poe.tradeapp.exchange.presentation.models.enums.IBindableViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 import com.poe.tradeapp.exchange.presentation.viewholders.FilterViewHolder
-import com.poe.tradeapp.exchange.presentation.viewholders.IBindableViewHolder
 
 internal class ItemsFiltersListAdapter(
     private val items: Array<ViewFilters.AllFilters>,

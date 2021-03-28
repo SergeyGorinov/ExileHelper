@@ -12,6 +12,7 @@ import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.databinding.FiltersHeaderItemBinding
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsFilterAdapter
 import com.poe.tradeapp.exchange.presentation.models.Filter
+import com.poe.tradeapp.exchange.presentation.models.enums.IBindableViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 
 internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -49,10 +50,14 @@ internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
         }
 
         viewBinding.filterEnabled.setOnCheckedChangeListener { _, checked ->
-            if (!checked && viewBinding.filterItemsLayout.visibility == View.VISIBLE)
-                animator.slideUp()
-            if (checked && viewBinding.filterItemsLayout.visibility == View.GONE)
-                animator.slideDown()
+            when {
+                !checked && viewBinding.filterItemsLayout.visibility == View.VISIBLE -> {
+                    animator.slideUp()
+                }
+                checked && viewBinding.filterItemsLayout.visibility == View.GONE -> {
+                    animator.slideDown()
+                }
+            }
             filter.isEnabled = checked
         }
 
@@ -67,8 +72,9 @@ internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
                 if (!filter.isEnabled) {
                     filter.isEnabled = true
                     viewBinding.filterEnabled.isChecked = filter.isEnabled
+                } else {
+                    animator.slideDown()
                 }
-                animator.slideDown()
             }
         }
     }

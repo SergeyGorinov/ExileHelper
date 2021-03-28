@@ -30,7 +30,7 @@
         tools:ignore="ContentDescription" />
 
     <include
-        android:id="@+id/socketsTemplateLayout"
+        android:id="@+id/sockets"
         layout="@layout/sockets_layout" />
 
     <include layout="@layout/items_result_item_hybrid" />

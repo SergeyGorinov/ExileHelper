@@ -48,8 +48,10 @@ internal class ItemsResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     fun addLoader() {
-        val currentList = asyncDiffer.currentList + null
-        asyncDiffer.submitList(currentList)
+        if (!asyncDiffer.currentList.contains(null)) {
+            val currentList = asyncDiffer.currentList + null
+            asyncDiffer.submitList(currentList)
+        }
     }
 
     internal class LoaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

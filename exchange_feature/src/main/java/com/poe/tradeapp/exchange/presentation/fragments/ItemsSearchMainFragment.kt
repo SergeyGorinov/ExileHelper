@@ -19,7 +19,7 @@ import com.poe.tradeapp.exchange.databinding.FragmentItemsSearchMainBinding
 import com.poe.tradeapp.exchange.presentation.ItemsSearchViewModel
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsFiltersListAdapter
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsSearchFieldAdapter
-import com.poe.tradeapp.exchange.presentation.models.SearchableItem
+import com.poe.tradeapp.exchange.presentation.models.SuggestionItem
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -51,7 +51,9 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
                 R.id.accept -> {
                     requireActivity().hideKeyboard(binding.itemsToolbar)
                     lifecycleScope.launch {
+                        viewModel.viewLoadingState.emit(true)
                         viewModel.fetchPartialResults(settings.league, 0)
+                        viewModel.viewLoadingState.emit(false)
                         if (viewModel.itemsResultData?.second?.isNotEmpty() == true) {
                             ItemsSearchResultFragment.newInstance().show(
                                 parentFragmentManager,
@@ -82,7 +84,7 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         binding.toolbarSearchInput.setOnItemClickListener { adapterView, _, position, _ ->
             val selectedItem = adapterView.getItemAtPosition(position)
             val adapter = adapterView.adapter
-            if (selectedItem is SearchableItem) {
+            if (selectedItem is SuggestionItem) {
                 viewModel.type = selectedItem.type
                 viewModel.name = selectedItem.name
                 if (adapter is ItemsSearchFieldAdapter)

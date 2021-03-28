@@ -1,6 +1,5 @@
 package com.poe.tradeapp.exchange.presentation.viewholders
 
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -22,19 +21,6 @@ internal class ItemsResultViewHolder(itemView: View) : RecyclerView.ViewHolder(i
     private val viewBinding = ItemsResultItemBinding.bind(itemView)
     private val headerViewBinding = ItemsResultItemHeaderBinding.bind(viewBinding.root)
     private val hybridViewBinding = ItemsResultItemHybridBinding.bind(viewBinding.root)
-
-    private val redSocket: Drawable? =
-        ContextCompat.getDrawable(itemView.context, R.drawable.red_socket)
-    private val greenSocket: Drawable? =
-        ContextCompat.getDrawable(itemView.context, R.drawable.green_socket)
-    private val blueSocket: Drawable? =
-        ContextCompat.getDrawable(itemView.context, R.drawable.blue_socket)
-    private val whiteSocket: Drawable? =
-        ContextCompat.getDrawable(itemView.context, R.drawable.white_socket)
-    private val horizontalConnector: Drawable? =
-        ContextCompat.getDrawable(itemView.context, R.drawable.horizontal_connector)
-    private val verticalConnector: Drawable? =
-        ContextCompat.getDrawable(itemView.context, R.drawable.vertical_connector)
 
     fun bind(item: FetchedItem, isOddItem: Boolean) {
         val color = ContextCompat.getColor(
@@ -94,129 +80,58 @@ internal class ItemsResultViewHolder(itemView: View) : RecyclerView.ViewHolder(i
             .transform(picassoImageScaleTransform)
             .into(viewBinding.itemImage)
 
-        prepareTemplate(item.sockets)
+        prepareSockets(item.sockets)
     }
 
     private fun setFrame(frameType: Int?, hasName: Boolean) {
-        when (frameType) {
-            0 -> {
-                headerViewBinding.leftHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        R.drawable.header_normal_left
-                    )
-                )
-                headerViewBinding.middleHeaderPart.background = ContextCompat.getDrawable(
-                    itemView.context,
-                    R.drawable.header_normal_middle_background
-                )
-                headerViewBinding.rightHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        R.drawable.header_normal_right
-                    )
-                )
+        val leftHeaderDrawable = when (frameType) {
+            0 -> R.drawable.header_normal_left
+            1 -> R.drawable.header_magic_left
+            2 -> if (hasName) R.drawable.header_double_rare_left else R.drawable.header_rare_left
+            3 -> if (hasName) R.drawable.header_double_unique_left else R.drawable.header_unique_left
+            4 -> R.drawable.header_gem_left
+            5 -> R.drawable.header_currency_left
+            else -> null
+        }
+        val middleHeaderDrawable = when (frameType) {
+            0 -> R.drawable.header_normal_middle_background
+            1 -> R.drawable.header_magic_middle_background
+            2 -> if (hasName) {
+                R.drawable.header_double_rare_middle_background
+            } else {
+                R.drawable.header_rare_middle_background
             }
-            1 -> {
-                headerViewBinding.leftHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        R.drawable.header_magic_left
-                    )
-                )
-                headerViewBinding.middleHeaderPart.background = ContextCompat.getDrawable(
-                    itemView.context,
-                    R.drawable.header_magic_middle_background
-                )
-                headerViewBinding.rightHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        R.drawable.header_magic_right
-                    )
-                )
+            3 -> if (hasName) {
+                R.drawable.header_double_unique_middle_background
+            } else {
+                R.drawable.header_unique_middle_background
             }
-            2 -> {
-                headerViewBinding.leftHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        if (hasName) R.drawable.header_double_rare_left
-                        else R.drawable.header_rare_left
-                    )
-                )
-                headerViewBinding.middleHeaderPart.background = ContextCompat.getDrawable(
-                    itemView.context,
-                    if (hasName) R.drawable.header_double_rare_middle_background
-                    else R.drawable.header_rare_middle_background
-                )
-                headerViewBinding.rightHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        if (hasName) R.drawable.header_double_rare_right
-                        else R.drawable.header_rare_right
-                    )
-                )
-            }
-            3 -> {
-                headerViewBinding.leftHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        if (hasName) R.drawable.header_double_unique_left
-                        else R.drawable.header_unique_left
-                    )
-                )
-                headerViewBinding.middleHeaderPart.background = ContextCompat.getDrawable(
-                    itemView.context,
-                    if (hasName) R.drawable.header_double_unique_middle_background
-                    else R.drawable.header_unique_middle_background
-                )
-                headerViewBinding.rightHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        if (hasName) R.drawable.header_double_unique_right
-                        else R.drawable.header_unique_right
-                    )
-                )
-            }
-            4 -> {
-                headerViewBinding.leftHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        R.drawable.header_gem_left
-                    )
-                )
-                headerViewBinding.middleHeaderPart.background = ContextCompat.getDrawable(
-                    itemView.context,
-                    R.drawable.header_gem_middle_background
-                )
-                headerViewBinding.rightHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        R.drawable.header_gem_right
-                    )
-                )
-            }
-            5 -> {
-                headerViewBinding.leftHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        R.drawable.header_currency_left
-                    )
-                )
-                headerViewBinding.middleHeaderPart.background = ContextCompat.getDrawable(
-                    itemView.context,
-                    R.drawable.header_currency_middle_background
-                )
-                headerViewBinding.rightHeaderPart.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        R.drawable.header_currency_right
-                    )
-                )
-            }
+            4 -> R.drawable.header_gem_middle_background
+            5 -> R.drawable.header_currency_middle_background
+            else -> null
+        }
+        val rightHeaderDrawable = when (frameType) {
+            0 -> R.drawable.header_normal_right
+            1 -> R.drawable.header_magic_right
+            2 -> if (hasName) R.drawable.header_double_rare_right else R.drawable.header_rare_right
+            3 -> if (hasName) R.drawable.header_double_unique_right else R.drawable.header_unique_right
+            4 -> R.drawable.header_gem_right
+            5 -> R.drawable.header_currency_right
+            else -> null
+        }
+
+        leftHeaderDrawable?.let {
+            headerViewBinding.leftHeaderPart.setBackgroundResource(it)
+        }
+        middleHeaderDrawable?.let {
+            headerViewBinding.middleHeaderPart.setBackgroundResource(it)
+        }
+        rightHeaderDrawable?.let {
+            headerViewBinding.rightHeaderPart.setBackgroundResource(it)
         }
     }
 
-    private fun prepareTemplate(sockets: List<Socket>?) {
+    private fun prepareSockets(sockets: List<Socket>?) {
         sockets ?: return
         var socketCount = sockets.size
         val socketGroups = if (socketCount % 2 != 0) {
@@ -236,67 +151,60 @@ internal class ItemsResultViewHolder(itemView: View) : RecyclerView.ViewHolder(i
     ): Int {
         when (groupId) {
             0 -> {
-                viewBinding.socketsTemplateLayout.socket1.setImageDrawable(getSocketColor(sockets[0]))
-                viewBinding.socketsTemplateLayout.topSocketGroup.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.socket1.visibility = View.VISIBLE
+                viewBinding.sockets.socket1.setImageResource(getSocketColor(sockets[0]))
+                viewBinding.sockets.topSocketGroup.visibility = View.VISIBLE
+                viewBinding.sockets.socket1.visibility = View.VISIBLE
                 if (socketCount >= 2) {
-                    viewBinding.socketsTemplateLayout.socket2.setImageDrawable(
-                        getSocketColor(
-                            sockets[1]
+                    viewBinding.sockets.socket2.setImageResource(getSocketColor(sockets[1]))
+                    viewBinding.sockets.connector12.visibility = View.VISIBLE
+                    if (sockets[0].group == sockets[1].group) {
+                        viewBinding.sockets.connector12.setImageResource(
+                            R.drawable.horizontal_connector
                         )
-                    )
-                    viewBinding.socketsTemplateLayout.connector12.visibility = View.VISIBLE
-                    if (sockets[0].group == sockets[1].group)
-                        viewBinding.socketsTemplateLayout.connector12.setImageDrawable(
-                            horizontalConnector
-                        )
-                    viewBinding.socketsTemplateLayout.socket2.visibility = View.VISIBLE
+                    }
+                    viewBinding.sockets.socket2.visibility = View.VISIBLE
                     return 2
                 }
                 return 1
             }
             1 -> {
-                if (sockets[1].group == sockets[2].group)
-                    viewBinding.socketsTemplateLayout.connector23.setImageDrawable(verticalConnector)
-                viewBinding.socketsTemplateLayout.socket3.setImageDrawable(getSocketColor(sockets[2]))
-                viewBinding.socketsTemplateLayout.connector23.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.middleSocketGroup.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.connector43.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.socket3.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.socket4.visibility = View.VISIBLE
+                if (sockets[1].group == sockets[2].group) {
+                    viewBinding.sockets.connector23.setImageResource(R.drawable.vertical_connector)
+                }
+                viewBinding.sockets.socket3.setImageResource(getSocketColor(sockets[2]))
+                viewBinding.sockets.connector23.visibility = View.VISIBLE
+                viewBinding.sockets.middleSocketGroup.visibility = View.VISIBLE
+                viewBinding.sockets.connector43.visibility = View.VISIBLE
+                viewBinding.sockets.socket3.visibility = View.VISIBLE
+                viewBinding.sockets.socket4.visibility = View.VISIBLE
                 if (socketCount >= 2) {
-                    viewBinding.socketsTemplateLayout.socket4.setImageDrawable(
-                        getSocketColor(
-                            sockets[3]
+                    viewBinding.sockets.socket4.setImageResource(getSocketColor(sockets[3]))
+                    if (sockets[2].group == sockets[3].group) {
+                        viewBinding.sockets.connector43.setImageResource(
+                            R.drawable.horizontal_connector
                         )
-                    )
-                    if (sockets[2].group == sockets[3].group)
-                        viewBinding.socketsTemplateLayout.connector43.setImageDrawable(
-                            horizontalConnector
-                        )
+                    }
                     return 2
                 }
                 return 1
             }
             2 -> {
-                if (sockets[3].group == sockets[4].group)
-                    viewBinding.socketsTemplateLayout.connector45.setImageDrawable(verticalConnector)
-                viewBinding.socketsTemplateLayout.socket5.setImageDrawable(getSocketColor(sockets[4]))
-                viewBinding.socketsTemplateLayout.connector45.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.bottomSocketGroup.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.socket5.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.connector56.visibility = View.VISIBLE
-                viewBinding.socketsTemplateLayout.socket6.visibility = View.VISIBLE
+                if (sockets[3].group == sockets[4].group) {
+                    viewBinding.sockets.connector45.setImageResource(R.drawable.vertical_connector)
+                }
+                viewBinding.sockets.socket5.setImageResource(getSocketColor(sockets[4]))
+                viewBinding.sockets.connector45.visibility = View.VISIBLE
+                viewBinding.sockets.bottomSocketGroup.visibility = View.VISIBLE
+                viewBinding.sockets.socket5.visibility = View.VISIBLE
+                viewBinding.sockets.connector56.visibility = View.VISIBLE
+                viewBinding.sockets.socket6.visibility = View.VISIBLE
                 if (socketCount >= 2) {
-                    viewBinding.socketsTemplateLayout.socket6.setImageDrawable(
-                        getSocketColor(
-                            sockets[5]
+                    viewBinding.sockets.socket6.setImageResource(getSocketColor(sockets[5]))
+                    if (sockets[4].group == sockets[5].group) {
+                        viewBinding.sockets.connector56.setImageResource(
+                            R.drawable.horizontal_connector
                         )
-                    )
-                    if (sockets[4].group == sockets[5].group)
-                        viewBinding.socketsTemplateLayout.connector56.setImageDrawable(
-                            horizontalConnector
-                        )
+                    }
                     return 2
                 }
                 return 1
@@ -306,22 +214,22 @@ internal class ItemsResultViewHolder(itemView: View) : RecyclerView.ViewHolder(i
         }
     }
 
-    private fun getSocketColor(socket: Socket): Drawable? {
+    private fun getSocketColor(socket: Socket): Int {
         when (socket.sColour) {
             "R" -> {
-                return redSocket
+                return R.drawable.red_socket
             }
             "G" -> {
-                return greenSocket
+                return R.drawable.green_socket
             }
             "B" -> {
-                return blueSocket
+                return R.drawable.blue_socket
             }
             "W" -> {
-                return whiteSocket
+                return R.drawable.white_socket
             }
             else -> {
-                return null
+                return R.drawable.white_socket
             }
         }
     }

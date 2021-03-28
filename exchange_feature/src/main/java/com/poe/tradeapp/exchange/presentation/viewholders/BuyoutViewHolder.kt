@@ -10,6 +10,7 @@ import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
 import com.poe.tradeapp.exchange.presentation.adapters.DropDownAdapter
 import com.poe.tradeapp.exchange.presentation.models.Filter
+import com.poe.tradeapp.exchange.presentation.models.enums.IBindableFieldViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.IEnum
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 
@@ -23,7 +24,8 @@ internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
     private var selectedItem: IEnum? = null
 
     override fun bind(item: IFilter, filter: Filter) {
-        val field = filter.getField(item.id ?: "")
+        val fieldId = item.id ?: return
+        val field = filter.getField(fieldId)
 
         filterName.text = item.text
 
@@ -56,8 +58,9 @@ internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
             val max = maxValue.text?.toString()?.toIntOrNull()
             val value = ItemsRequestModelFields.Price(min, max, selectedItem?.id)
             field.value = if (value.isEmpty()) null else value
-            if (adapter is DropDownAdapter)
+            if (adapter is DropDownAdapter) {
                 adapter.selectedItem = selectedItem
+            }
         }
 
         minValue.doOnTextChanged { _, _, _, _ ->
