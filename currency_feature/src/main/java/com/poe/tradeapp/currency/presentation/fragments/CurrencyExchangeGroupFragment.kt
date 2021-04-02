@@ -4,19 +4,19 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import com.poe.tradeapp.core.presentation.BaseFragment
-import com.poe.tradeapp.core.presentation.generateFlexboxDecorator
-import com.poe.tradeapp.core.presentation.generateFlexboxManager
+import com.poe.tradeapp.core.presentation.*
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.FragmentCurrencyExchangeGroupBinding
 import com.poe.tradeapp.currency.presentation.CurrencyExchangeViewModel
 import com.poe.tradeapp.currency.presentation.adapters.CurrencyGroupAdapter
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 internal class CurrencyExchangeGroupFragment :
     BaseFragment(R.layout.fragment_currency_exchange_group) {
 
-    private val viewModel by sharedViewModel<CurrencyExchangeViewModel>()
+    private val viewModel by scopedViewModel<CurrencyExchangeViewModel>(
+        FragmentScopes.CURRENCY_FEATURE.scopeId,
+        FragmentScopes.CURRENCY_FEATURE
+    )
 
     private val groupId by lazy {
         arguments?.getString(GROUP_ID_KEY)

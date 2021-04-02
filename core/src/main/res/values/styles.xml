@@ -42,7 +42,7 @@
     </style>
 
     <style name="AppTheme.AlertDialog" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="backgroundColor">@color/primaryColor</item>
+        <item name="android:windowBackground">@drawable/default_bordered_background</item>
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="fontFamily">@font/fontinsmallcaps</item>
     </style>

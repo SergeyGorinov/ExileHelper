@@ -4,4 +4,9 @@
     <string name="have_currencies_header">The currencies you have:</string>
     <string name="add_wanted_currency_desc">Add wanted currency</string>
     <string name="add_have_currency_desc">Add wanted currency</string>
+    <string name="select_action_text">Select action:</string>
+    <string name="add_notification_text">Add currency price notification</string>
+    <string name="show_trade_list_text">Show trade list</string>
+    <string name="notify_dialog_buying_item">Notify me when</string>
+    <string name="notify_dialog_paying_item">Will cost less than</string>
 </resources>

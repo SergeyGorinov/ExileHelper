@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.poe.tradeapp.core.DI
 import com.poe.tradeapp.core.presentation.ApplicationSettings
 import com.poe.tradeapp.core.presentation.CenteredImageSpan
+import com.poe.tradeapp.core.presentation.OnResultsScrollListener
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.databinding.FragmentItemsSearchResultBinding
 import com.poe.tradeapp.exchange.presentation.ItemsSearchViewModel
@@ -52,7 +52,7 @@ internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
         viewBinding?.results?.layoutManager = layoutManager
         viewBinding?.results?.adapter = adapter
         viewBinding?.results?.addOnScrollListener(
-            OnResultsScrollListener(viewModel.itemsResultData?.second ?: listOf()) {
+            OnResultsScrollListener(viewModel.itemsResultData?.second?.size ?: 0) {
                 if (!isLoading) {
                     isLoading = true
                     viewBinding?.results?.post {
@@ -67,6 +67,11 @@ internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
             }
         )
         adapter.addFetchedItems(populateResponse(viewModel.itemsResultFetchedData))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewBinding = null
     }
 
     private fun populateResponse(items: List<ItemResultViewData>): List<FetchedItem> {
@@ -148,27 +153,6 @@ internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         this.appendLine()
-    }
-
-    private class OnResultsScrollListener(
-        items: List<String>,
-        private val onDownloadRequest: (Int) -> Unit
-    ) : RecyclerView.OnScrollListener() {
-
-        private var totalCount = items.size
-
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            super.onScrolled(recyclerView, dx, dy)
-            val totalCurrentItems = recyclerView.layoutManager?.itemCount ?: 0
-            if (totalCurrentItems < totalCount) {
-                val lastVisiblePosition =
-                    (recyclerView.layoutManager as? LinearLayoutManager)?.findLastVisibleItemPosition()
-                        ?: 0
-                if ((totalCurrentItems - 3) <= lastVisiblePosition) {
-                    onDownloadRequest(totalCurrentItems)
-                }
-            }
-        }
     }
 
     companion object {

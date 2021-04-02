@@ -6,15 +6,24 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.poe.tradeapp.R
 import com.poe.tradeapp.core.presentation.BaseFragment
 import com.poe.tradeapp.databinding.FragmentLoginBinding
+import com.poe.tradeapp.presentation.MainActivityViewModel
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.regex.Pattern
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class LoginFragment : BaseFragment(R.layout.fragment_login) {
+
+    private val viewModel by sharedViewModel<MainActivityViewModel>()
 
     private val isSignIn by lazy { requireArguments().getBoolean(IS_SIGN_IN_KEY, false) }
 
@@ -54,7 +63,22 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
                     binding.password.text.toString()
                 ).addOnCompleteListener {
                     if (it.isSuccessful) {
-                        getMainActivity()?.goToCurrencyExchange()
+                        lifecycleScope.launch {
+                            val authToken = suspendCoroutine<String?> { coroutine ->
+                                it.result?.user?.getIdToken(false)?.addOnCompleteListener { task ->
+                                    coroutine.resume(task.result?.token)
+                                }
+                            }
+                            val messagingToken = suspendCoroutine<String?> { coroutine ->
+                                FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                                    coroutine.resume(task.result)
+                                }
+                            }
+                            if (authToken != null && messagingToken != null) {
+                                viewModel.addToken(messagingToken, authToken)
+                            }
+                            getMainActivity()?.goToCurrencyExchange()
+                        }
                     } else {
                         Toast.makeText(
                             requireActivity(),

@@ -1,7 +1,7 @@
 package com.poe.tradeapp.core.data
 
+import com.poe.tradeapp.core.data.models.ItemsModel
 import com.poe.tradeapp.core.data.models.LeaguesModel
-import com.poe.tradeapp.core.data.models.SearchItemsModel
 import com.poe.tradeapp.core.data.models.StaticModel
 import com.poe.tradeapp.core.data.models.StatsModel
 import retrofit2.Call
@@ -13,7 +13,7 @@ interface StaticApi {
     fun getLeagueData(): Call<LeaguesModel>
 
     @GET("api/trade/data/items")
-    fun getItemsData(): Call<SearchItemsModel>
+    fun getItemsData(): Call<ItemsModel>
 
     @GET("api/trade/data/stats")
     fun getStatsData(): Call<StatsModel>

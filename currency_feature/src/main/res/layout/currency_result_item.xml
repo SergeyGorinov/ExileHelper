@@ -17,28 +17,68 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="SelectableText" />
 
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/getExchangeData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:constraint_referenced_ids="getExchangeText,getExchangeImage,getExchangeLabel"
+        app:flow_horizontalGap="8dp"
+        app:flow_horizontalStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/stockText" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/getExchangeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:fontFamily="@font/fontinsmallcaps"
         android:textColor="@color/primaryTextColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/stockText"
         tools:ignore="SelectableText" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/getExchangeImage"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/getExchangeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="@color/primaryTextColor"
+        tools:ignore="SelectableText" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/payExchangeData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:constraint_referenced_ids="payExchangeText,payExchangeImage,payExchangeLabel"
+        app:flow_horizontalGap="8dp"
+        app:flow_horizontalStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/getExchangeData" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/payExchangeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:fontFamily="@font/fontinsmallcaps"
         android:textColor="@color/primaryTextColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/getExchangeText"
+        tools:ignore="SelectableText" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/payExchangeImage"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="8dp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payExchangeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="@color/primaryTextColor"
         tools:ignore="SelectableText" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -54,7 +94,7 @@
         app:layout_constraintEnd_toStartOf="@id/playerStatus"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/payExchangeText"
+        app:layout_constraintTop_toBottomOf="@id/payExchangeData"
         tools:ignore="SelectableText" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -70,6 +110,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toEndOf="@id/nickWithCountry"
-        app:layout_constraintTop_toBottomOf="@id/payExchangeText"
+        app:layout_constraintTop_toBottomOf="@id/payExchangeData"
         tools:ignore="SelectableText" />
 </androidx.constraintlayout.widget.ConstraintLayout>

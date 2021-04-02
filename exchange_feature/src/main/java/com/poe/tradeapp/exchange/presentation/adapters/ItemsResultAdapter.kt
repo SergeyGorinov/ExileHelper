@@ -26,7 +26,7 @@ internal class ItemsResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val viewLayout =
-            if (viewType == 0) R.layout.items_result_loading else R.layout.items_result_item
+            if (viewType == 0) R.layout.result_loading else R.layout.items_result_item
         val view = LayoutInflater.from(parent.context).inflate(viewLayout, parent, false)
         return if (viewType == 0) LoaderViewHolder(view) else ItemsResultViewHolder(view)
     }

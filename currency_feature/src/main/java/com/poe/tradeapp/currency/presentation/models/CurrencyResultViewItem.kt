@@ -1,6 +1,6 @@
 package com.poe.tradeapp.currency.presentation.models
 
-data class CurrencyResultViewItem(
+internal data class CurrencyResultViewItem(
     val stock: Int,
     val pay: Int,
     val get: Int,

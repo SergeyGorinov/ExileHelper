@@ -24,6 +24,7 @@ import com.poe.tradeapp.core.presentation.IMainActivity
 import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
 import com.poe.tradeapp.databinding.ActivityMainBinding
 import com.poe.tradeapp.exchange.presentation.fragments.ItemsSearchMainFragment
+import com.poe.tradeapp.notifications_feature.presentation.NotificationsMainFragment
 import com.poe.tradeapp.presentation.fragments.LoaderFragment
 import com.poe.tradeapp.presentation.fragments.StartFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -151,10 +152,7 @@ class MainActivity : FragmentActivity(), IMainActivity {
             return@setOnNavigationItemSelectedListener when (it.itemId) {
                 R.id.currencyExchangeMenu -> {
                     router.newRootScreen(
-                        CurrencyExchangeMainFragment.newInstance(
-                            viewModel.wantItemId,
-                            viewModel.haveItemId
-                        )
+                        CurrencyExchangeMainFragment.newInstance(null, null)
                     )
                     true
                 }
@@ -168,6 +166,10 @@ class MainActivity : FragmentActivity(), IMainActivity {
                     router.newRootScreen(ChartsMainFragment.newInstance())
                     true
                 }
+                R.id.notificationsMenu -> {
+                    router.newRootScreen(NotificationsMainFragment.newInstance())
+                    true
+                }
                 else -> {
                     false
                 }
@@ -176,17 +178,6 @@ class MainActivity : FragmentActivity(), IMainActivity {
         viewBinding.bottomNavBar.setOnNavigationItemReselectedListener {
             return@setOnNavigationItemReselectedListener
         }
-//        FirebaseMessaging.getInstance().token.addOnCompleteListener {
-//            if (!it.isSuccessful) {
-//                return@addOnCompleteListener
-//            }
-//            val token = it.result ?: return@addOnCompleteListener
-//            lifecycleScope.launch(Dispatchers.IO) {
-//                viewModel.sendRequest(
-//                    UserRequest(token, "chaos", "alt", 5f)
-//                )
-//            }
-//        }
     }
 
     override fun onResume() {
@@ -215,15 +206,8 @@ class MainActivity : FragmentActivity(), IMainActivity {
     }
 
     override fun goToCurrencyExchange(wantItemId: String?, haveItemId: String?) {
-        viewModel.wantItemId = wantItemId
-        viewModel.haveItemId = haveItemId
         if (viewBinding.bottomNavBar.selectedItemId == R.id.currencyExchangeMenu) {
-            router.newRootScreen(
-                CurrencyExchangeMainFragment.newInstance(
-                    viewModel.wantItemId,
-                    viewModel.haveItemId
-                )
-            )
+            router.newRootScreen(CurrencyExchangeMainFragment.newInstance(wantItemId, haveItemId))
         } else {
             viewBinding.bottomNavBar.selectedItemId = R.id.currencyExchangeMenu
         }

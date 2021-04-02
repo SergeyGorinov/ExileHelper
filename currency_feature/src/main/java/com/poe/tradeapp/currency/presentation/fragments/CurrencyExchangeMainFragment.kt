@@ -7,33 +7,38 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import com.poe.tradeapp.core.presentation.BaseFragment
-import com.poe.tradeapp.core.presentation.generateFlexboxDecorator
-import com.poe.tradeapp.core.presentation.generateFlexboxManager
-import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
+import com.poe.tradeapp.core.presentation.*
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.FragmentCurrencyExchangeMainBinding
 import com.poe.tradeapp.currency.presentation.CurrencyExchangeViewModel
+import com.poe.tradeapp.currency.presentation.EnterNotifyValueAlertDialog
+import com.poe.tradeapp.currency.presentation.SelectActionAlertDialog
 import com.poe.tradeapp.currency.presentation.adapters.CurrencySelectedAdapter
+import com.poe.tradeapp.currency.presentation.models.StaticItemViewData
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exchange_main) {
 
-    private val viewModel by sharedViewModel<CurrencyExchangeViewModel>()
+    private val scope by fragmentLifecycleScope(
+        FragmentScopes.CURRENCY_FEATURE.scopeId,
+        FragmentScopes.CURRENCY_FEATURE
+    )
+
+    private val viewModel by scopedViewModel<CurrencyExchangeViewModel>(
+        FragmentScopes.CURRENCY_FEATURE.scopeId,
+        FragmentScopes.CURRENCY_FEATURE
+    )
 
     private lateinit var binding: FragmentCurrencyExchangeMainBinding
 
     private val wantItemId by lazy { requireArguments().getString(WANT_ITEM_ID_KEY) }
     private val haveItemId by lazy { requireArguments().getString(HAVE_ITEM_ID_KEY) }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        lifecycleScope.launch {
-            viewModel.requestItems()
-        }
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,7 +50,7 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
         val progressDialog = requireActivity().getTransparentProgressDialog()
 
-        lifecycleScope.launchWhenCreated {
+        lifecycleScope.launchWhenResumed {
             viewModel.viewLoadingState.collect {
                 if (it) {
                     progressDialog.show()
@@ -63,7 +68,53 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         binding.toolbarLayout.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.accept -> {
-                    requestResults()
+                    SelectActionAlertDialog(
+                        requireActivity(),
+                        {
+                            requestResults()
+                        },
+                        {
+                            val buyingItem = viewModel.allCurrencies.flatMap {
+                                it.staticItems
+                            }.firstOrNull {
+                                viewModel.wantCurrencies.contains(it.id)
+                            }
+                            val payingItem = viewModel.allCurrencies.flatMap {
+                                it.staticItems
+                            }.firstOrNull {
+                                viewModel.haveCurrencies.contains(it.id)
+                            }
+                            if (buyingItem != null && payingItem != null) {
+                                EnterNotifyValueAlertDialog(
+                                    buyingItem.label,
+                                    payingItem.label,
+                                    requireActivity()
+                                ) {
+                                    lifecycleScope.launch {
+                                        val messagingToken =
+                                            suspendCoroutine<String?> { coroutine ->
+                                                FirebaseMessaging.getInstance().token.addOnCompleteListener {
+                                                    coroutine.resume(it.result)
+                                                }
+                                            }
+                                        val authToken = suspendCoroutine<String?> { coroutine ->
+                                            Firebase.auth.currentUser?.getIdToken(false)
+                                                ?.addOnCompleteListener {
+                                                    coroutine.resume(it.result?.token)
+                                                } ?: coroutine.resume(null)
+                                        }
+                                        setRequest(
+                                            buyingItem,
+                                            payingItem,
+                                            it,
+                                            messagingToken,
+                                            authToken
+                                        )
+                                    }
+                                }.show()
+                            }
+                        }
+                    ).show()
                     true
                 }
                 else ->
@@ -89,6 +140,11 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             requestResults()
             requireArguments().clear()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.close()
     }
 
     private fun restoreState() {
@@ -135,16 +191,51 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             val progressDialog = requireActivity().getTransparentProgressDialog()
             try {
                 progressDialog.show()
-                if (!viewModel.requestResult(settings.league)) {
+                val result = viewModel.requestResult(settings.league, 0)
+                if (result.isEmpty()) {
                     Toast.makeText(requireActivity(), "Nothing found!", Toast.LENGTH_LONG).show()
                     return@launch
                 }
                 CurrencyExchangeResultFragment
-                    .newInstance()
+                    .newInstance(result)
                     .showNow(parentFragmentManager, null)
             } finally {
                 progressDialog.dismiss()
             }
+        }
+    }
+
+    private suspend fun setRequest(
+        buyingItem: StaticItemViewData,
+        payingItem: StaticItemViewData,
+        payingAmount: Int,
+        messagingToken: String?,
+        authToken: String?
+    ) {
+        if (messagingToken != null) {
+            val toastText = if (viewModel.sendNotificationRequest(
+                    messagingToken,
+                    buyingItem,
+                    payingItem,
+                    payingAmount,
+                    authToken
+                )
+            ) {
+                "Success!"
+            } else {
+                "Notification request set failed!"
+            }
+            Toast.makeText(
+                requireActivity(),
+                toastText,
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
+            Toast.makeText(
+                requireActivity(),
+                "Messaging token can not be null!",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 

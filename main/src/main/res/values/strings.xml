@@ -11,4 +11,8 @@
     <string name="email_not_match_alert_text">Email doesn\'t have valid format!</string>
     <string name="resend_email_verification_link_text">Resend email verification link</string>
     <string name="resend_timeout_text">You can resend verification link after %d seconds</string>
+    <string name="notification_requests">Notifications</string>
+    <string name="main_search_items_button">Items</string>
+    <string name="main_exchange_currency_button">Currency</string>
+    <string name="main_charts_button">Charts</string>
 </resources>

@@ -15,4 +15,9 @@
         android:enabled="true"
         android:icon="@drawable/charts_24"
         android:title="@string/main_charts_button" />
+    <item
+        android:id="@+id/notificationsMenu"
+        android:enabled="true"
+        android:icon="@drawable/notifications_24"
+        android:title="@string/notification_requests" />
 </menu>

@@ -14,6 +14,7 @@ buildscript {
     ext.appcompat_version = '1.2.0'
     ext.mp_android_chart_version = 'v3.1.0'
     ext.flexbox_version = '2.0.1'
+    ext.objectbox_version = '2.9.1'
 
     repositories {
         google()
@@ -23,7 +24,8 @@ buildscript {
 
     dependencies {
         classpath 'com.google.gms:google-services:4.3.5'
-        classpath "com.android.tools.build:gradle:${gradle_version}"
+        classpath "com.android.tools.build:gradle:$gradle_version"
+        classpath "io.objectbox:objectbox-gradle-plugin:$objectbox_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
     }
@@ -55,6 +57,7 @@ subprojects {
     apply plugin: 'kotlin-android'
     apply plugin: 'kotlin-kapt'
     apply plugin: 'kotlinx-serialization'
+    apply plugin: 'io.objectbox'
 
     android {
         compileSdkVersion 30
@@ -129,6 +132,7 @@ subprojects {
         implementation "com.github.PhilJay:MPAndroidChart:$mp_android_chart_version"
         implementation "com.squareup.picasso:picasso:$picasso_version"
         implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
+        implementation "io.objectbox:objectbox-kotlin:$objectbox_version"
 
         implementation platform('com.google.firebase:firebase-bom:26.7.0')
         implementation 'com.google.firebase:firebase-messaging'
@@ -145,6 +149,7 @@ subprojects {
             implementation project(":currency_feature")
             implementation project(":exchange_feature")
             implementation project(":charts_feature")
+            implementation project(":notifications_feature")
         }
     }
 }

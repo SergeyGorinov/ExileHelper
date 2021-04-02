@@ -1,46 +1,75 @@
 package com.poe.tradeapp.currency.presentation.adapters
 
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.poe.tradeapp.core.presentation.CenteredImageSpan
-import com.poe.tradeapp.core.presentation.dp
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.CurrencyResultItemBinding
 import com.poe.tradeapp.currency.presentation.models.CurrencyResultViewItem
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 
-internal class CurrencyResultAdapter(
-    private val items: List<CurrencyResultViewItem>,
-    private val onImageLoad: (Int) -> Unit
-) : RecyclerView.Adapter<CurrencyResultAdapter.CurrencyResultViewHolder>() {
+internal class CurrencyResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyResultViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.currency_result_item, parent, false)
-        return CurrencyResultViewHolder(view)
-    }
+    private val diffUtilCallback = object : DiffUtil.ItemCallback<CurrencyResultViewItem?>() {
+        override fun areItemsTheSame(
+            oldItem: CurrencyResultViewItem,
+            newItem: CurrencyResultViewItem
+        ): Boolean {
+            return oldItem.accountName == newItem.accountName && oldItem.pay == newItem.pay
+        }
 
-    override fun onBindViewHolder(holder: CurrencyResultViewHolder, position: Int) {
-        holder.bind(items[position], position % 2 == 0) {
-            onImageLoad(position)
+        override fun areContentsTheSame(
+            oldItem: CurrencyResultViewItem,
+            newItem: CurrencyResultViewItem
+        ): Boolean {
+            return oldItem == newItem
         }
     }
 
-    override fun getItemCount() = items.size
+    val asyncDiffer = AsyncListDiffer(this, diffUtilCallback)
 
-    internal class CurrencyResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        return if (viewType == 0) {
+            LoaderViewHolder(inflater.inflate(R.layout.result_loading, parent, false))
+        } else {
+            CurrencyResultViewHolder(inflater.inflate(R.layout.currency_result_item, parent, false))
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val item = asyncDiffer.currentList.getOrNull(position)
+        if (item != null && holder is CurrencyResultViewHolder) {
+            holder.bind(item, position % 2 == 0)
+        }
+    }
+
+    override fun getItemCount() = asyncDiffer.currentList.size
+
+    override fun getItemViewType(position: Int) =
+        if (asyncDiffer.currentList.getOrNull(position) == null) 0 else 1
+
+    fun addData(data: List<CurrencyResultViewItem>) {
+        val list = asyncDiffer.currentList.filterNotNull() + data
+        asyncDiffer.submitList(list)
+    }
+
+    fun addLoader() {
+        if (!asyncDiffer.currentList.contains(null)) {
+            val currentList = asyncDiffer.currentList + null
+            asyncDiffer.submitList(currentList)
+        }
+    }
+
+    private class CurrencyResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val viewBinding = CurrencyResultItemBinding.bind(itemView)
 
-        fun bind(item: CurrencyResultViewItem, oddRow: Boolean, onImageLoad: () -> Unit) {
+        fun bind(item: CurrencyResultViewItem, oddRow: Boolean) {
             val color = ContextCompat.getColor(
                 itemView.context, if (oddRow) {
                     R.color.odd_result_row_color
@@ -48,20 +77,6 @@ internal class CurrencyResultAdapter(
                     R.color.even_result_row_color
                 }
             )
-            val getExchangeText = SpannableStringBuilder(
-                itemView.context.getString(
-                    R.string.exchange_get_text,
-                    item.get
-                )
-            )
-            val payExchangeText = SpannableStringBuilder(
-                itemView.context.getString(
-                    R.string.exchange_pay_text,
-                    item.pay
-                )
-            )
-            insertCurrency(item.getIcon, item.getLabel, getExchangeText, onImageLoad)
-            insertCurrency(item.payIcon, item.payLabel, payExchangeText, onImageLoad)
             viewBinding.root.setBackgroundColor(color)
             viewBinding.stockText.text = itemView.context.getString(R.string.stock_text, item.stock)
             viewBinding.nickWithCountry.text = itemView.context.getString(
@@ -70,55 +85,20 @@ internal class CurrencyResultAdapter(
                 item.lastCharacterName
             )
             viewBinding.playerStatus.text = item.status
-            viewBinding.getExchangeText.text = getExchangeText
-            viewBinding.payExchangeText.text = payExchangeText
-        }
-
-        private fun insertCurrency(
-            currencyIcon: String?,
-            currencyLabel: String?,
-            text: SpannableStringBuilder,
-            onImageLoad: () -> Unit
-        ) {
-            when {
-                currencyIcon != null -> {
-                    val textLength = text.length
-                    Picasso.get().load(currencyIcon).resize(24.dp, 24.dp).into(object : Target {
-                        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                            bitmap ?: return
-                            val drawable = BitmapDrawable(itemView.resources, bitmap).apply {
-                                setBounds(0, 0, intrinsicWidth, intrinsicHeight)
-                            }
-                            text.setSpan(
-                                CenteredImageSpan(drawable),
-                                textLength - 1,
-                                textLength,
-                                SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE
-                            )
-                            onImageLoad()
-                        }
-
-                        override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) = Unit
-
-                        override fun onPrepareLoad(placeHolderDrawable: Drawable?) = Unit
-                    })
-                    text.append(" $currencyLabel")
-                }
-                currencyLabel != null -> {
-                    text.replace(
-                        text.length - 1,
-                        text.length,
-                        currencyLabel
-                    )
-                }
-                else -> {
-                    text.replace(
-                        text.length - 1,
-                        text.length,
-                        "Unknown"
-                    )
-                }
-            }
+            viewBinding.getExchangeText.text = itemView.context.getString(
+                R.string.exchange_get_text,
+                item.get
+            )
+            viewBinding.payExchangeText.text = itemView.context.getString(
+                R.string.exchange_pay_text,
+                item.pay
+            )
+            viewBinding.getExchangeLabel.text = item.getLabel
+            viewBinding.payExchangeLabel.text = item.payLabel
+            Picasso.get().load(item.getIcon).into(viewBinding.getExchangeImage)
+            Picasso.get().load(item.payIcon).into(viewBinding.payExchangeImage)
         }
     }
+
+    private class LoaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }

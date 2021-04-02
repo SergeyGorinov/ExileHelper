@@ -1,13 +1,26 @@
 package com.poe.tradeapp.core.domain
 
-import com.poe.tradeapp.core.data.models.League
-import com.poe.tradeapp.core.data.models.SearchItems
-import com.poe.tradeapp.core.data.models.StatGroup
-import com.poe.tradeapp.core.data.models.StaticGroup
+import com.poe.tradeapp.core.data.models.*
+import retrofit2.Response
 
 interface ICoreRepository {
-    suspend fun getCurrencyItems(): List<StaticGroup>
-    suspend fun getItems(): List<SearchItems>
-    suspend fun getStats(): List<StatGroup>
-    suspend fun getLeagues(): List<League>
+
+    val leagues: List<String>
+    val staticData: List<StaticGroup>
+    val itemData: List<ItemGroup>
+    val statData: List<StatGroup>
+
+    suspend fun getCurrencyItems()
+    suspend fun getItems()
+    suspend fun getStats()
+    suspend fun getLeagues()
+    suspend fun setNotificationRequestRemote(request: RemoteNotificationRequest): Response<Void>
+    suspend fun setNotificationRequestLocal(request: NotificationRequest)
+    suspend fun syncRemoteNotificationRequests(
+        messagingToken: String,
+        authorizationToken: String? = null
+    )
+
+    suspend fun getNotificationRequestsLocal(): List<NotificationRequest>
+    suspend fun addToken(messagingToken: String, authorizationToken: String): Boolean
 }

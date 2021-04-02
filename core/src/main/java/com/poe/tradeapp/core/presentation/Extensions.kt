@@ -8,6 +8,9 @@ import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.flexbox.FlexWrap
@@ -15,6 +18,10 @@ import com.google.android.flexbox.FlexboxItemDecoration
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.poe.tradeapp.core.R
+import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
+import org.koin.java.KoinJavaComponent
+import org.koin.java.KoinJavaComponent.getKoin
 import java.util.*
 
 fun RecyclerView.measureForAnimator(): Int {
@@ -80,6 +87,20 @@ fun Context.getTransparentProgressDialog(): AlertDialog {
 }
 
 fun String.toLowerCaseLocalized() = this.toLowerCase(Locale.getDefault())
+
+inline fun <reified T : ViewModel> Fragment.scopedViewModel(
+    scopeId: String,
+    scopeName: FragmentScopes
+): Lazy<T> {
+    return lazy {
+        val scope = KoinJavaComponent.getKoin().getOrCreateScope(scopeId, named(scopeName))
+        scope.get()
+    }
+}
+
+fun LifecycleOwner.fragmentLifecycleScope(scopeId: String, scopeName: FragmentScopes): Lazy<Scope> {
+    return lazy { getKoin().getOrCreateScope(scopeId, named(scopeName)) }
+}
 
 val Int.dp: Int
     get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()

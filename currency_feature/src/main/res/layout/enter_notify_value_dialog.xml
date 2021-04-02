@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="24dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/buyingItemLeftSide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:text="@string/notify_dialog_buying_item"
+        android:textColor="@color/primaryTextColor"
+        app:layout_constraintBottom_toBottomOf="@id/buyingItemRightSide"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/buyingItemRightSide"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/buyingItemRightSide"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="@color/primaryTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buyingItemLeftSide"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payingItemLeftSide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:text="@string/notify_dialog_paying_item"
+        android:textColor="@color/primaryTextColor"
+        app:layout_constraintBottom_toBottomOf="@id/payingValueLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/payingValueLayout" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/payingValueLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/default_bordered_background"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/payingItemLeftSide"
+        app:layout_constraintTop_toBottomOf="@id/buyingItemRightSide">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/payingValue"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@color/primaryColor"
+            android:digits="0123456789"
+            android:ellipsize="end"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center|center_vertical"
+            android:inputType="textNoSuggestions|number"
+            android:maxLength="6"
+            android:padding="0dp"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payingItemRightSide"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:gravity="center"
+        android:textColor="@color/primaryTextColor"
+        app:layout_constraintBottom_toBottomOf="@id/payingValueLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/payingValueLayout"
+        app:layout_constraintTop_toTopOf="@id/payingValueLayout" />
+</androidx.constraintlayout.widget.ConstraintLayout>

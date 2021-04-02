@@ -1,27 +1,36 @@
 package com.poe.tradeapp.presentation
 
 import androidx.lifecycle.ViewModel
+import com.poe.tradeapp.core.domain.usecases.AddTokenUseCase
 import com.poe.tradeapp.core.domain.usecases.GetLeaguesUseCase
-import com.poe.tradeapp.data.models.UserRequest
-import com.poe.tradeapp.domain.usecases.SendRequestUseCase
+import com.poe.tradeapp.core.domain.usecases.UpdateStaticDataUseCase
 
 internal class MainActivityViewModel(
-    private val sendRequestUseCase: SendRequestUseCase,
-    private val getLeaguesUseCase: GetLeaguesUseCase
+    private val updateStaticDataUseCase: UpdateStaticDataUseCase,
+    private val getLeaguesUseCase: GetLeaguesUseCase,
+    private val addTokenUseCase: AddTokenUseCase
 ) : ViewModel() {
 
-    var wantItemId: String? = null
-    var haveItemId: String? = null
+//    val currencyItems: List<StaticGroupViewData>
+//        get() = allCurrencies.filterNot { it.id.startsWith("Maps") } + StaticGroupViewData(
+//            "Maps",
+//            "Maps",
+//            true,
+//            listOf()
+//        )
+//
+//    val maps: List<StaticGroupViewData>
+//        get() {
+//            return allCurrencies.filter { it.id.startsWith("Maps") }
+//        }
 
-    var leagues: List<String> = listOf()
+    val leagues: List<String> = getLeaguesUseCase.execute()
 
-    suspend fun sendRequest(userRequest: UserRequest) {
-        sendRequestUseCase.execute(userRequest)
+    suspend fun getRemoteData() {
+        updateStaticDataUseCase.execute()
     }
 
-    suspend fun getLeagues() {
-        if (leagues.isEmpty()) {
-            leagues = getLeaguesUseCase.execute()
-        }
+    suspend fun addToken(messagingToken: String, authorizationToken: String): Boolean {
+        return addTokenUseCase.execute(messagingToken, authorizationToken)
     }
 }

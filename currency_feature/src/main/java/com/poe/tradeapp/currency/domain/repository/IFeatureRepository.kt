@@ -1,12 +1,12 @@
 package com.poe.tradeapp.currency.domain.repository
 
-import kotlinx.serialization.json.JsonObject
+import com.poe.tradeapp.currency.data.models.CurrencyResultItem
 
 internal interface IFeatureRepository {
 
-    suspend fun getCurrencyExchangeData(
-        wantSelectedCurrencies: List<String>,
-        haveSelectedCurrencies: List<String>,
-        league: String
-    ): JsonObject?
+    val wantCurrencies: MutableList<String>
+    val haveCurrencies: MutableList<String>
+    val totalResultCount: Int
+
+    suspend fun getCurrencyExchangeData(league: String, position: Int): List<CurrencyResultItem>
 }

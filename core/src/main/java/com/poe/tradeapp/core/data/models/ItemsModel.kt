@@ -3,18 +3,18 @@ package com.poe.tradeapp.core.data.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SearchItemsModel(
-    val result: List<SearchItems>
+data class ItemsModel(
+    val result: List<ItemGroup>
 )
 
 @Serializable
-data class SearchItems(
+data class ItemGroup(
     val label: String,
-    val entries: List<SearchItem>
+    val entries: List<Item>
 )
 
 @Serializable
-data class SearchItem(
+data class Item(
     val type: String,
     val text: String,
     val name: String? = null,

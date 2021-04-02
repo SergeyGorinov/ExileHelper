@@ -8,20 +8,24 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.poe.tradeapp.core.presentation.BaseFragment
+import com.poe.tradeapp.core.presentation.FragmentScopes
+import com.poe.tradeapp.core.presentation.scopedViewModel
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.FragmentCurrencyExchangeMapsBinding
 import com.poe.tradeapp.currency.presentation.CurrencyExchangeViewModel
 import com.poe.tradeapp.currency.presentation.adapters.CurrencyGroupsAdapter
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 internal class CurrencyExchangeMapsFragment :
     BaseFragment(R.layout.fragment_currency_exchange_maps) {
 
+    private val viewModel by scopedViewModel<CurrencyExchangeViewModel>(
+        FragmentScopes.CURRENCY_FEATURE.scopeId,
+        FragmentScopes.CURRENCY_FEATURE
+    )
+
     private val isFromWanted by lazy {
         arguments?.getBoolean(IS_FROM_WANTED_KEY, false) ?: false
     }
-
-    private val viewModel by sharedViewModel<CurrencyExchangeViewModel>()
 
     private lateinit var binding: FragmentCurrencyExchangeMapsBinding
 

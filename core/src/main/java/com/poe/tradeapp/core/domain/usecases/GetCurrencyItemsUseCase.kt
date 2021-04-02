@@ -6,8 +6,8 @@ import com.poe.tradeapp.core.domain.models.CurrencyItem
 
 class GetCurrencyItemsUseCase(private val repository: ICoreRepository) {
 
-    suspend fun execute(): List<CurrencyGroup> {
-        return repository.getCurrencyItems().map { group ->
+    fun execute(): List<CurrencyGroup> {
+        return repository.staticData.map { group ->
             val items = group.entries.map {
                 val imageUrl = if (it.image != null) {
                     "https://www.pathofexile.com${it.image}"

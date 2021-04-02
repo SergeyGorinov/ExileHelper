@@ -14,9 +14,16 @@ internal val dataModule = module {
             .baseUrl("https://www.pathofexile.com/")
             .addConverterFactory(Json.asConverterFactory(MediaType.get("application/json")))
             .build()
-            .create(StaticApi::class.java) as StaticApi
-    }
+            .create(StaticApi::class.java)
+    } bind StaticApi::class
     single {
-        CoreRepository(get())
+        Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:8080/")
+            .addConverterFactory(Json.asConverterFactory(MediaType.get("application/json")))
+            .build()
+            .create(PoeTradeApi::class.java)
+    } bind PoeTradeApi::class
+    single {
+        CoreRepository(get(), get())
     } bind ICoreRepository::class
 }

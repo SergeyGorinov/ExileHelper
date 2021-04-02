@@ -1,84 +1,112 @@
 package com.poe.tradeapp.currency.presentation
 
 import androidx.lifecycle.ViewModel
+import com.poe.tradeapp.core.domain.models.NotificationItemData
+import com.poe.tradeapp.core.domain.models.NotificationRequest
 import com.poe.tradeapp.core.domain.usecases.GetCurrencyItemsUseCase
+import com.poe.tradeapp.core.domain.usecases.SetNotificationRequestUseCase
+import com.poe.tradeapp.currency.data.models.CurrencyRequest
+import com.poe.tradeapp.currency.data.models.Exchange
+import com.poe.tradeapp.currency.data.models.Status
 import com.poe.tradeapp.currency.domain.usecases.GetCurrencyExchangeResultUseCase
+import com.poe.tradeapp.currency.domain.usecases.GetHavingCurrencyUseCase
+import com.poe.tradeapp.currency.domain.usecases.GetRequestingCurrenciesUseCase
+import com.poe.tradeapp.currency.domain.usecases.GetTotalResultCountUseCase
 import com.poe.tradeapp.currency.presentation.models.CurrencyResultViewItem
 import com.poe.tradeapp.currency.presentation.models.StaticGroupViewData
 import com.poe.tradeapp.currency.presentation.models.StaticItemViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 internal class CurrencyExchangeViewModel(
-    private val getCurrencyItems: GetCurrencyItemsUseCase,
-    private val getCurrencyResult: GetCurrencyExchangeResultUseCase
+    getCurrencyItemsUseCase: GetCurrencyItemsUseCase,
+    getRequestingCurrenciesUseCase: GetRequestingCurrenciesUseCase,
+    getHavingCurrencyUseCase: GetHavingCurrencyUseCase,
+    getTotalResultCountUseCase: GetTotalResultCountUseCase,
+    private val getCurrencyResult: GetCurrencyExchangeResultUseCase,
+    private val setNotificationRequestUseCase: SetNotificationRequestUseCase
 ) : ViewModel() {
 
-    val viewLoadingState = MutableStateFlow(true)
-
-    val wantCurrencies = mutableListOf<String>()
-    val haveCurrencies = mutableListOf<String>()
-
-    var allCurrencies: List<StaticGroupViewData> = listOf()
-        private set
-
-    val currencyItems: List<StaticGroupViewData>
-        get() = allCurrencies.filterNot { it.id.startsWith("Maps") } + StaticGroupViewData(
-            "Maps",
-            "Maps",
-            true,
-            listOf()
-        )
-
-    val maps: List<StaticGroupViewData>
-        get() {
-            return allCurrencies.filter { it.id.startsWith("Maps") }
+    val allCurrencies =
+        getCurrencyItemsUseCase.execute().filterNot { it.label == null }.map { group ->
+            val entries =
+                group.items.map { StaticItemViewData(it.id, it.label, it.imageUrl) }
+            val isText = group.id.startsWith("Maps") || group.id.startsWith("Cards")
+            StaticGroupViewData(group.id, group.label, isText, entries)
         }
 
-    var currencyResultData: List<CurrencyResultViewItem> = listOf()
-        private set
+    val currencyItems = allCurrencies.filterNot {
+        it.id.startsWith("Maps")
+    } + StaticGroupViewData("Maps", "Maps", true, listOf())
 
-    suspend fun requestItems() = withContext(Dispatchers.IO) {
-        if (allCurrencies.isEmpty()) {
-            viewLoadingState.emit(true)
-            allCurrencies =
-                getCurrencyItems.execute().filterNot { it.label == null }.map { group ->
-                    val entries =
-                        group.items.map { StaticItemViewData(it.id, it.label, it.imageUrl) }
-                    val isText = group.id.startsWith("Maps") || group.id.startsWith("Cards")
-                    StaticGroupViewData(group.id, group.label, isText, entries)
-                }
-            viewLoadingState.emit(false)
-        }
-    }
+    val maps = allCurrencies.filter { it.id.startsWith("Maps") }
 
-    suspend fun requestResult(league: String) = withContext(Dispatchers.IO) {
-        val result = getCurrencyResult.execute(wantCurrencies, haveCurrencies, league)
-        currencyResultData = result.map { item ->
-            val payItem = allCurrencies.flatMap {
-                it.staticItems
-            }.firstOrNull {
-                it.id == item.payCurrencyId
-            }
-            val getItem = allCurrencies.flatMap {
-                it.staticItems
-            }.firstOrNull {
-                it.id == item.getCurrencyId
-            }
+    val wantCurrencies = getRequestingCurrenciesUseCase.execute()
+    val haveCurrencies = getHavingCurrencyUseCase.execute()
+
+    val viewLoadingState = MutableStateFlow(false)
+
+    val getTotalResultCount = getTotalResultCountUseCase.execute()
+
+    suspend fun requestResult(league: String, position: Int) = withContext(Dispatchers.IO) {
+        viewLoadingState.emit(true)
+        val result = getCurrencyResult.execute(league, position).map { item ->
             CurrencyResultViewItem(
                 item.stock,
                 item.pay,
                 item.get,
-                payItem?.imageUrl,
-                getItem?.imageUrl,
-                payItem?.label,
-                getItem?.label,
+                item.payImageUrl,
+                item.getImageUrl,
+                item.payLabel,
+                item.getLabel,
                 item.accountName,
                 item.lastCharacterName,
                 item.status
             )
         }
-        return@withContext currencyResultData.isNotEmpty()
+
+        viewLoadingState.emit(false)
+        return@withContext result
+    }
+
+    suspend fun sendNotificationRequest(
+        messagingToken: String,
+        buyingItem: StaticItemViewData,
+        payingItem: StaticItemViewData,
+        payingAmount: Int,
+        authToken: String? = null
+    ) = withContext(Dispatchers.IO) {
+        val request = NotificationRequest(
+            NotificationItemData(buyingItem.label, buyingItem.imageUrl ?: ""),
+            NotificationItemData(payingItem.label, payingItem.imageUrl ?: ""),
+            payingAmount
+        )
+        val payload = Json.encodeToString(
+            CurrencyRequest.serializer(),
+            CurrencyRequest(
+                Exchange(
+                    status = Status("online"),
+                    want = listOf(buyingItem.id),
+                    have = listOf(payingItem.id),
+                    minimum = null,
+                    fulfillable = null,
+                    account = null
+                )
+            )
+        )
+        viewLoadingState.emit(false)
+        return@withContext try {
+            setNotificationRequestUseCase.execute(
+                request,
+                payload,
+                0,
+                messagingToken,
+                authToken
+            )
+        } catch (e: Exception) {
+            false
+        }
     }
 }
