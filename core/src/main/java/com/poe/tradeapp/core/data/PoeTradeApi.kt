@@ -17,7 +17,9 @@ interface PoeTradeApi {
         @Query("authorizationToken")
         authorizationToken: String,
         @Query("messagingToken")
-        messagingToken: String
+        messagingToken: String,
+        @Query("type")
+        type: String
     ): Response<List<RemoteNotificationRequest>>
 
     @GET("addToken")

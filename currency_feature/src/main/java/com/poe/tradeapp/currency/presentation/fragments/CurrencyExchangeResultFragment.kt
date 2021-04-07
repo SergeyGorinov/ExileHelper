@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -29,6 +30,9 @@ internal class CurrencyExchangeResultFragment : BottomSheetDialogFragment() {
 
     private val settings by DI.inject<ApplicationSettings>()
 
+    private val isFullfilable by lazy { requireArguments().getBoolean(IS_FULLFILABLE_KEY, false) }
+    private val minimum by lazy { requireArguments().getString(MINIMUM_STOCK_KEY) }
+
     private var binding: FragmentResultBinding? = null
 
     var data: List<CurrencyResultViewItem> = listOf()
@@ -50,35 +54,59 @@ internal class CurrencyExchangeResultFragment : BottomSheetDialogFragment() {
 
         val adapter = CurrencyResultAdapter()
 
-        binding?.let { viewBinding ->
-            viewBinding.results.layoutManager = LinearLayoutManager(view.context)
-            viewBinding.results.adapter = adapter
-            viewBinding.results.addOnScrollListener(
-                OnResultsScrollListener(viewModel.getTotalResultCount) {
-                    if (!isLoading) {
-                        isLoading = true
-                        viewBinding.results.post {
-                            adapter.addLoader()
-                        }
-                        lifecycleScope.launch {
-                            adapter.addData(viewModel.requestResult(settings.league, it))
-                            isLoading = false
-                        }
-                    }
+        val scrollListener = OnResultsScrollListener(viewModel.getTotalResultCount) {
+            if (!isLoading) {
+                isLoading = true
+                binding?.results?.post {
+                    adapter.addLoader()
                 }
-            )
-            adapter.asyncDiffer.submitList(data)
+                lifecycleScope.launch {
+                    adapter.addData(
+                        viewModel.requestResult(
+                            settings.league,
+                            isFullfilable,
+                            minimum,
+                            it
+                        )
+                    )
+                    isLoading = false
+                }
+            }
+        }
+
+        binding?.let { viewBinding ->
+            viewBinding.results.apply {
+                layoutManager = LinearLayoutManager(view.context)
+                this.adapter = adapter
+                addOnScrollListener(scrollListener)
+                setItemViewCacheSize(20)
+            }
+            adapter.addData(data)
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding?.results?.adapter = null
         binding = null
     }
 
     companion object {
-        fun newInstance(data: List<CurrencyResultViewItem>): CurrencyExchangeResultFragment {
-            return CurrencyExchangeResultFragment().apply { this.data = data }
+        private const val IS_FULLFILABLE_KEY = "IS_FULLFILABLE_KEY"
+        private const val MINIMUM_STOCK_KEY = "MINIMUM_STACK_KEY"
+
+        fun newInstance(
+            data: List<CurrencyResultViewItem>,
+            isFullfilable: Boolean,
+            minimum: String?
+        ): CurrencyExchangeResultFragment {
+            return CurrencyExchangeResultFragment().apply {
+                this.data = data
+                arguments = bundleOf(
+                    IS_FULLFILABLE_KEY to isFullfilable,
+                    MINIMUM_STOCK_KEY to minimum
+                )
+            }
         }
     }
 }

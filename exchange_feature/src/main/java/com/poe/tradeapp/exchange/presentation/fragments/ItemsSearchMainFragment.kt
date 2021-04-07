@@ -11,9 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import com.poe.tradeapp.core.presentation.BaseFragment
-import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
-import com.poe.tradeapp.core.presentation.hideKeyboard
+import com.poe.tradeapp.core.presentation.*
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.databinding.FragmentItemsSearchMainBinding
 import com.poe.tradeapp.exchange.presentation.ItemsSearchViewModel
@@ -23,11 +21,18 @@ import com.poe.tradeapp.exchange.presentation.models.SuggestionItem
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main) {
 
-    private val viewModel by sharedViewModel<ItemsSearchViewModel>()
+    private val scope by fragmentLifecycleScope(
+        FragmentScopes.EXCHANGE_FEATURE.scopeId,
+        FragmentScopes.EXCHANGE_FEATURE
+    )
+
+    private val viewModel by scopedViewModel<ItemsSearchViewModel>(
+        FragmentScopes.EXCHANGE_FEATURE.scopeId,
+        FragmentScopes.EXCHANGE_FEATURE
+    )
 
     private lateinit var binding: FragmentItemsSearchMainBinding
 
@@ -52,10 +57,10 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
                     requireActivity().hideKeyboard(binding.toolbar)
                     lifecycleScope.launch {
                         viewModel.viewLoadingState.emit(true)
-                        viewModel.fetchPartialResults(settings.league, 0)
+                        val results = viewModel.fetchPartialResults(settings.league, 0)
                         viewModel.viewLoadingState.emit(false)
-                        if (viewModel.itemsResultData?.second?.isNotEmpty() == true) {
-                            ItemsSearchResultFragment.newInstance().show(
+                        if (results.isNotEmpty()) {
+                            ItemsSearchResultFragment.newInstance(results).show(
                                 parentFragmentManager,
                                 null
                             )
@@ -85,8 +90,7 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             val selectedItem = adapterView.getItemAtPosition(position)
             val adapter = adapterView.adapter
             if (selectedItem is SuggestionItem) {
-                viewModel.type = selectedItem.type
-                viewModel.name = selectedItem.name
+                viewModel.setItemData(selectedItem.type, selectedItem.name)
                 if (adapter is ItemsSearchFieldAdapter)
                     adapter.selectedItem = selectedItem
                 requireActivity().hideKeyboard(binding.toolbarSearchInput)
@@ -128,16 +132,18 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             }
         }
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.requestItems()
-            binding.toolbarSearchInput.setAdapter(
-                ItemsSearchFieldAdapter(
-                    requireActivity(),
-                    R.layout.dropdown_item,
-                    viewModel.itemGroups
-                )
+        binding.toolbarSearchInput.setAdapter(
+            ItemsSearchFieldAdapter(
+                requireActivity(),
+                R.layout.dropdown_item,
+                viewModel.itemGroups
             )
-        }
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.close()
     }
 
 //    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

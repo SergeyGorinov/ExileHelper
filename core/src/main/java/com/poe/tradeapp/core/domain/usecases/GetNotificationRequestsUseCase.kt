@@ -8,9 +8,10 @@ class GetNotificationRequestsUseCase(private val repository: ICoreRepository) {
 
     suspend fun execute(
         messagingToken: String,
-        authorizationToken: String? = null
+        authorizationToken: String? = null,
+        type: String
     ): List<NotificationRequest> {
-        repository.syncRemoteNotificationRequests(messagingToken, authorizationToken)
+        repository.syncRemoteNotificationRequests(messagingToken, authorizationToken, type)
         return repository.getNotificationRequestsLocal().map { request ->
             NotificationRequest(
                 NotificationItemData(request.buyingItem.itemName, request.buyingItem.itemIcon),

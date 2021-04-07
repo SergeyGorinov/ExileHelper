@@ -7,7 +7,7 @@ import com.poe.tradeapp.core.domain.models.ItemGroup
 
 class GetItemsUseCase(private val repository: ICoreRepository) {
 
-    suspend fun execute(): List<ItemGroup> {
+    fun execute(): List<ItemGroup> {
         return repository.itemData.map { group ->
             val entries = group.entries.map {
                 ItemData(

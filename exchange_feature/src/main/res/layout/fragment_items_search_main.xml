@@ -71,7 +71,7 @@
                 app:menu="@menu/menu_items"
                 app:navigationIcon="@drawable/menu_24"
                 app:title="@string/items_search_title"
-                app:titleTextAppearance="@style/TitleFontStyle" />
+                app:titleTextAppearance="@style/AppTheme.TitleFontStyle" />
         </FrameLayout>
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -1,6 +1,6 @@
-package com.poe.tradeapp.notifications_feature.presentation.models
+package com.poe.tradeapp.core.presentation.models
 
-internal data class NotificationRequestViewData(
+data class NotificationRequestViewData(
     val buyingItemText: String,
     val buyingItemImage: String,
     val payingItemText: String,

@@ -8,5 +8,10 @@ internal interface IFeatureRepository {
     val haveCurrencies: MutableList<String>
     val totalResultCount: Int
 
-    suspend fun getCurrencyExchangeData(league: String, position: Int): List<CurrencyResultItem>
+    suspend fun getCurrencyExchangeData(
+        league: String,
+        isFullfilable: Boolean,
+        minimum: String?,
+        position: Int
+    ): List<CurrencyResultItem>
 }

@@ -1,5 +1,6 @@
 package com.poe.tradeapp.currency.presentation.fragments
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
@@ -32,10 +33,41 @@ internal class CurrencyExchangeGroupFragment :
         viewBinding = FragmentCurrencyExchangeGroupBinding.bind(view)
         binding = getBinding()
         binding.toolbarLayout.toolbar.title = "Select currencies"
-        binding.toolbarLayout.toolbar.inflateMenu(R.menu.menu_currency)
-        binding.toolbarLayout.toolbar.menu.findItem(R.id.accept).setOnMenuItemClickListener {
+
+        val alphaAnimator = ObjectAnimator.ofInt(255, 0)
+        alphaAnimator.addUpdateListener {
+            val value = it.animatedValue as Int
+            if (value >= 0) {
+                binding.accept.imageAlpha = value
+            }
+        }
+
+        val rotateAnimator = ObjectAnimator.ofFloat(0f, -90f)
+        rotateAnimator.addUpdateListener {
+            val value = it.animatedValue as Float
+            if (value >= -90f) {
+                binding.accept.rotation = value
+            }
+        }
+
+        val alphaReverseAnimator = ObjectAnimator.ofInt(0, 255)
+        alphaReverseAnimator.addUpdateListener {
+            val value = it.animatedValue as Int
+            if (value <= 255) {
+                binding.accept.imageAlpha = value
+            }
+        }
+
+        val rotateReverseAnimator = ObjectAnimator.ofFloat(-90f, 0f)
+        rotateReverseAnimator.addUpdateListener {
+            val value = it.animatedValue as Float
+            if (value <= 0f) {
+                binding.accept.rotation = value
+            }
+        }
+
+        binding.accept.setOnClickListener {
             router.backTo(null)
-            true
         }
         val group = viewModel.allCurrencies.firstOrNull { it.id == groupId }
         if (group != null) {

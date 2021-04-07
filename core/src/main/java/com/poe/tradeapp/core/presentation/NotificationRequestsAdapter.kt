@@ -1,15 +1,15 @@
-package com.poe.tradeapp.notifications_feature.presentation.adapters
+package com.poe.tradeapp.core.presentation
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.poe.tradeapp.notifications_feature.R
-import com.poe.tradeapp.notifications_feature.databinding.NotificationItemBinding
-import com.poe.tradeapp.notifications_feature.presentation.models.NotificationRequestViewData
+import com.poe.tradeapp.core.R
+import com.poe.tradeapp.core.databinding.NotificationItemBinding
+import com.poe.tradeapp.core.presentation.models.NotificationRequestViewData
 import com.squareup.picasso.Picasso
 
-internal class NotificationRequestsAdapter(private val items: List<NotificationRequestViewData>) :
+class NotificationRequestsAdapter(private val items: List<NotificationRequestViewData>) :
     RecyclerView.Adapter<NotificationRequestsAdapter.NotificationRequestsViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -29,14 +29,15 @@ internal class NotificationRequestsAdapter(private val items: List<NotificationR
 
     override fun getItemCount() = items.size
 
-    internal class NotificationRequestsViewHolder(itemView: View) :
+    class NotificationRequestsViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
 
         private val viewBinding = NotificationItemBinding.bind(itemView)
 
         fun bind(item: NotificationRequestViewData) {
+            val payingItemText = "${item.payingItemAmount} ${item.buyingItemText}"
             viewBinding.buyingItemText.text = item.buyingItemText
-            viewBinding.payingItemText.text = "${item.payingItemAmount} ${item.buyingItemText}"
+            viewBinding.payingItemText.text = payingItemText
             Picasso.get().load(item.buyingItemImage).into(viewBinding.buyingItemImage)
             Picasso.get().load(item.payingItemImage).into(viewBinding.payingItemImage)
         }

@@ -11,27 +11,46 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.poe.tradeapp.core.DI
 import com.poe.tradeapp.core.R
 import com.poe.tradeapp.core.databinding.MenuLayoutBinding
 import org.koin.core.component.inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
     protected val router by DI.inject<Router>()
     protected val settings by DI.inject<ApplicationSettings>()
 
+    protected suspend fun getMessagingToken() = suspendCoroutine<String?> { coroutine ->
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            coroutine.resume(it.result)
+        }
+    }
+
+    protected suspend fun getAuthToken() = suspendCoroutine<String?> { coroutine ->
+        Firebase.auth.currentUser?.getIdToken(false)
+            ?.addOnCompleteListener {
+                coroutine.resume(it.result?.token)
+            } ?: coroutine.resume(null)
+    }
+
     private lateinit var menuDialog: Dialog
 
     override var viewBinding: ViewBinding? = null
 
-    private var toolbar: MaterialToolbar? = null
+    private val toolbar by lazy { viewBinding?.root?.findViewById<MaterialToolbar>(R.id.toolbar) }
+    private val progressBar by lazy {
+        viewBinding?.root?.findViewById<LinearProgressIndicator>(R.id.toolbarProgressBar)
+    }
 
     override fun onResume() {
         super.onResume()
-        toolbar = viewBinding?.root?.findViewById(R.id.toolbar)
         toolbar?.setNavigationOnClickListener {
             showMenu()
         }
@@ -45,6 +64,14 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
     inline fun <reified T : ViewBinding> getBinding() = viewBinding as T
 
     protected fun getMainActivity() = requireActivity() as? IMainActivity
+
+    protected fun toggleProgressBar(show: Boolean) {
+        if (show) {
+            progressBar?.show()
+        } else {
+            progressBar?.hide()
+        }
+    }
 
     private fun showMenu() {
         val leagues = getMainActivity()?.leagues ?: listOf()

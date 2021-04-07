@@ -20,6 +20,8 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
 
     override suspend fun getCurrencyExchangeData(
         league: String,
+        isFullfilable: Boolean,
+        minimum: String?,
         position: Int
     ): List<CurrencyResultItem> {
         if (position == 0) {
@@ -30,9 +32,8 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
                         status = Status("online"),
                         want = wantCurrencies,
                         have = haveCurrencies,
-                        minimum = null,
-                        fulfillable = null,
-                        account = null
+                        fulfillable = if (isFullfilable) 0 else null,
+                        minimum = minimum
                     )
                 )
             )
@@ -41,7 +42,7 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
         val data = currencyResultListData?.let {
             try {
                 apiService.getCurrencyExchangeResponse(
-                    if (it.result.size - position > 20) {
+                    if (it.result.size - position >= 20) {
                         it.result.subList(position, position + 20).joinToString(separator = ",")
                     } else {
                         it.result.subList(position, position + (it.result.size - position))

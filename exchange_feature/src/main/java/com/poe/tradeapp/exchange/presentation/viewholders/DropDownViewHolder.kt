@@ -6,9 +6,9 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
+import com.poe.tradeapp.exchange.data.models.Filter
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
 import com.poe.tradeapp.exchange.presentation.adapters.DropDownAdapter
-import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IBindableFieldViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.IEnum
 import com.poe.tradeapp.exchange.presentation.models.enums.IFilter

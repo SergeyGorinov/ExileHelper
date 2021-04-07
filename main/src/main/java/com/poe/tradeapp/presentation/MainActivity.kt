@@ -7,8 +7,10 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.terrakok.cicerone.*
 import com.github.terrakok.cicerone.androidx.AppNavigator
@@ -16,6 +18,7 @@ import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.github.terrakok.cicerone.androidx.TransactionInfo
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.poe.tradeapp.MyFirebaseMessaging
 import com.poe.tradeapp.R
 import com.poe.tradeapp.charts_feature.presentation.fragments.ChartsMainFragment
@@ -24,12 +27,16 @@ import com.poe.tradeapp.core.presentation.IMainActivity
 import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
 import com.poe.tradeapp.databinding.ActivityMainBinding
 import com.poe.tradeapp.exchange.presentation.fragments.ItemsSearchMainFragment
-import com.poe.tradeapp.notifications_feature.presentation.NotificationsMainFragment
 import com.poe.tradeapp.presentation.fragments.LoaderFragment
 import com.poe.tradeapp.presentation.fragments.StartFragment
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalCoroutinesApi
 class MainActivity : FragmentActivity(), IMainActivity {
@@ -166,10 +173,6 @@ class MainActivity : FragmentActivity(), IMainActivity {
                     router.newRootScreen(ChartsMainFragment.newInstance())
                     true
                 }
-                R.id.notificationsMenu -> {
-                    router.newRootScreen(NotificationsMainFragment.newInstance())
-                    true
-                }
                 else -> {
                     false
                 }
@@ -177,6 +180,36 @@ class MainActivity : FragmentActivity(), IMainActivity {
         }
         viewBinding.bottomNavBar.setOnNavigationItemReselectedListener {
             return@setOnNavigationItemReselectedListener
+        }
+        lifecycleScope.launch {
+            val user = Firebase.auth.currentUser ?: return@launch
+            val result = withContext(Dispatchers.IO) {
+                val authToken = suspendCoroutine<String?> { coroutine ->
+                    user.getIdToken(false).addOnCompleteListener {
+                        coroutine.resume(it.result?.token)
+                    }
+                }
+                val messagingToken = suspendCoroutine<String?> { coroutine ->
+                    FirebaseMessaging.getInstance().token.addOnCompleteListener {
+                        coroutine.resume(it.result)
+                    }
+                }
+                return@withContext if (authToken != null && messagingToken != null) {
+                    viewModel.addToken(messagingToken, authToken)
+                } else {
+                    false
+                }
+            }
+            if (!result) {
+                AlertDialog.Builder(this@MainActivity, R.style.AppTheme_AlertDialog)
+                    .setTitle("Error")
+                    .setMessage("Cannot connect to server!\nNotification requests were not synced.")
+                    .setPositiveButton("OK") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
+            }
         }
     }
 

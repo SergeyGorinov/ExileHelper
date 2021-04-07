@@ -7,6 +7,6 @@ import org.koin.dsl.module
 
 internal val presentationModule = module {
     scope(named(FragmentScopes.CURRENCY_FEATURE)) {
-        viewModel { CurrencyExchangeViewModel(get(), get(), get(), get(), get(), get()) }
+        viewModel { CurrencyExchangeViewModel(get(), get(), get(), get(), get(), get(), get()) }
     }
 }

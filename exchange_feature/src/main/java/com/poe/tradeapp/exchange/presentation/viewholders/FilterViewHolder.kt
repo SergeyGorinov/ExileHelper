@@ -9,9 +9,9 @@ import com.poe.tradeapp.core.presentation.SlideUpDownAnimator
 import com.poe.tradeapp.core.presentation.hideKeyboard
 import com.poe.tradeapp.core.presentation.measureForAnimator
 import com.poe.tradeapp.exchange.R
+import com.poe.tradeapp.exchange.data.models.Filter
 import com.poe.tradeapp.exchange.databinding.FiltersHeaderItemBinding
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsFilterAdapter
-import com.poe.tradeapp.exchange.presentation.models.Filter
 import com.poe.tradeapp.exchange.presentation.models.enums.IBindableViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 

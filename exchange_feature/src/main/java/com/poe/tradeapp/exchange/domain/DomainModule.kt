@@ -1,10 +1,18 @@
 package com.poe.tradeapp.exchange.domain
 
-import com.poe.tradeapp.exchange.domain.usecases.GetItemsDataListUseCase
-import com.poe.tradeapp.exchange.domain.usecases.GetItemsListUseCase
+import com.poe.tradeapp.core.presentation.FragmentScopes
+import com.poe.tradeapp.exchange.domain.usecases.GetFiltersUseCase
+import com.poe.tradeapp.exchange.domain.usecases.GetItemsResultDataUseCase
+import com.poe.tradeapp.exchange.domain.usecases.GetTotalItemsResultCountUseCase
+import com.poe.tradeapp.exchange.domain.usecases.SetItemDataUseCase
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 internal val domainModule = module {
-    single { GetItemsListUseCase(get()) }
-    single { GetItemsDataListUseCase(get()) }
+    scope(named(FragmentScopes.EXCHANGE_FEATURE)) {
+        scoped { GetFiltersUseCase(get()) }
+        scoped { GetItemsResultDataUseCase(get()) }
+        scoped { GetTotalItemsResultCountUseCase(get()) }
+        scoped { SetItemDataUseCase(get()) }
+    }
 }

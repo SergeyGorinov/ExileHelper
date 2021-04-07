@@ -10,9 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.poe.tradeapp.core.DI
-import com.poe.tradeapp.core.presentation.ApplicationSettings
-import com.poe.tradeapp.core.presentation.CenteredImageSpan
-import com.poe.tradeapp.core.presentation.OnResultsScrollListener
+import com.poe.tradeapp.core.presentation.*
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.databinding.FragmentItemsSearchResultBinding
 import com.poe.tradeapp.exchange.presentation.ItemsSearchViewModel
@@ -21,17 +19,21 @@ import com.poe.tradeapp.exchange.presentation.adapters.ItemsResultAdapter
 import com.poe.tradeapp.exchange.presentation.models.FetchedItem
 import com.poe.tradeapp.exchange.presentation.models.ItemResultViewData
 import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.core.component.inject
 
 internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
 
-    private val viewModel by sharedViewModel<ItemsSearchViewModel>()
+    private val viewModel by scopedViewModel<ItemsSearchViewModel>(
+        FragmentScopes.EXCHANGE_FEATURE.scopeId,
+        FragmentScopes.EXCHANGE_FEATURE
+    )
     private val settings by DI.inject<ApplicationSettings>()
 
     private var viewBinding: FragmentItemsSearchResultBinding? = null
 
     private var isLoading = false
+
+    var data: List<ItemResultViewData> = listOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,21 +54,21 @@ internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
         viewBinding?.results?.layoutManager = layoutManager
         viewBinding?.results?.adapter = adapter
         viewBinding?.results?.addOnScrollListener(
-            OnResultsScrollListener(viewModel.itemsResultData?.second?.size ?: 0) {
+            OnResultsScrollListener(viewModel.totalItemsCount) {
                 if (!isLoading) {
                     isLoading = true
                     viewBinding?.results?.post {
                         adapter.addLoader()
                     }
                     lifecycleScope.launch {
-                        viewModel.fetchPartialResults(settings.league, it)
-                        adapter.addFetchedItems(populateResponse(viewModel.itemsResultFetchedData))
+                        val results = viewModel.fetchPartialResults(settings.league, it)
+                        adapter.addFetchedItems(populateResponse(results))
                         isLoading = false
                     }
                 }
             }
         )
-        adapter.addFetchedItems(populateResponse(viewModel.itemsResultFetchedData))
+        adapter.addFetchedItems(populateResponse(data))
     }
 
     override fun onDestroy() {
@@ -156,6 +158,10 @@ internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        fun newInstance() = ItemsSearchResultFragment()
+        fun newInstance(data: List<ItemResultViewData>): ItemsSearchResultFragment {
+            return ItemsSearchResultFragment().apply {
+                this.data = data
+            }
+        }
     }
 }

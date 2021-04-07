@@ -43,11 +43,12 @@ class CoreRepository(
 
     override suspend fun syncRemoteNotificationRequests(
         messagingToken: String,
-        authorizationToken: String?
+        authorizationToken: String?,
+        type: String
     ) {
         if (authorizationToken != null) {
             val result = try {
-                val response = poeTradeApi.getRequests(authorizationToken, messagingToken)
+                val response = poeTradeApi.getRequests(authorizationToken, messagingToken, type)
                 response.body()
             } catch (e: Exception) {
                 Log.e("GET REQUESTS ERROR", e.stackTraceToString())

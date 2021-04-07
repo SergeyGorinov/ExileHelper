@@ -149,7 +149,6 @@ subprojects {
             implementation project(":currency_feature")
             implementation project(":exchange_feature")
             implementation project(":charts_feature")
-            implementation project(":notifications_feature")
         }
     }
 }

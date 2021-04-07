@@ -1,4 +1,3 @@
-include ':notifications_feature'
 include ':charts_feature'
 include ':currency_feature'
 include ':core'

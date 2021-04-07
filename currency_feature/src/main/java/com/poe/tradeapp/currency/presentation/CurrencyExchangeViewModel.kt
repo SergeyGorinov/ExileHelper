@@ -1,10 +1,13 @@
 package com.poe.tradeapp.currency.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.poe.tradeapp.core.domain.models.NotificationItemData
 import com.poe.tradeapp.core.domain.models.NotificationRequest
 import com.poe.tradeapp.core.domain.usecases.GetCurrencyItemsUseCase
+import com.poe.tradeapp.core.domain.usecases.GetNotificationRequestsUseCase
 import com.poe.tradeapp.core.domain.usecases.SetNotificationRequestUseCase
+import com.poe.tradeapp.core.presentation.models.NotificationRequestViewData
 import com.poe.tradeapp.currency.data.models.CurrencyRequest
 import com.poe.tradeapp.currency.data.models.Exchange
 import com.poe.tradeapp.currency.data.models.Status
@@ -12,6 +15,7 @@ import com.poe.tradeapp.currency.domain.usecases.GetCurrencyExchangeResultUseCas
 import com.poe.tradeapp.currency.domain.usecases.GetHavingCurrencyUseCase
 import com.poe.tradeapp.currency.domain.usecases.GetRequestingCurrenciesUseCase
 import com.poe.tradeapp.currency.domain.usecases.GetTotalResultCountUseCase
+import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
 import com.poe.tradeapp.currency.presentation.models.CurrencyResultViewItem
 import com.poe.tradeapp.currency.presentation.models.StaticGroupViewData
 import com.poe.tradeapp.currency.presentation.models.StaticItemViewData
@@ -26,7 +30,8 @@ internal class CurrencyExchangeViewModel(
     getHavingCurrencyUseCase: GetHavingCurrencyUseCase,
     getTotalResultCountUseCase: GetTotalResultCountUseCase,
     private val getCurrencyResult: GetCurrencyExchangeResultUseCase,
-    private val setNotificationRequestUseCase: SetNotificationRequestUseCase
+    private val setNotificationRequestUseCase: SetNotificationRequestUseCase,
+    private val getNotificationRequestsUseCase: GetNotificationRequestsUseCase
 ) : ViewModel() {
 
     val allCurrencies =
@@ -50,25 +55,34 @@ internal class CurrencyExchangeViewModel(
 
     val getTotalResultCount = getTotalResultCountUseCase.execute()
 
-    suspend fun requestResult(league: String, position: Int) = withContext(Dispatchers.IO) {
+    suspend fun requestResult(
+        league: String,
+        isFullfilable: Boolean,
+        minimum: String?,
+        position: Int
+    ) = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
-        val result = getCurrencyResult.execute(league, position).map { item ->
-            CurrencyResultViewItem(
-                item.stock,
-                item.pay,
-                item.get,
-                item.payImageUrl,
-                item.getImageUrl,
-                item.payLabel,
-                item.getLabel,
-                item.accountName,
-                item.lastCharacterName,
-                item.status
-            )
+        return@withContext try {
+            getCurrencyResult.execute(league, isFullfilable, minimum, position).map { item ->
+                CurrencyResultViewItem(
+                    item.stock,
+                    item.pay,
+                    item.get,
+                    item.payImageUrl,
+                    item.getImageUrl,
+                    item.payLabel,
+                    item.getLabel,
+                    item.accountName,
+                    item.lastCharacterName,
+                    item.status
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("requestResult", e.stackTraceToString())
+            listOf()
+        } finally {
+            viewLoadingState.emit(false)
         }
-
-        viewLoadingState.emit(false)
-        return@withContext result
     }
 
     suspend fun sendNotificationRequest(
@@ -107,6 +121,36 @@ internal class CurrencyExchangeViewModel(
             )
         } catch (e: Exception) {
             false
+        }
+    }
+
+    suspend fun getNotificationRequests(
+        messagingToken: String?,
+        authToken: String?
+    ): List<NotificationRequestViewData> {
+        viewLoadingState.emit(true)
+        messagingToken ?: return emptyList()
+        return try {
+            withContext(Dispatchers.IO) {
+                getNotificationRequestsUseCase.execute(
+                    messagingToken,
+                    authToken,
+                    CurrencyExchangeMainFragment.NOTIFICATION_REQUESTS_TYPE
+                ).map {
+                    NotificationRequestViewData(
+                        it.buyingItem.itemName,
+                        it.buyingItem.itemIcon,
+                        it.payingItem.itemName,
+                        it.payingItem.itemIcon,
+                        it.payingAmount
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("getNotificationRequests", e.stackTraceToString())
+            emptyList()
+        } finally {
+            viewLoadingState.emit(false)
         }
     }
 }

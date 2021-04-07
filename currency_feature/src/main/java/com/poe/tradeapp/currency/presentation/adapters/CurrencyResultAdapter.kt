@@ -30,7 +30,7 @@ internal class CurrencyResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    val asyncDiffer = AsyncListDiffer(this, diffUtilCallback)
+    private val asyncDiffer = AsyncListDiffer(this, diffUtilCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -54,8 +54,7 @@ internal class CurrencyResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHol
         if (asyncDiffer.currentList.getOrNull(position) == null) 0 else 1
 
     fun addData(data: List<CurrencyResultViewItem>) {
-        val list = asyncDiffer.currentList.filterNotNull() + data
-        asyncDiffer.submitList(list)
+        asyncDiffer.submitList(data)
     }
 
     fun addLoader() {

@@ -1,4 +1,4 @@
-package com.poe.tradeapp.exchange.presentation.models
+package com.poe.tradeapp.exchange.data.models
 
 import kotlin.properties.Delegates
 

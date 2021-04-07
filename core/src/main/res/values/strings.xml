@@ -37,4 +37,6 @@
     <string name="exchange_pay_text">"You will pay %d x"</string>
     <string name="account_text">"%s (%s)"</string>
     <string name="select_league_text">Select league:</string>
+    <string name="notify_item_left_side">Notify me when</string>
+    <string name="notify_right_side_text">will cost less than</string>
 </resources>

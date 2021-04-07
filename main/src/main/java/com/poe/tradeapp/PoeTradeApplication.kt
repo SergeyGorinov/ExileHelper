@@ -7,7 +7,6 @@ import com.poe.tradeapp.core.coreModules
 import com.poe.tradeapp.core.data.ObjectBox
 import com.poe.tradeapp.currency.currencyFeatureModules
 import com.poe.tradeapp.exchange.exchangeFeatureModules
-import com.poe.tradeapp.notifications_feature.notificationFeatureModules
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Suppress("unused")
@@ -22,8 +21,7 @@ class PoeTradeApplication : Application() {
                     coreModules +
                     currencyFeatureModules +
                     exchangeFeatureModules +
-                    chartsFeatureModules +
-                    notificationFeatureModules
+                    chartsFeatureModules
         )
         ObjectBox.init(this)
     }

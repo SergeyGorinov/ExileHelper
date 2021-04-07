@@ -1,27 +1,30 @@
 package com.poe.tradeapp.currency.presentation.fragments
 
 import android.content.Context
+import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import com.poe.tradeapp.core.presentation.*
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.FragmentCurrencyExchangeMainBinding
 import com.poe.tradeapp.currency.presentation.CurrencyExchangeViewModel
-import com.poe.tradeapp.currency.presentation.EnterNotifyValueAlertDialog
-import com.poe.tradeapp.currency.presentation.SelectActionAlertDialog
+import com.poe.tradeapp.currency.presentation.SwipeToDeleteCallback
+import com.poe.tradeapp.currency.presentation.TabLayoutListener
 import com.poe.tradeapp.currency.presentation.adapters.CurrencySelectedAdapter
-import com.poe.tradeapp.currency.presentation.models.StaticItemViewData
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exchange_main) {
 
@@ -35,98 +38,35 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         FragmentScopes.CURRENCY_FEATURE
     )
 
-    private lateinit var binding: FragmentCurrencyExchangeMainBinding
-
     private val wantItemId by lazy { requireArguments().getString(WANT_ITEM_ID_KEY) }
     private val haveItemId by lazy { requireArguments().getString(HAVE_ITEM_ID_KEY) }
+
+    private lateinit var binding: FragmentCurrencyExchangeMainBinding
+    private lateinit var adapter: CurrencySelectedAdapter
+
+    private var searchJob: Job? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         getMainActivity()?.showBottomNavBarIfNeeded()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(TAB_POSITION_KEY, binding.tabLayout.selectedTabPosition)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val progressDialog = requireActivity().getTransparentProgressDialog()
-
-        lifecycleScope.launchWhenResumed {
-            viewModel.viewLoadingState.collect {
-                if (it) {
-                    progressDialog.show()
-                } else {
-                    progressDialog.dismiss()
-                }
-            }
-        }
 
         viewBinding = FragmentCurrencyExchangeMainBinding.bind(view)
         binding = getBinding()
 
-        binding.toolbarLayout.toolbar.inflateMenu(R.menu.menu_currency)
-        binding.toolbarLayout.toolbar.title = "Currency Exchange"
-        binding.toolbarLayout.toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.accept -> {
-                    SelectActionAlertDialog(
-                        requireActivity(),
-                        {
-                            requestResults()
-                        },
-                        {
-                            val buyingItem = viewModel.allCurrencies.flatMap {
-                                it.staticItems
-                            }.firstOrNull {
-                                viewModel.wantCurrencies.contains(it.id)
-                            }
-                            val payingItem = viewModel.allCurrencies.flatMap {
-                                it.staticItems
-                            }.firstOrNull {
-                                viewModel.haveCurrencies.contains(it.id)
-                            }
-                            if (buyingItem != null && payingItem != null) {
-                                EnterNotifyValueAlertDialog(
-                                    buyingItem.label,
-                                    payingItem.label,
-                                    requireActivity()
-                                ) {
-                                    lifecycleScope.launch {
-                                        val messagingToken =
-                                            suspendCoroutine<String?> { coroutine ->
-                                                FirebaseMessaging.getInstance().token.addOnCompleteListener {
-                                                    coroutine.resume(it.result)
-                                                }
-                                            }
-                                        val authToken = suspendCoroutine<String?> { coroutine ->
-                                            Firebase.auth.currentUser?.getIdToken(false)
-                                                ?.addOnCompleteListener {
-                                                    coroutine.resume(it.result?.token)
-                                                } ?: coroutine.resume(null)
-                                        }
-                                        setRequest(
-                                            buyingItem,
-                                            payingItem,
-                                            it,
-                                            messagingToken,
-                                            authToken
-                                        )
-                                    }
-                                }.show()
-                            }
-                        }
-                    ).show()
-                    true
-                }
-                else ->
-                    false
-            }
-        }
-        binding.wantAddCurrency.setOnClickListener {
-            router.navigateTo(CurrencyExchangeGroupsFragment.newInstance(true))
-        }
-        binding.haveAddCurrency.setOnClickListener {
-            router.navigateTo(CurrencyExchangeGroupsFragment.newInstance(false))
-        }
+        setupToolbar()
+        setupCurrencyList()
+        setupTabLayout(savedInstanceState?.getInt(TAB_POSITION_KEY) ?: 0)
+        setupOnClickListeners()
+
         wantItemId?.let {
             viewModel.wantCurrencies.clear()
             viewModel.wantCurrencies.add(it)
@@ -135,46 +75,159 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             viewModel.haveCurrencies.clear()
             viewModel.haveCurrencies.add(it)
         }
-        restoreState()
-        if (wantItemId != null) {
+        if (wantItemId != null && haveItemId != null) {
             requestResults()
             requireArguments().clear()
+        }
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.viewLoadingState.collect {
+                if (it) {
+                    binding.toolbarProgressBar.show()
+                } else {
+                    binding.toolbarProgressBar.hide()
+                }
+            }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        binding.currencies.adapter = null
         scope.close()
     }
 
-    private fun restoreState() {
-        val wantItems = viewModel.wantCurrencies.map { selectedId ->
-            viewModel.allCurrencies.flatMap { it.staticItems }.filter { it.id == selectedId }
-        }.flatten().toMutableList()
-        val haveItems = viewModel.haveCurrencies.map { selectedId ->
-            viewModel.allCurrencies.flatMap { it.staticItems }.filter { it.id == selectedId }
-        }.flatten().toMutableList()
-
-        binding.wantCurrencies.layoutManager = requireActivity().generateFlexboxManager()
-        binding.wantCurrencies.adapter = CurrencySelectedAdapter(wantItems) { currencyId ->
-            wantItems.removeAll { it.id == currencyId }
-            viewModel.wantCurrencies.remove(currencyId)
-        }
-        binding.wantCurrencies.addItemDecoration(requireActivity().generateFlexboxDecorator())
-        binding.haveCurrencies.layoutManager = requireActivity().generateFlexboxManager()
-        binding.haveCurrencies.adapter =
-            CurrencySelectedAdapter(haveItems) { currencyId ->
-                haveItems.removeAll { it.id == currencyId }
-                viewModel.haveCurrencies.remove(currencyId)
+    private fun setupToolbar() {
+        binding.toolbar.inflateMenu(R.menu.menu_currency)
+        binding.toolbar.title = "Currency Exchange"
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.notifications -> {
+                    lifecycleScope.launch {
+                        item.isEnabled = false
+                        val items =
+                            viewModel.getNotificationRequests(getMessagingToken(), getAuthToken())
+                        NotificationRequestsFragment.newInstance(items)
+                            .show(parentFragmentManager, null)
+                        item.isEnabled = true
+                    }
+                    true
+                }
+                else ->
+                    false
             }
-        binding.haveCurrencies.addItemDecoration(requireActivity().generateFlexboxDecorator())
+        }
+    }
+
+    private fun setupCurrencyList() {
+        adapter = CurrencySelectedAdapter { currencyId, isWantList ->
+            val selectedItems = if (isWantList) {
+                viewModel.wantCurrencies
+            } else {
+                viewModel.haveCurrencies
+            }
+            selectedItems.remove(currencyId)
+            changeEmptyPlaceholderVisibility(selectedItems.isEmpty())
+        }
+
+        val backgroundColor =
+            ColorDrawable(ContextCompat.getColor(requireActivity(), R.color.secondaryColor))
+        val icon = ContextCompat.getDrawable(requireActivity(), R.drawable.clear_24)
+        val itemSwipeHelper =
+            ItemTouchHelper(SwipeToDeleteCallback(adapter, backgroundColor, icon!!))
+        binding.currencies.layoutManager = LinearLayoutManager(requireActivity())
+        binding.currencies.adapter = adapter
+        binding.currencies.addItemDecoration(
+            requireActivity().generateCustomDividerDecoration(R.drawable.currency_list_divider)
+        )
+        itemSwipeHelper.attachToRecyclerView(binding.currencies)
+    }
+
+    private fun setupTabLayout(selectedTabPosition: Int) {
+        changeTabsFont(ResourcesCompat.getFont(requireActivity(), R.font.fontinsmallcaps))
+        if (binding.tabLayout.selectedTabPosition == selectedTabPosition) {
+            updateCurrencyList(
+                if (selectedTabPosition == 0) viewModel.wantCurrencies else viewModel.haveCurrencies,
+                selectedTabPosition == 0
+            )
+        } else {
+            binding.tabLayout.getTabAt(selectedTabPosition)?.let {
+                binding.tabLayout.selectTab(it, true)
+            }
+        }
+
+        binding.tabLayout.addOnTabSelectedListener(
+            TabLayoutListener(
+                binding.currenciesContainer,
+                binding.currencies,
+                binding.emptyPlaceholder
+            ) {
+                updateCurrencyList(
+                    if (it == 0) viewModel.wantCurrencies else viewModel.haveCurrencies,
+                    it == 0
+                )
+            }
+        )
+    }
+
+    private fun setupOnClickListeners() {
+        binding.add.setOnClickListener {
+            router.navigateTo(
+                CurrencyExchangeGroupsFragment.newInstance(
+                    binding.tabLayout.selectedTabPosition == 0
+                )
+            )
+        }
+        binding.search.setOnClickListener {
+            requestResults()
+        }
+        binding.fullfilable.setOnClickListener {
+            it.isSelected = !it.isSelected
+        }
+    }
+
+    private fun updateCurrencyList(selectedItems: List<String>, isWantList: Boolean) {
+        val isEmpty = selectedItems.isEmpty()
+        changeEmptyPlaceholderVisibility(isEmpty)
+        if (!isEmpty) {
+            val items = selectedItems.map { selectedId ->
+                viewModel.allCurrencies.flatMap { it.staticItems }.filter { it.id == selectedId }
+            }.flatten().toMutableList()
+            adapter.setItems(items, isWantList)
+        }
+    }
+
+    private fun changeEmptyPlaceholderVisibility(isVisible: Boolean) {
+        if (isVisible) {
+            binding.emptyPlaceholder.visibility = View.VISIBLE
+            binding.currencies.visibility = View.GONE
+        } else {
+            binding.emptyPlaceholder.visibility = View.GONE
+            binding.currencies.visibility = View.VISIBLE
+        }
+    }
+
+    private fun changeTabsFont(font: Typeface?) {
+        font ?: return
+        val vg = binding.tabLayout.getChildAt(0) as ViewGroup
+        val tabsCount = vg.childCount
+        for (j in 0 until tabsCount) {
+            val vgTab = vg.getChildAt(j) as ViewGroup
+            val tabChildCount = vgTab.childCount
+            for (i in 0 until tabChildCount) {
+                val tabViewChild = vgTab.getChildAt(i)
+                if (tabViewChild is TextView) {
+                    tabViewChild.typeface = font
+                }
+            }
+        }
     }
 
     private fun requestResults() {
         if (viewModel.wantCurrencies.isEmpty()) {
             Toast.makeText(
                 requireActivity(),
-                "You must specify items You want",
+                "Add items You want",
                 Toast.LENGTH_LONG
             ).show()
             return
@@ -182,66 +235,43 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         if (viewModel.haveCurrencies.isEmpty()) {
             Toast.makeText(
                 requireActivity(),
-                "You must specify items You have",
+                "Add items You have",
                 Toast.LENGTH_LONG
             ).show()
             return
         }
-        lifecycleScope.launch {
-            val progressDialog = requireActivity().getTransparentProgressDialog()
-            try {
-                progressDialog.show()
-                val result = viewModel.requestResult(settings.league, 0)
-                if (result.isEmpty()) {
-                    Toast.makeText(requireActivity(), "Nothing found!", Toast.LENGTH_LONG).show()
-                    return@launch
-                }
-                CurrencyExchangeResultFragment
-                    .newInstance(result)
-                    .showNow(parentFragmentManager, null)
-            } finally {
-                progressDialog.dismiss()
-            }
+        if (searchJob?.isActive == true) {
+            searchJob?.cancel()
         }
-    }
-
-    private suspend fun setRequest(
-        buyingItem: StaticItemViewData,
-        payingItem: StaticItemViewData,
-        payingAmount: Int,
-        messagingToken: String?,
-        authToken: String?
-    ) {
-        if (messagingToken != null) {
-            val toastText = if (viewModel.sendNotificationRequest(
-                    messagingToken,
-                    buyingItem,
-                    payingItem,
-                    payingAmount,
-                    authToken
-                )
-            ) {
-                "Success!"
-            } else {
-                "Notification request set failed!"
+        searchJob = lifecycleScope.launch {
+            binding.search.isEnabled = false
+            val result = viewModel.requestResult(
+                settings.league,
+                binding.fullfilable.isSelected,
+                binding.minimumStockValue.text.toString(),
+                0
+            )
+            if (result.isEmpty()) {
+                Toast.makeText(requireActivity(), "Nothing found!", Toast.LENGTH_LONG).show()
+                binding.search.isEnabled = true
+                return@launch
             }
-            Toast.makeText(
-                requireActivity(),
-                toastText,
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            Toast.makeText(
-                requireActivity(),
-                "Messaging token can not be null!",
-                Toast.LENGTH_LONG
-            ).show()
+            CurrencyExchangeResultFragment
+                .newInstance(
+                    result,
+                    binding.fullfilable.isSelected,
+                    binding.minimumStockValue.text.toString()
+                ).show(parentFragmentManager, null)
+            binding.search.isEnabled = true
         }
     }
 
     companion object {
+        const val NOTIFICATION_REQUESTS_TYPE = "0"
+
         private const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
         private const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
+        private const val TAB_POSITION_KEY = "TAB_POSITION_KEY"
 
         fun newInstance(wantItemId: String? = null, haveItemId: String? = null) = FragmentScreen {
             CurrencyExchangeMainFragment().apply {

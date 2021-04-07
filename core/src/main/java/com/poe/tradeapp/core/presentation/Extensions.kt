@@ -3,7 +3,9 @@ package com.poe.tradeapp.core.presentation
 import android.app.AlertDialog
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -23,6 +25,7 @@ import org.koin.core.scope.Scope
 import org.koin.java.KoinJavaComponent
 import org.koin.java.KoinJavaComponent.getKoin
 import java.util.*
+
 
 fun RecyclerView.measureForAnimator(): Int {
     val layoutParams = this.layoutParams
@@ -45,12 +48,38 @@ fun Context.hideKeyboard(view: View) {
     inputManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
-fun Context.generateLinearDividerDecoration(): DividerItemDecoration {
+fun Context.generateLinearDividerDecoration(drawableResId: Int = R.drawable.recyclerview_divider): DividerItemDecoration {
     return DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
         ContextCompat.getDrawable(
-            this@generateLinearDividerDecoration, R.drawable.recyclerview_divider
+            this@generateLinearDividerDecoration, drawableResId
         )?.let {
             setDrawable(it)
+        }
+    }
+}
+
+fun Context.generateCustomDividerDecoration(drawableResId: Int): RecyclerView.ItemDecoration {
+    val divider = ContextCompat.getDrawable(this, drawableResId)
+    return object : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            outRect.bottom = (divider?.intrinsicHeight ?: 0)
+        }
+
+        override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+            val left = parent.paddingLeft + 52.dp
+            val right = parent.width - parent.paddingRight
+            for (i in 0 until parent.childCount - 1) {
+                val child = parent.getChildAt(i)
+                val top = child.bottom
+                val bottom = top + (divider?.intrinsicHeight ?: 0)
+                divider?.setBounds(left, top, right, bottom)
+                divider?.draw(c)
+            }
         }
     }
 }
@@ -104,3 +133,6 @@ fun LifecycleOwner.fragmentLifecycleScope(scopeId: String, scopeName: FragmentSc
 
 val Int.dp: Int
     get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()
+
+val Int.dpf: Float
+    get() = this * Resources.getSystem().displayMetrics.density + 0.5f

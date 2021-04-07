@@ -7,7 +7,7 @@ import com.poe.tradeapp.core.domain.models.StatGroup
 
 class GetStatsUseCase(private val repository: ICoreRepository) {
 
-    suspend fun execute(): List<StatGroup> {
+    fun execute(): List<StatGroup> {
         return repository.statData.map { group ->
             val entries =
                 group.entries.map { entry ->
