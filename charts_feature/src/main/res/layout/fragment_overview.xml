@@ -29,7 +29,7 @@
             android:background="@drawable/left_side_rounded_button"
             android:fontFamily="@font/fontinsmallcaps"
             android:gravity="center"
-            android:text="Sell"
+            android:text="@string/sell"
             android:textColor="@color/primaryTextColor"
             android:textSize="16sp" />
 
@@ -40,7 +40,7 @@
             android:background="@drawable/right_side_rounded_button"
             android:fontFamily="@font/fontinsmallcaps"
             android:gravity="center"
-            android:text="Buy"
+            android:text="@string/buy"
             android:textColor="@color/primaryTextColor"
             android:textSize="16sp" />
 

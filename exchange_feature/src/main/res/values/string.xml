@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="filterMinTextFieldHint">MIN</string>
+    <string name="filterMaxTextFieldHint">MAX</string>
+    <string name="accept">Accept</string>
+    <string name="socket_filter_red_socket">R</string>
+    <string name="socket_filter_green_socket">G</string>
+    <string name="socket_filter_blue_socket">B</string>
+    <string name="socket_filter_white_socket">W</string>
+    <string name="min_hint">MIN</string>
+    <string name="max_hint">MAX</string>
+    <string name="account_name_hint">Enter account name…</string>
+    <string name="toolbar_search_item_hint">Search item</string>
+    <string name="clear_filter_description">clearFilter</string>
+    <string name="items_search_title">Selected item: %s</string>
+</resources>

@@ -7,10 +7,7 @@ import android.graphics.drawable.Drawable
 import android.text.style.ImageSpan
 import java.lang.ref.WeakReference
 
-class CenteredImageSpan : ImageSpan {
-
-    constructor(image: Drawable) : super(image)
-    constructor(context: Context, image: Int) : super(context, image)
+class CenteredImageSpan(context: Context, image: Int) : ImageSpan(context, image) {
 
     private var wrDrawable: WeakReference<Drawable>? = null
 

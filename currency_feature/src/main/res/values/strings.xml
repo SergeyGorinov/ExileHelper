@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="want_currencies_header">Currencies You want</string>
-    <string name="have_currencies_header">Currencies You have</string>
-    <string name="notify_dialog_buying_item">Notify me when</string>
-    <string name="notify_dialog_paying_item">Will cost less than</string>
-    <string name="search">Search</string>
-    <string name="add_currency">Add currency</string>
     <string name="notifications">Notifications</string>
     <string name="minimum_stock">Minimum stock:</string>
     <string name="can_fullfill_trade">Can fullfill trade:</string>
-    <string name="add_have">Add currency you have</string>
-    <string name="add_want">Add currency you want</string>
-    <string name="search_currency">Search currency</string>
-    <string name="add_currency_hint">"Tap there\nTo add a currency"</string>
     <string name="want">Want</string>
     <string name="have">Have</string>
     <string name="empty_list_placeholder">Currency list is empty</string>
+    <string name="stock_text">"Stock: %d"</string>
+    <string name="exchange_get_text">"You will get %d x"</string>
+    <string name="exchange_pay_text">"You will pay %d x"</string>
+    <string name="account_text">"%s (%s)"</string>
+    <string name="notify_item_left_side">Notify me when</string>
+    <string name="notify_right_side_text">will cost less than</string>
 </resources>

@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.github.terrakok.cicerone.Router
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
@@ -45,9 +44,6 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
     override var viewBinding: ViewBinding? = null
 
     private val toolbar by lazy { viewBinding?.root?.findViewById<MaterialToolbar>(R.id.toolbar) }
-    private val progressBar by lazy {
-        viewBinding?.root?.findViewById<LinearProgressIndicator>(R.id.toolbarProgressBar)
-    }
 
     override fun onResume() {
         super.onResume()
@@ -64,14 +60,6 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
     inline fun <reified T : ViewBinding> getBinding() = viewBinding as T
 
     protected fun getMainActivity() = requireActivity() as? IMainActivity
-
-    protected fun toggleProgressBar(show: Boolean) {
-        if (show) {
-            progressBar?.show()
-        } else {
-            progressBar?.hide()
-        }
-    }
 
     private fun showMenu() {
         val leagues = getMainActivity()?.leagues ?: listOf()

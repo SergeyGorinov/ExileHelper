@@ -8,4 +8,6 @@
     <string name="overview_header_pay">Pay</string>
     <string name="overview_header_get">Get</string>
     <string name="overview_metrics_header">Last 7 days</string>
+    <string name="sell">Sell</string>
+    <string name="buy">Buy</string>
 </resources>

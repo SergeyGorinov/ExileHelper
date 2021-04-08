@@ -142,8 +142,8 @@ internal class ChartsViewModel(
             val overViewData = overviewData[type]?.firstOrNull { it.id == id }
             val data = getCurrencyHistoryUseCase.execute(league, type, id)
             val maxDay = max(
-                data.buyingGraphData.firstOrNull()?.daysAgo ?: 0,
-                data.sellingGraphData.first().daysAgo
+                data.buyingGraphData.filter { it.daysAgo <= 50 }.maxOf { it.daysAgo },
+                data.sellingGraphData.filter { it.daysAgo <= 50 }.maxOf { it.daysAgo }
             )
             val sellingGraphDataSet = getFilteredGraphData(maxDay, data.sellingGraphData, true)
             val buyingGraphDataSet = getFilteredGraphData(maxDay, data.buyingGraphData, false)
@@ -172,7 +172,7 @@ internal class ChartsViewModel(
             getItemsOverview(league, type)
             val overViewData = overviewData[type]?.firstOrNull { it.id == id }
             val data = getItemHistoryUseCase.execute(league, type, id)
-            val graphData = getFilteredGraphData(data.maxOf { it.daysAgo }, data, true)
+            val graphData = getFilteredGraphData(data.maxOf { it.daysAgo }, data, false)
             viewLoadingState.emit(false)
             currentItemHistory = HistoryModel(
                 overViewData?.name ?: "",
@@ -197,29 +197,13 @@ internal class ChartsViewModel(
         } else {
             1
         }
-        val data = mutableListOf<GraphData>()
-        var i = 0
-        if (filteredGraphData.isNotEmpty()) {
-            do {
-                val entry = filteredGraphData[i]
-                data.add(
-                    GraphData(
-                        entry.count,
-                        if (selling) 1 / entry.value.toFloat() else entry.value.toFloat(),
-                        entry.daysAgo
-                    )
-                )
-                i += takeAmount
-            } while (i < filteredGraphData.size)
-            if (data.last().daysAgo != 0) {
-                data.add(
-                    GraphData(
-                        data.last().count,
-                        if (selling) data.last().value else 1 / data.last().value,
-                        data.last().daysAgo
-                    )
-                )
-            }
+        val data = filteredGraphData.chunked(takeAmount).map { chunked ->
+            val value = chunked.sumByDouble { it.value }.toFloat() / chunked.size
+            GraphData(
+                chunked.sumBy { it.count } / chunked.size,
+                if (selling) 1 / value else value,
+                chunked.first().daysAgo
+            )
         }
         return data.map { Entry((maxDay - it.daysAgo).toFloat(), it.value) }.run {
             LineDataSet(this, "dataSet").apply {

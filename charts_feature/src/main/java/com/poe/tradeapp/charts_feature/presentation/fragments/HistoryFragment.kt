@@ -28,6 +28,7 @@ import com.poe.tradeapp.charts_feature.databinding.FragmentHistoryBinding
 import com.poe.tradeapp.charts_feature.presentation.ChartsViewModel
 import com.poe.tradeapp.charts_feature.presentation.models.HistoryModel
 import com.poe.tradeapp.core.presentation.BaseFragment
+import com.poe.tradeapp.core.presentation.dpf
 import com.squareup.picasso.Picasso
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.text.SimpleDateFormat
@@ -126,23 +127,22 @@ internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
         val xMin = minOf(data.sellingGraphData?.xMin ?: 0f, data.buyingGraphData.xMin)
         binding.chart.xAxis.apply {
             axisMinimum = xMin
-            axisMaximum = xMax
+            axisMaximum = xMax + 5f
             position = XAxis.XAxisPosition.BOTTOM
-            labelRotationAngle = -45f
+            labelRotationAngle = 45f
             textSize = 16f
             typeface = textFont
             this.textColor = textColor
             valueFormatter = object : ValueFormatter() {
-                private val formatter = SimpleDateFormat("MMM dd", Locale.getDefault())
                 override fun getAxisLabel(value: Float, axis: AxisBase?): String {
                     val currentDate = Calendar.getInstance()
                     currentDate.add(Calendar.DAY_OF_YEAR, -(xMax - value).toInt())
-                    return formatter.format(currentDate.time)
+                    return SimpleDateFormat("MMM dd", Locale.getDefault()).format(currentDate.time)
                 }
             }
         }
         binding.chart.axisLeft.apply {
-            xOffset = 15f
+            xOffset = 25f
             textSize = 16f
             typeface = textFont
             this.textColor = textColor
@@ -169,6 +169,7 @@ internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
                     super.drawValue(c, valueText, x, y - 20, color)
                 }
             }
+            extraBottomOffset = 8.dpf
         }
     }
 
