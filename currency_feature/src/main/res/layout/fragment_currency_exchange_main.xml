@@ -83,7 +83,7 @@
             android:background="@drawable/default_bordered_background"
             android:hint="@string/empty_hint"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
+            android:paddingVertical="4dp"
             app:boxStrokeWidth="0dp"
             app:hintTextColor="@android:color/transparent"
             app:layout_constraintBottom_toTopOf="@id/optionsBarrier"
@@ -119,11 +119,13 @@
             app:layout_constraintEnd_toStartOf="@id/fullfilable"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/fullfilable"
+            style="@style/AppTheme.CheckBoxStyle"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@drawable/default_bordered_checkbox"
+            android:button="@color/transparent"
             app:layout_constraintBottom_toTopOf="@id/optionsBarrier"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -160,6 +162,18 @@
                 android:id="@+id/currencies"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:background="@color/transparent"
+                android:backgroundTint="@color/primaryLightColor"
+                android:src="@drawable/add_24"
+                app:borderWidth="0dp"
+                app:fabSize="mini"
+                tools:ignore="ContentDescription" />
         </FrameLayout>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -180,16 +194,4 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:background="@color/transparent"
-        android:backgroundTint="@color/secondaryColor"
-        android:src="@drawable/add_24"
-        app:borderWidth="0dp"
-        tools:ignore="ContentDescription" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

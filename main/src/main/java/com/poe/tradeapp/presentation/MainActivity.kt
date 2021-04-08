@@ -184,19 +184,23 @@ class MainActivity : FragmentActivity(), IMainActivity {
         lifecycleScope.launch {
             val user = Firebase.auth.currentUser ?: return@launch
             val result = withContext(Dispatchers.IO) {
-                val authToken = suspendCoroutine<String?> { coroutine ->
-                    user.getIdToken(false).addOnCompleteListener {
-                        coroutine.resume(it.result?.token)
+                try {
+                    val authToken = suspendCoroutine<String?> { coroutine ->
+                        user.getIdToken(false).addOnCompleteListener {
+                            coroutine.resume(it.result?.token)
+                        }
                     }
-                }
-                val messagingToken = suspendCoroutine<String?> { coroutine ->
-                    FirebaseMessaging.getInstance().token.addOnCompleteListener {
-                        coroutine.resume(it.result)
+                    val messagingToken = suspendCoroutine<String?> { coroutine ->
+                        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+                            coroutine.resume(it.result)
+                        }
                     }
-                }
-                return@withContext if (authToken != null && messagingToken != null) {
-                    viewModel.addToken(messagingToken, authToken)
-                } else {
+                    return@withContext if (authToken != null && messagingToken != null) {
+                        viewModel.addToken(messagingToken, authToken)
+                    } else {
+                        false
+                    }
+                } catch (e: Exception) {
                     false
                 }
             }

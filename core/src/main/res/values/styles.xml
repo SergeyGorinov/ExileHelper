@@ -65,6 +65,14 @@
         <item name="android:popupBackground">@color/primaryColor</item>
     </style>
 
+    <style name="AppTheme.CheckBoxStyle" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="minHeight">0dp</item>
+        <item name="minWidth">0dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
+
     <!-- Workaround for removing default vertical padding. -->
     <dimen name="mtrl_exposed_dropdown_menu_popup_vertical_padding">0dp</dimen>
 </resources>

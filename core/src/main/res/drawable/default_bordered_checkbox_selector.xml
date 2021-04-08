@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/unchecked"
+        android:drawable="@drawable/default_bordered_background"
+        android:state_selected="false" />
+    <item
+        android:id="@+id/checked"
+        android:drawable="@drawable/done_24"
+        android:state_selected="true" />
+    <transition
+        android:drawable="@drawable/checkbox_check"
+        android:fromId="@id/unchecked"
+        android:toId="@id/checked" />
+    <transition
+        android:drawable="@drawable/checkbox_uncheck"
+        android:fromId="@id/checked"
+        android:toId="@id/unchecked" />
+</animated-selector>
