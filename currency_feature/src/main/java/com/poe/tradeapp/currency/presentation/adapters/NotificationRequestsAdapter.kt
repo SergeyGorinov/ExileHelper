@@ -1,12 +1,12 @@
-package com.poe.tradeapp.core.presentation
+package com.poe.tradeapp.currency.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.poe.tradeapp.core.R
-import com.poe.tradeapp.core.databinding.NotificationItemBinding
 import com.poe.tradeapp.core.presentation.models.NotificationRequestViewData
+import com.poe.tradeapp.currency.R
+import com.poe.tradeapp.currency.databinding.NotificationItemBinding
 import com.squareup.picasso.Picasso
 
 class NotificationRequestsAdapter(private val items: List<NotificationRequestViewData>) :

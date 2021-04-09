@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/primaryColor"
+    android:orientation="horizontal"
+    android:paddingVertical="2dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/image"
+        android:layout_width="24dp"
+        android:layout_height="24dp" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:layout_marginStart="4dp"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="@color/items_search_suggestions_item_text"
+        android:textSize="16sp"
+        tools:ignore="SelectableText" />
+</LinearLayout>

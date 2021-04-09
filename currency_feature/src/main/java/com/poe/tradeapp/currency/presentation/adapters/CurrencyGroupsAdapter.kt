@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.CurrencyGroupBinding
-import com.poe.tradeapp.currency.presentation.models.StaticGroupViewData
+import com.poe.tradeapp.currency.presentation.models.CurrencyGroupViewData
 import com.squareup.picasso.Picasso
 
 internal class CurrencyGroupsAdapter(
-    private val items: List<StaticGroupViewData>,
+    private val items: List<CurrencyGroupViewData>,
     private val onButtonClick: (String) -> Unit
 ) : RecyclerView.Adapter<CurrencyGroupsAdapter.CurrencyGroupsViewHolder>() {
 
@@ -28,7 +28,7 @@ internal class CurrencyGroupsAdapter(
 
         private val viewBinding = CurrencyGroupBinding.bind(itemView)
 
-        fun bind(group: StaticGroupViewData, onButtonClick: (String) -> Unit) {
+        fun bind(group: CurrencyGroupViewData, onButtonClick: (String) -> Unit) {
             viewBinding.text.text = group.label
             viewBinding.root.setOnClickListener {
                 onButtonClick(group.id)

@@ -7,10 +7,11 @@ import com.poe.tradeapp.core.domain.models.NotificationRequest
 class GetNotificationRequestsUseCase(private val repository: ICoreRepository) {
 
     suspend fun execute(
-        messagingToken: String,
+        messagingToken: String?,
         authorizationToken: String? = null,
         type: String
     ): List<NotificationRequest> {
+        messagingToken ?: return emptyList()
         repository.syncRemoteNotificationRequests(messagingToken, authorizationToken, type)
         return repository.getNotificationRequestsLocal().map { request ->
             NotificationRequest(

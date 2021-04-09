@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.CurrencyImageButtonBinding
 import com.poe.tradeapp.currency.databinding.CurrencyTextButtonBinding
-import com.poe.tradeapp.currency.presentation.models.StaticItemViewData
+import com.poe.tradeapp.currency.presentation.models.CurrencyViewData
 import com.squareup.picasso.Picasso
 
 internal class CurrencyGroupAdapter(
-    private val items: List<Pair<Boolean, StaticItemViewData>>,
+    private val items: List<Pair<Boolean, CurrencyViewData>>,
     private val isTextGroup: Boolean,
     private val onItemClick: (Boolean, String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -52,7 +52,7 @@ internal class CurrencyGroupAdapter(
 
         fun bind(
             isSelected: Boolean,
-            item: StaticItemViewData,
+            item: CurrencyViewData,
             onItemClick: (Boolean, String) -> Unit
         ) {
             viewBinding.root.isSelected = isSelected
@@ -70,7 +70,7 @@ internal class CurrencyGroupAdapter(
 
         fun bind(
             isSelected: Boolean,
-            item: StaticItemViewData,
+            item: CurrencyViewData,
             onItemClick: (Boolean, String) -> Unit
         ) {
             viewBinding.root.isSelected = isSelected

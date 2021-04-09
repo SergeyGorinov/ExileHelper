@@ -7,6 +7,7 @@ import com.poe.tradeapp.core.domain.models.NotificationRequest
 import com.poe.tradeapp.core.domain.usecases.GetCurrencyItemsUseCase
 import com.poe.tradeapp.core.domain.usecases.GetNotificationRequestsUseCase
 import com.poe.tradeapp.core.domain.usecases.SetNotificationRequestUseCase
+import com.poe.tradeapp.core.presentation.FirebaseUtils
 import com.poe.tradeapp.core.presentation.models.NotificationRequestViewData
 import com.poe.tradeapp.currency.data.models.CurrencyRequest
 import com.poe.tradeapp.currency.data.models.Exchange
@@ -16,9 +17,9 @@ import com.poe.tradeapp.currency.domain.usecases.GetHavingCurrencyUseCase
 import com.poe.tradeapp.currency.domain.usecases.GetRequestingCurrenciesUseCase
 import com.poe.tradeapp.currency.domain.usecases.GetTotalResultCountUseCase
 import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
+import com.poe.tradeapp.currency.presentation.models.CurrencyGroupViewData
 import com.poe.tradeapp.currency.presentation.models.CurrencyResultViewItem
-import com.poe.tradeapp.currency.presentation.models.StaticGroupViewData
-import com.poe.tradeapp.currency.presentation.models.StaticItemViewData
+import com.poe.tradeapp.currency.presentation.models.CurrencyViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
@@ -37,14 +38,14 @@ internal class CurrencyExchangeViewModel(
     val allCurrencies =
         getCurrencyItemsUseCase.execute().filterNot { it.label == null }.map { group ->
             val entries =
-                group.items.map { StaticItemViewData(it.id, it.label, it.imageUrl) }
+                group.items.map { CurrencyViewData(it.id, it.label, it.imageUrl) }
             val isText = group.id.startsWith("Maps") || group.id.startsWith("Cards")
-            StaticGroupViewData(group.id, group.label, isText, entries)
+            CurrencyGroupViewData(group.id, group.label, isText, entries)
         }
 
     val currencyItems = allCurrencies.filterNot {
         it.id.startsWith("Maps")
-    } + StaticGroupViewData("Maps", "Maps", true, listOf())
+    } + CurrencyGroupViewData("Maps", "Maps", true, listOf())
 
     val maps = allCurrencies.filter { it.id.startsWith("Maps") }
 
@@ -57,13 +58,13 @@ internal class CurrencyExchangeViewModel(
 
     suspend fun requestResult(
         league: String,
-        isFullfilable: Boolean,
+        isFulfillable: Boolean,
         minimum: String?,
         position: Int
     ) = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
         return@withContext try {
-            getCurrencyResult.execute(league, isFullfilable, minimum, position).map { item ->
+            getCurrencyResult.execute(league, isFulfillable, minimum, position).map { item ->
                 CurrencyResultViewItem(
                     item.stock,
                     item.pay,
@@ -86,11 +87,9 @@ internal class CurrencyExchangeViewModel(
     }
 
     suspend fun sendNotificationRequest(
-        messagingToken: String,
-        buyingItem: StaticItemViewData,
-        payingItem: StaticItemViewData,
-        payingAmount: Int,
-        authToken: String? = null
+        buyingItem: CurrencyViewData,
+        payingItem: CurrencyViewData,
+        payingAmount: Int
     ) = withContext(Dispatchers.IO) {
         val request = NotificationRequest(
             NotificationItemData(buyingItem.label, buyingItem.imageUrl ?: ""),
@@ -110,31 +109,28 @@ internal class CurrencyExchangeViewModel(
                 )
             )
         )
-        viewLoadingState.emit(false)
         return@withContext try {
             setNotificationRequestUseCase.execute(
                 request,
                 payload,
                 0,
-                messagingToken,
-                authToken
+                FirebaseUtils.getMessagingToken(),
+                FirebaseUtils.getAuthToken()
             )
         } catch (e: Exception) {
             false
+        } finally {
+            viewLoadingState.emit(false)
         }
     }
 
-    suspend fun getNotificationRequests(
-        messagingToken: String?,
-        authToken: String?
-    ): List<NotificationRequestViewData> {
+    suspend fun getNotificationRequests(): List<NotificationRequestViewData> {
         viewLoadingState.emit(true)
-        messagingToken ?: return emptyList()
         return try {
             withContext(Dispatchers.IO) {
                 getNotificationRequestsUseCase.execute(
-                    messagingToken,
-                    authToken,
+                    FirebaseUtils.getMessagingToken(),
+                    FirebaseUtils.getAuthToken(),
                     CurrencyExchangeMainFragment.NOTIFICATION_REQUESTS_TYPE
                 ).map {
                     NotificationRequestViewData(

@@ -61,4 +61,5 @@ dependencies {
     implementation "io.objectbox:objectbox-kotlin:$objectbox_version"
 
     implementation project(":core")
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }

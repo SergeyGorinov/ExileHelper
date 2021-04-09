@@ -34,7 +34,8 @@
                 android:visibility="gone"
                 app:indicatorColor="@color/secondaryLightColor"
                 app:trackColor="@color/secondaryColor"
-                app:trackCornerRadius="4dp" />
+                app:trackCornerRadius="4dp"
+                app:trackThickness="2dp" />
         </FrameLayout>
 
         <com.google.android.material.tabs.TabLayout
@@ -98,7 +99,6 @@
                 android:digits="0123456789"
                 android:fontFamily="@font/fontinsmallcaps"
                 android:gravity="center|center_vertical"
-                android:hint="@string/filterMinTextFieldHint"
                 android:inputType="textNoSuggestions|number"
                 android:padding="0dp"
                 android:textColor="@color/primaryTextColor"
@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:fontFamily="@font/fontinsmallcaps"
-            android:text="@string/can_fullfill_trade"
+            android:text="@string/can_fulfill_trade"
             android:textColor="@color/primaryTextColor"
             app:layout_constraintBottom_toTopOf="@id/optionsBarrier"
             app:layout_constraintEnd_toStartOf="@id/fullfilable"

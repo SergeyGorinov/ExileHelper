@@ -2,7 +2,7 @@
 <resources>
     <string name="notifications">Notifications</string>
     <string name="minimum_stock">Minimum stock:</string>
-    <string name="can_fullfill_trade">Can fullfill trade:</string>
+    <string name="can_fulfill_trade">Can fulfill trade:</string>
     <string name="want">Want</string>
     <string name="have">Have</string>
     <string name="empty_list_placeholder">Currency list is empty</string>
@@ -12,4 +12,7 @@
     <string name="account_text">"%s (%s)"</string>
     <string name="notify_item_left_side">Notify me when</string>
     <string name="notify_right_side_text">will cost less than</string>
+    <string name="notification_requests_list_empty">Currency notification\nrequests list is empty</string>
+    <string name="add_new_notification_request">Add request</string>
+    <string name="currency_list_hint">Enter currency name…</string>
 </resources>

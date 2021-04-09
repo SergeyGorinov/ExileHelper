@@ -1,8 +1,8 @@
 package com.poe.tradeapp.currency.presentation.models
 
-internal data class StaticGroupViewData(
+internal data class CurrencyGroupViewData(
     val id: String,
     val label: String?,
     val isTextItems: Boolean,
-    val staticItems: List<StaticItemViewData>
+    val staticItems: List<CurrencyViewData>
 )

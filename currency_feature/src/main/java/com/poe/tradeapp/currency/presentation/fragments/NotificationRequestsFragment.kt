@@ -11,17 +11,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.poe.tradeapp.core.presentation.NotificationRequestsAdapter
+import com.poe.tradeapp.core.presentation.generateLinearDividerDecoration
 import com.poe.tradeapp.core.presentation.models.NotificationRequestViewData
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.FragmentNotificationRequestsBinding
-
+import com.poe.tradeapp.currency.presentation.adapters.NotificationRequestsAdapter
 
 internal class NotificationRequestsFragment : BottomSheetDialogFragment() {
 
     private var viewBinding: FragmentNotificationRequestsBinding? = null
 
     var items: List<NotificationRequestViewData> = listOf()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.AppTheme_BaseBottomSheetDialog)
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
@@ -53,10 +58,15 @@ internal class NotificationRequestsFragment : BottomSheetDialogFragment() {
                 visibility = View.VISIBLE
                 layoutManager = LinearLayoutManager(requireActivity())
                 adapter = NotificationRequestsAdapter(items)
+                addItemDecoration(requireActivity().generateLinearDividerDecoration())
             }
         } else {
             viewBinding?.emptyPlaceholder?.visibility = View.VISIBLE
             viewBinding?.notificationRequests?.visibility = View.GONE
+        }
+        viewBinding?.addRequest?.setOnClickListener {
+            dismiss()
+            NotificationRequestAddFragment.newInstance().show(parentFragmentManager, null)
         }
     }
 

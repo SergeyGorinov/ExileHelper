@@ -73,6 +73,15 @@
         <item name="android:padding">0dp</item>
     </style>
 
+    <style name="AppTheme.BaseBottomSheetDialog" parent="@style/Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/AppTheme.BottomSheet</item>
+    </style>
+
+    <style name="AppTheme.BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_bottom_sheet</item>
+    </style>
+
     <!-- Workaround for removing default vertical padding. -->
     <dimen name="mtrl_exposed_dropdown_menu_popup_vertical_padding">0dp</dimen>
 </resources>

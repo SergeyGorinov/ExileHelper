@@ -13,31 +13,15 @@ import com.github.terrakok.cicerone.Router
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import com.poe.tradeapp.core.DI
 import com.poe.tradeapp.core.R
 import com.poe.tradeapp.core.databinding.MenuLayoutBinding
 import org.koin.core.component.inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
     protected val router by DI.inject<Router>()
     protected val settings by DI.inject<ApplicationSettings>()
-
-    protected suspend fun getMessagingToken() = suspendCoroutine<String?> { coroutine ->
-        FirebaseMessaging.getInstance().token.addOnCompleteListener {
-            coroutine.resume(it.result)
-        }
-    }
-
-    protected suspend fun getAuthToken() = suspendCoroutine<String?> { coroutine ->
-        Firebase.auth.currentUser?.getIdToken(false)
-            ?.addOnCompleteListener {
-                coroutine.resume(it.result?.token)
-            } ?: coroutine.resume(null)
-    }
 
     private lateinit var menuDialog: Dialog
 

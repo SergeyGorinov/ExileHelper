@@ -105,10 +105,11 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
                 R.id.notifications -> {
                     lifecycleScope.launch {
                         item.isEnabled = false
-                        val items =
-                            viewModel.getNotificationRequests(getMessagingToken(), getAuthToken())
-                        NotificationRequestsFragment.newInstance(items)
-                            .show(parentFragmentManager, null)
+                        val items = viewModel.getNotificationRequests()
+                        NotificationRequestsFragment.newInstance(items).show(
+                            parentFragmentManager,
+                            null
+                        )
                         item.isEnabled = true
                     }
                     true
@@ -130,11 +131,13 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             changeEmptyPlaceholderVisibility(selectedItems.isEmpty())
         }
 
-        val backgroundColor =
-            ColorDrawable(ContextCompat.getColor(requireActivity(), R.color.secondaryColor))
+        val backgroundColor = ColorDrawable(
+            ContextCompat.getColor(requireActivity(), R.color.secondaryColor)
+        )
         val icon = ContextCompat.getDrawable(requireActivity(), R.drawable.clear_24)
-        val itemSwipeHelper =
-            ItemTouchHelper(SwipeToDeleteCallback(adapter, backgroundColor, icon!!))
+        val itemSwipeHelper = ItemTouchHelper(
+            SwipeToDeleteCallback(adapter, backgroundColor, icon!!)
+        )
         binding.currencies.layoutManager = LinearLayoutManager(requireActivity())
         binding.currencies.adapter = adapter
         binding.currencies.addItemDecoration(

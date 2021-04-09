@@ -13,9 +13,10 @@ class SetNotificationRequestUseCase(private val repository: ICoreRepository) {
         request: NotificationRequest,
         payload: String,
         type: Int,
-        messagingToken: String,
+        messagingToken: String?,
         authToken: String? = null
     ): Boolean {
+        messagingToken ?: return false
         val buyingItem = Json.encodeToString(NotificationItemData.serializer(), request.buyingItem)
         val payingItem = Json.encodeToString(NotificationItemData.serializer(), request.payingItem)
         val response = repository.setNotificationRequestRemote(

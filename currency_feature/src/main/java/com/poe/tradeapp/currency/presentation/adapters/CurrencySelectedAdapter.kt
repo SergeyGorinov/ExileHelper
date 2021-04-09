@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.currency.R
 import com.poe.tradeapp.currency.databinding.CurrencySelectedItemBinding
-import com.poe.tradeapp.currency.presentation.models.StaticItemViewData
+import com.poe.tradeapp.currency.presentation.models.CurrencyViewData
 import com.squareup.picasso.Picasso
 
 internal class CurrencySelectedAdapter(private val onRemove: (String, Boolean) -> Unit) :
     RecyclerView.Adapter<CurrencySelectedAdapter.CurrencySelectedViewHolder>() {
 
-    private var items: MutableList<StaticItemViewData> = mutableListOf()
+    private var items: MutableList<CurrencyViewData> = mutableListOf()
     private var isWantList: Boolean = true
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencySelectedViewHolder {
@@ -28,7 +28,7 @@ internal class CurrencySelectedAdapter(private val onRemove: (String, Boolean) -
 
     override fun getItemCount() = items.size
 
-    fun setItems(items: MutableList<StaticItemViewData>, isWantList: Boolean) {
+    fun setItems(items: MutableList<CurrencyViewData>, isWantList: Boolean) {
         this.items = items
         this.isWantList = isWantList
         notifyDataSetChanged()
@@ -45,7 +45,7 @@ internal class CurrencySelectedAdapter(private val onRemove: (String, Boolean) -
 
         private val viewBinding = CurrencySelectedItemBinding.bind(itemView)
 
-        fun bind(item: StaticItemViewData) {
+        fun bind(item: CurrencyViewData) {
             if (item.imageUrl != null) {
                 Picasso.get().load(item.imageUrl).into(viewBinding.image)
             }
