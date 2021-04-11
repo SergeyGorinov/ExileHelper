@@ -7,6 +7,7 @@ import android.view.Window
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.github.terrakok.cicerone.Router
@@ -22,6 +23,8 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
     protected val router by DI.inject<Router>()
     protected val settings by DI.inject<ApplicationSettings>()
+
+    protected val savedState = bundleOf()
 
     private lateinit var menuDialog: Dialog
 
@@ -46,7 +49,7 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
     protected fun getMainActivity() = requireActivity() as? IMainActivity
 
     private fun showMenu() {
-        val leagues = getMainActivity()?.leagues ?: listOf()
+        val leagues = getMainActivity()?.getLeagues() ?: listOf()
         val view = View.inflate(requireActivity(), R.layout.menu_layout, null)
         val binding = MenuLayoutBinding.bind(view)
         binding.leagueSelector.adapter =
@@ -69,8 +72,7 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
         menuDialog = Dialog(requireActivity(), R.style.AppTheme_DialogMenu)
 
         Firebase.auth.currentUser?.let {
-            binding.signOut.visibility = View.VISIBLE
-            binding.signedInEmail.visibility = View.VISIBLE
+            binding.accountData.visibility = View.VISIBLE
             binding.signedInEmail.text = it.email
             binding.signOut.setOnClickListener {
                 AlertDialog.Builder(requireActivity(), R.style.AppTheme_AlertDialog)

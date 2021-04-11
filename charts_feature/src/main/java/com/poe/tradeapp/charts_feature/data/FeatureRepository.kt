@@ -3,21 +3,104 @@ package com.poe.tradeapp.charts_feature.data
 import com.poe.tradeapp.charts_feature.data.models.GraphData
 import com.poe.tradeapp.charts_feature.data.models.HistoryModel
 import com.poe.tradeapp.charts_feature.data.models.ItemGroup
-import com.poe.tradeapp.charts_feature.data.models.OverviewResponse
-import kotlinx.serialization.json.JsonObject
+import com.poe.tradeapp.charts_feature.domain.models.CurrencyData
+import com.poe.tradeapp.charts_feature.domain.models.OverviewData
+import kotlinx.serialization.json.*
 import retrofit2.await
 
 internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatureRepository() {
 
+    override var overviewData = listOf<OverviewData>()
+
     override suspend fun getCurrenciesOverview(
         league: String,
         type: String
-    ): OverviewResponse {
-        return api.getCurrenciesOverview(league, type).await()
+    ) {
+        val result = api.getCurrenciesOverview(league, type).await()
+        val currenciesOverview = result.lines
+        val currenciesDetails = result.currencyDetails
+        overviewData = currenciesOverview.map { currencyOverview ->
+            val sellingData = if (currencyOverview.pay != null) {
+                CurrencyData(currencyOverview.pay.listing_count, 1 / currencyOverview.pay.value)
+            } else {
+                null
+            }
+            val buyingData =
+                CurrencyData(currencyOverview.receive.listing_count, currencyOverview.receive.value)
+            val currencyDetail =
+                currenciesDetails.firstOrNull { it.id == currencyOverview.receive.get_currency_id }
+            OverviewData(
+                currencyOverview.receive.get_currency_id.toString(),
+                currencyOverview.currencyTypeName,
+                null,
+                currencyDetail?.icon,
+                currencyDetail?.tradeId ?: currencyOverview.detailsId,
+                sellingData,
+                buyingData,
+                if (currencyOverview.receiveSparkLine.data.any { it == null }) {
+                    null
+                } else {
+                    currencyOverview.receiveSparkLine.data.filterNotNull()
+                },
+                if (currencyOverview.paySparkLine.data.any { it == null }) {
+                    listOf()
+                } else {
+                    currencyOverview.paySparkLine.data.filterNotNull()
+                },
+                currencyOverview.receiveSparkLine.totalChange,
+                currencyOverview.paySparkLine.totalChange
+            )
+        }
     }
 
-    override suspend fun getItemsOverview(league: String, type: String): JsonObject {
-        return api.getItemsOverview(league, type).await()
+    override suspend fun getItemsOverview(league: String, type: String) {
+        val result = try {
+            api.getItemsOverview(league, type).await().getValue("lines").jsonArray
+        } catch (e: Exception) {
+            emptyList()
+        }
+        overviewData = result.mapNotNull { itemOverview ->
+            try {
+                val id = itemOverview.jsonObject.getValue("id").jsonPrimitive.content
+                val name = itemOverview.jsonObject.getValue("name").jsonPrimitive.content
+                val baseType =
+                    if (itemOverview.jsonObject.getValue("baseType").jsonPrimitive.isString) {
+                        itemOverview.jsonObject.getValue("baseType").jsonPrimitive.content
+                    } else {
+                        null
+                    }
+                val icon = itemOverview.jsonObject.getValue("icon").jsonPrimitive.content
+                val tradeId = itemOverview.jsonObject.getValue("detailsId").jsonPrimitive.content
+                val listingCount =
+                    itemOverview.jsonObject.getValue("listingCount").jsonPrimitive.intOrNull ?: 0
+                val chaosValue =
+                    itemOverview.jsonObject.getValue("chaosValue").jsonPrimitive.doubleOrNull ?: 0.0
+                val sparkLine = itemOverview.jsonObject.getValue("sparkline").jsonObject
+                val totalChange = sparkLine.getValue("totalChange").jsonPrimitive.floatOrNull ?: 0f
+                val sparkLineData = sparkLine.getValue("data").jsonArray.map {
+                    it.jsonPrimitive.content.toFloatOrNull()
+                }
+                OverviewData(
+                    id,
+                    name,
+                    baseType,
+                    icon,
+                    tradeId,
+                    null,
+                    CurrencyData(listingCount, chaosValue),
+                    null,
+                    if (sparkLineData.any { it == null }) {
+                        listOf()
+                    } else {
+                        sparkLineData.filterNotNull()
+                    },
+                    null,
+                    totalChange
+                )
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 
     override suspend fun getCurrencyHistory(

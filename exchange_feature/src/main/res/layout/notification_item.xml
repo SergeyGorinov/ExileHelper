@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/primaryColor"
+    android:paddingVertical="8dp">
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/payingItemData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="leftSideText,buyingItemText,buyingItemImage"
+        app:flow_horizontalBias="0"
+        app:flow_horizontalGap="4dp"
+        app:flow_horizontalStyle="packed"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.helper.widget.Flow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:constraint_referenced_ids="rightSideText,payingItemText,payingItemImage"
+        app:flow_horizontalBias="0"
+        app:flow_horizontalGap="4dp"
+        app:flow_horizontalStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/payingItemData" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/leftSideText"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:text="@string/notify_item_left_side"
+        android:textColor="@color/primaryTextColor" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/buyingItemText"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="@color/primaryTextColor" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/buyingItemImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="32dp"
+        app:layout_constraintHeight_max="32dp"
+        tools:ignore="ContentDescription" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/rightSideText"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:text="@string/notify_right_side_text"
+        android:textColor="@color/primaryTextColor" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payingItemText"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:textColor="@color/primaryTextColor" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/payingItemImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="32dp"
+        app:layout_constraintHeight_max="32dp"
+        tools:ignore="ContentDescription" />
+</androidx.constraintlayout.widget.ConstraintLayout>

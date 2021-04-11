@@ -15,4 +15,5 @@
     <string name="notification_requests_list_empty">Currency notification\nrequests list is empty</string>
     <string name="add_new_notification_request">Add request</string>
     <string name="currency_list_hint">Enter currency name…</string>
+    <string name="minimum_stock_hint">Min</string>
 </resources>

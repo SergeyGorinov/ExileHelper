@@ -3,4 +3,5 @@
     <string name="search">Search</string>
     <string name="empty_hint">" "</string>
     <string name="select_league_text">Select league:</string>
+    <string name="account">Account</string>
 </resources>

@@ -7,7 +7,7 @@ internal data class FetchedItem(
     val typeLine: String,
     val iconUrl: String,
     val sockets: List<Socket>?,
-    val frameType: Int?,
+    val frameType: Int,
     val influenceIcons: List<Int?>,
     val itemTextData: SpannableStringBuilder,
     val hybridTypeLine: String? = null,

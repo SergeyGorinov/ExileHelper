@@ -7,6 +7,18 @@ import org.koin.dsl.module
 
 internal val presentationModule = module {
     scope(named(FragmentScopes.EXCHANGE_FEATURE)) {
-        viewModel { ItemsSearchViewModel(get(), get(), get(), get(), get(), get(), get()) }
+        viewModel {
+            ItemsSearchViewModel(
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
     }
 }

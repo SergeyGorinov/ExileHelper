@@ -4,6 +4,7 @@ import com.github.mikephil.charting.data.LineDataSet
 
 internal data class HistoryModel(
     val name: String,
+    val type: String?,
     val icon: String?,
     val tradeId: String?,
     val sellingGraphData: LineDataSet?,

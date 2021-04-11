@@ -5,6 +5,7 @@ import com.github.mikephil.charting.data.LineDataSet
 internal data class OverviewViewData(
     val id: String,
     val name: String,
+    val type: String?,
     val tradeId: String?,
     val icon: String?,
     val sellingListingData: ListingData?,

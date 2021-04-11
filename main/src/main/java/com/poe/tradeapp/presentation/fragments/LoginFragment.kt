@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import com.poe.tradeapp.R
 import com.poe.tradeapp.core.presentation.BaseFragment
 import com.poe.tradeapp.databinding.FragmentLoginBinding
@@ -18,8 +17,6 @@ import com.poe.tradeapp.presentation.MainActivityViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.util.regex.Pattern
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
@@ -64,25 +61,13 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
                 ).addOnCompleteListener {
                     if (it.isSuccessful) {
                         lifecycleScope.launch {
-                            val authToken = suspendCoroutine<String?> { coroutine ->
-                                it.result?.user?.getIdToken(false)?.addOnCompleteListener { task ->
-                                    coroutine.resume(task.result?.token)
-                                }
-                            }
-                            val messagingToken = suspendCoroutine<String?> { coroutine ->
-                                FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-                                    coroutine.resume(task.result)
-                                }
-                            }
-                            if (authToken != null && messagingToken != null) {
-                                viewModel.addToken(messagingToken, authToken)
-                            }
-                            getMainActivity()?.goToCurrencyExchange()
+                            viewModel.addToken()
+                            getMainActivity()?.goToCurrencyExchange(firstTime = true)
                         }
                     } else {
                         Toast.makeText(
                             requireActivity(),
-                            "Authentication  failed!",
+                            "Authentication failed!",
                             Toast.LENGTH_LONG
                         ).show()
                     }

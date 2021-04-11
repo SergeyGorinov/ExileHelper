@@ -16,13 +16,66 @@ internal class ChartsViewModel(
     private val getItemsGroupsUseCase: GetItemsGroupsUseCase,
     private val getCurrenciesOverviewUseCase: GetCurrenciesOverviewUseCase,
     private val getItemsOverviewUseCase: GetItemsOverviewUseCase,
-    private val getItemHistoryUseCase: GetItemHistoryUseCase
+    private val getItemHistoryUseCase: GetItemHistoryUseCase,
+    getOverviewUseCase: GetOverviewUseCase
 ) : ViewModel() {
 
-    val viewLoadingState = MutableStateFlow(true)
-    val overviewData = mutableMapOf<String, List<OverviewViewData>>()
+    val viewLoadingState = MutableStateFlow(false)
 
-    var currentItemHistory: HistoryModel? = null
+    val overviewData = getOverviewUseCase.execute().map {
+        val sellingGraphData = if (it.sellingSparkLine != null) {
+            mutableListOf<Entry>().apply {
+                for (i in it.sellingSparkLine.indices) {
+                    add(Entry(i.toFloat(), it.sellingSparkLine[i]))
+                }
+            }
+        } else {
+            null
+        }
+        val buyingGraphData = mutableListOf<Entry>().apply {
+            for (i in it.buyingSparkLine.indices) {
+                add(Entry(i.toFloat(), it.buyingSparkLine[i]))
+            }
+        }
+        val sellingGraphDataSet = LineDataSet(sellingGraphData, "Pay graph").apply {
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setDrawValues(false)
+            setDrawFilled(true)
+            setDrawCircles(false)
+            setDrawCircleHole(false)
+            setDrawValues(false)
+            fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
+        }
+        val buyingGraphDataSet = LineDataSet(buyingGraphData, "Get graph").apply {
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setDrawValues(false)
+            setDrawFilled(true)
+            setDrawCircles(false)
+            setDrawCircleHole(false)
+            setDrawValues(false)
+            fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
+        }
+        val sellingData = if (it.sellingListingData != null) {
+            ListingData(it.sellingListingData.listingCount, it.sellingListingData.value)
+        } else {
+            null
+        }
+        val buyingData =
+            ListingData(it.buyingListingData.listingCount, it.buyingListingData.value)
+        OverviewViewData(
+            it.id,
+            it.name,
+            it.type,
+            it.tradeId,
+            it.icon,
+            sellingData,
+            buyingData,
+            sellingGraphDataSet,
+            buyingGraphDataSet,
+            it.sellingTotalChange,
+            it.buyingTotalChange
+        )
+    }
 
     fun getItemsGroups(): List<ItemGroup> {
         return getItemsGroupsUseCase.execute().map {
@@ -31,103 +84,18 @@ internal class ChartsViewModel(
     }
 
     suspend fun getCurrenciesOverview(league: String, type: String) {
-        if (!overviewData.contains(type)) {
-            withContext(Dispatchers.IO) {
-                viewLoadingState.emit(true)
-                val result = getCurrenciesOverviewUseCase.execute(league, type).map {
-                    val sellingGraphData = if (it.sellingSparkLine != null) {
-                        mutableListOf<Entry>().apply {
-                            for (i in it.sellingSparkLine.indices) {
-                                add(Entry(i.toFloat(), it.sellingSparkLine[i]))
-                            }
-                        }
-                    } else {
-                        null
-                    }
-                    val buyingGraphData = mutableListOf<Entry>().apply {
-                        for (i in it.buyingSparkLine.indices) {
-                            add(Entry(i.toFloat(), it.buyingSparkLine[i]))
-                        }
-                    }
-                    val sellingGraphDataSet = LineDataSet(sellingGraphData, "Pay graph").apply {
-                        mode = LineDataSet.Mode.CUBIC_BEZIER
-                        setDrawValues(false)
-                        setDrawFilled(true)
-                        setDrawCircles(false)
-                        setDrawCircleHole(false)
-                        setDrawValues(false)
-                        fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
-                    }
-                    val buyingGraphDataSet = LineDataSet(buyingGraphData, "Get graph").apply {
-                        mode = LineDataSet.Mode.CUBIC_BEZIER
-                        setDrawValues(false)
-                        setDrawFilled(true)
-                        setDrawCircles(false)
-                        setDrawCircleHole(false)
-                        setDrawValues(false)
-                        fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
-                    }
-                    val sellingData = if (it.sellingListingData != null) {
-                        ListingData(it.sellingListingData.listingCount, it.sellingListingData.value)
-                    } else {
-                        null
-                    }
-                    val buyingData =
-                        ListingData(it.buyingListingData.listingCount, it.buyingListingData.value)
-                    OverviewViewData(
-                        it.id,
-                        it.name,
-                        it.tradeId,
-                        it.icon,
-                        sellingData,
-                        buyingData,
-                        sellingGraphDataSet,
-                        buyingGraphDataSet,
-                        it.sellingTotalChange,
-                        it.buyingTotalChange
-                    )
-                }
-                overviewData[type] = result
-                viewLoadingState.emit(false)
-            }
+        withContext(Dispatchers.IO) {
+            viewLoadingState.emit(true)
+            getCurrenciesOverviewUseCase.execute(league, type)
+            viewLoadingState.emit(false)
         }
     }
 
     suspend fun getItemsOverview(league: String, type: String) {
-        if (!overviewData.containsKey(type)) {
-            withContext(Dispatchers.IO) {
-                viewLoadingState.emit(true)
-                val result = getItemsOverviewUseCase.execute(league, type).map {
-                    val graphData = mutableListOf<Entry>().apply {
-                        for (i in it.buyingSparkLine.indices) {
-                            add(Entry(i.toFloat(), it.buyingSparkLine[i]))
-                        }
-                    }
-                    val graphDataSet = LineDataSet(graphData, "Item graph").apply {
-                        mode = LineDataSet.Mode.CUBIC_BEZIER
-                        setDrawValues(false)
-                        setDrawFilled(true)
-                        setDrawCircles(false)
-                        setDrawCircleHole(false)
-                        setDrawValues(false)
-                        fillFormatter = IFillFormatter { dataSet, _ -> dataSet.yMin }
-                    }
-                    OverviewViewData(
-                        it.id,
-                        it.name,
-                        it.tradeId,
-                        it.icon,
-                        null,
-                        ListingData(it.buyingListingData.listingCount, it.buyingListingData.value),
-                        null,
-                        graphDataSet,
-                        it.sellingTotalChange,
-                        it.buyingTotalChange
-                    )
-                }
-                overviewData[type] = result
-                viewLoadingState.emit(false)
-            }
+        withContext(Dispatchers.IO) {
+            viewLoadingState.emit(true)
+            getItemsOverviewUseCase.execute(league, type)
+            viewLoadingState.emit(false)
         }
     }
 
@@ -135,55 +103,51 @@ internal class ChartsViewModel(
         league: String,
         type: String,
         id: String
-    ) {
-        withContext(Dispatchers.IO) {
-            viewLoadingState.emit(true)
-            getCurrenciesOverview(league, type)
-            val overViewData = overviewData[type]?.firstOrNull { it.id == id }
-            val data = getCurrencyHistoryUseCase.execute(league, type, id)
-            val maxDay = max(
-                data.buyingGraphData.filter { it.daysAgo <= 50 }.maxOf { it.daysAgo },
-                data.sellingGraphData.filter { it.daysAgo <= 50 }.maxOf { it.daysAgo }
-            )
-            val sellingGraphDataSet = getFilteredGraphData(maxDay, data.sellingGraphData, true)
-            val buyingGraphDataSet = getFilteredGraphData(maxDay, data.buyingGraphData, false)
-            val sellingValue = overViewData?.sellingListingData?.value?.toFloat() ?: 0f
-            val buyingValue = overViewData?.buyingListingData?.value?.toFloat() ?: 0f
-            viewLoadingState.emit(false)
-            currentItemHistory = HistoryModel(
-                overViewData?.name ?: "",
-                overViewData?.icon,
-                overViewData?.tradeId,
-                sellingGraphDataSet,
-                buyingGraphDataSet,
-                sellingValue,
-                buyingValue
-            )
-        }
+    ) = withContext(Dispatchers.IO) {
+        viewLoadingState.emit(true)
+        val overViewData = overviewData.firstOrNull { it.id == id }
+        val data = getCurrencyHistoryUseCase.execute(league, type, id)
+        val maxDay = max(
+            data.buyingGraphData.filter { it.daysAgo <= 50 }.maxOfOrNull { it.daysAgo } ?: 0,
+            data.sellingGraphData.filter { it.daysAgo <= 50 }.maxOfOrNull { it.daysAgo } ?: 0
+        )
+        val sellingGraphDataSet = getFilteredGraphData(maxDay, data.sellingGraphData, true)
+        val buyingGraphDataSet = getFilteredGraphData(maxDay, data.buyingGraphData, false)
+        val sellingValue = overViewData?.sellingListingData?.value?.toFloat() ?: 0f
+        val buyingValue = overViewData?.buyingListingData?.value?.toFloat() ?: 0f
+        viewLoadingState.emit(false)
+        HistoryModel(
+            overViewData?.name ?: "",
+            null,
+            overViewData?.icon,
+            overViewData?.tradeId,
+            sellingGraphDataSet,
+            buyingGraphDataSet,
+            sellingValue,
+            buyingValue
+        )
     }
 
     suspend fun getItemHistory(
         league: String,
         type: String,
         id: String
-    ) {
-        withContext(Dispatchers.IO) {
-            viewLoadingState.emit(true)
-            getItemsOverview(league, type)
-            val overViewData = overviewData[type]?.firstOrNull { it.id == id }
-            val data = getItemHistoryUseCase.execute(league, type, id)
-            val graphData = getFilteredGraphData(data.maxOf { it.daysAgo }, data, false)
-            viewLoadingState.emit(false)
-            currentItemHistory = HistoryModel(
-                overViewData?.name ?: "",
-                overViewData?.icon,
-                overViewData?.tradeId,
-                null,
-                graphData,
-                null,
-                overViewData?.buyingListingData?.value?.toFloat() ?: 0f
-            )
-        }
+    ) = withContext(Dispatchers.IO) {
+        viewLoadingState.emit(true)
+        val overViewData = overviewData.firstOrNull { it.id == id }
+        val data = getItemHistoryUseCase.execute(league, type, id)
+        val graphData = getFilteredGraphData(data.maxOfOrNull { it.daysAgo } ?: 0, data, false)
+        viewLoadingState.emit(false)
+        HistoryModel(
+            overViewData?.name ?: "",
+            overViewData?.type,
+            overViewData?.icon,
+            overViewData?.tradeId,
+            null,
+            graphData,
+            null,
+            overViewData?.buyingListingData?.value?.toFloat() ?: 0f
+        )
     }
 
     private fun getFilteredGraphData(

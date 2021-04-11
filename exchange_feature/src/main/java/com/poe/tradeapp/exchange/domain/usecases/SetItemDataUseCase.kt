@@ -4,7 +4,7 @@ import com.poe.tradeapp.exchange.domain.IFeatureRepository
 
 internal class SetItemDataUseCase(private val repository: IFeatureRepository) {
 
-    fun execute(type: String, name: String?) {
+    fun execute(type: String?, name: String?) {
         repository.setItemData(type, name)
     }
 }

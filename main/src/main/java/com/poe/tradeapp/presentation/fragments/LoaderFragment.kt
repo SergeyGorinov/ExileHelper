@@ -20,8 +20,7 @@ class LoaderFragment : BaseFragment(R.layout.fragment_loader) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val auth = FirebaseAuth.getInstance()
-        val user = auth.currentUser
+        val user = FirebaseAuth.getInstance().currentUser
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
@@ -29,7 +28,7 @@ class LoaderFragment : BaseFragment(R.layout.fragment_loader) {
             }
             when {
                 user != null && user.isEmailVerified -> {
-                    getMainActivity()?.goToCurrencyExchange()
+                    getMainActivity()?.goToCurrencyExchange(firstTime = true)
                 }
                 user != null && !user.isEmailVerified -> {
                     router.newRootScreen(EmailVerificationFragment.newInstance())

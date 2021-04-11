@@ -6,9 +6,12 @@ import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,6 +20,7 @@ import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxItemDecoration
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.google.android.material.tabs.TabLayout
 import com.poe.tradeapp.core.R
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -54,7 +58,10 @@ fun Context.generateLinearDividerDecoration(drawableResId: Int = R.drawable.recy
     }
 }
 
-fun Context.generateCustomDividerDecoration(drawableResId: Int): RecyclerView.ItemDecoration {
+fun Context.generateCustomDividerDecoration(
+    drawableResId: Int,
+    leftOffset: Int
+): RecyclerView.ItemDecoration {
     val divider = ContextCompat.getDrawable(this, drawableResId)
     return object : RecyclerView.ItemDecoration() {
         override fun getItemOffsets(
@@ -67,7 +74,7 @@ fun Context.generateCustomDividerDecoration(drawableResId: Int): RecyclerView.It
         }
 
         override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-            val left = parent.paddingLeft + 52.dp
+            val left = parent.paddingLeft + leftOffset
             val right = parent.width - parent.paddingRight
             for (i in 0 until parent.childCount - 1) {
                 val child = parent.getChildAt(i)
@@ -125,6 +132,22 @@ inline fun <reified T : ViewModel> scopedViewModel(
 
 fun fragmentLifecycleScope(scopeId: String, scopeName: FragmentScopes): Lazy<Scope> {
     return lazy { getKoin().getOrCreateScope(scopeId, named(scopeName)) }
+}
+
+fun TabLayout.changeTabsFont(font: Typeface?) {
+    font ?: return
+    val vg = getChildAt(0) as ViewGroup
+    val tabsCount = vg.childCount
+    for (j in 0 until tabsCount) {
+        val vgTab = vg.getChildAt(j) as ViewGroup
+        val tabChildCount = vgTab.childCount
+        for (i in 0 until tabChildCount) {
+            val tabViewChild = vgTab.getChildAt(i)
+            if (tabViewChild is TextView) {
+                tabViewChild.typeface = font
+            }
+        }
+    }
 }
 
 val Int.dp: Int

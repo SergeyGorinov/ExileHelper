@@ -22,18 +22,10 @@ internal class ItemsResultViewHolder(itemView: View) : RecyclerView.ViewHolder(i
     private val headerViewBinding = ItemsResultItemHeaderBinding.bind(viewBinding.root)
     private val hybridViewBinding = ItemsResultItemHybridBinding.bind(viewBinding.root)
 
-    fun bind(item: FetchedItem, isOddItem: Boolean) {
-        val color = ContextCompat.getColor(
-            itemView.context,
-            if (isOddItem) R.color.odd_result_row_color else R.color.even_result_row_color
-        )
-        itemView.setBackgroundColor(color)
-
+    fun bind(item: FetchedItem) {
         val hasName = !item.name.isNullOrBlank()
 
-        if (item.frameType != null) {
-            setFrame(item.frameType, hasName)
-        }
+        setFrame(item.frameType, hasName)
 
         when {
             item.influenceIcons.size > 1 -> {
@@ -80,7 +72,12 @@ internal class ItemsResultViewHolder(itemView: View) : RecyclerView.ViewHolder(i
             .transform(picassoImageScaleTransform)
             .into(viewBinding.itemImage)
 
-        prepareSockets(item.sockets)
+        if (item.sockets != null) {
+            prepareSockets(item.sockets)
+            viewBinding.sockets.root.visibility = View.VISIBLE
+        } else {
+            viewBinding.sockets.root.visibility = View.GONE
+        }
     }
 
     private fun setFrame(frameType: Int?, hasName: Boolean) {

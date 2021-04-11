@@ -5,6 +5,7 @@ import android.view.View
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.poe.tradeapp.R
 import com.poe.tradeapp.core.presentation.BaseFragment
+import com.poe.tradeapp.currency.presentation.fragments.CurrencyExchangeMainFragment
 import com.poe.tradeapp.databinding.FragmentStartBinding
 
 class StartFragment : BaseFragment(R.layout.fragment_start) {
@@ -22,6 +23,9 @@ class StartFragment : BaseFragment(R.layout.fragment_start) {
         }
         binding.signUp.setOnClickListener {
             router.navigateTo(LoginFragment.newInstance(false))
+        }
+        binding.noAccount.setOnClickListener {
+            router.newRootScreen(CurrencyExchangeMainFragment.newInstance())
         }
     }
 

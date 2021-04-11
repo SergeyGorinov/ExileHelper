@@ -6,6 +6,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,6 +35,9 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         FragmentScopes.EXCHANGE_FEATURE
     )
 
+    private val itemType by lazy { requireArguments().getString(ITEM_TYPE_KEY) }
+    private val itemName by lazy { requireArguments().getString(ITEM_NAME_KEY) }
+
     private lateinit var binding: FragmentItemsSearchMainBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,36 +46,70 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         viewBinding = FragmentItemsSearchMainBinding.bind(view)
         binding = getBinding()
 
-        val progressBar = requireActivity().getTransparentProgressDialog()
+        setupToolbar()
+        setupFiltersList()
 
-        binding.toolbar.title =
-            resources.getString(R.string.items_search_title, "None")
-        binding.appbar.visibility = View.VISIBLE
-        binding.toolbar.setOnClickListener {
-            showToolbarSearchLayout()
+        binding.selectedItem.text = resources.getString(R.string.items_search_title, "None")
+
+        binding.selectedItemRemove.setOnClickListener {
+            viewModel.setItemData(null, null)
+            binding.selectedItem.text = resources.getString(R.string.items_search_title, "None")
         }
+
+        binding.accept.setOnClickListener {
+            requestResult()
+        }
+
+        itemType?.let {
+            viewModel.setItemData(it, itemName)
+            requestResult()
+        }
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.viewLoadingState.collect {
+                if (it) {
+                    binding.toolbarProgressBar.show()
+                } else {
+                    binding.toolbarProgressBar.hide()
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.close()
+    }
+
+    fun closeToolbarSearchLayoutIfNeeded(): Boolean {
+        return if (binding.toolbarSearchLayout.visibility == View.VISIBLE) {
+            hideToolbarSearchLayout()
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.title = "Items search"
+        binding.appbar.visibility = View.VISIBLE
 
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.accept -> {
-                    requireActivity().hideKeyboard(binding.toolbar)
+                R.id.notifications -> {
                     lifecycleScope.launch {
-                        viewModel.viewLoadingState.emit(true)
-                        val results = viewModel.fetchPartialResults(settings.league, 0)
-                        viewModel.viewLoadingState.emit(false)
-                        if (results.isNotEmpty()) {
-                            ItemsSearchResultFragment.newInstance(results).show(
-                                parentFragmentManager,
-                                null
-                            )
-                        } else {
-                            Toast.makeText(
-                                requireActivity(),
-                                "Items not found!",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                        item.isEnabled = false
+                        val items = viewModel.getNotificationRequests()
+                        NotificationRequestsFragment.newInstance(items).show(
+                            parentFragmentManager,
+                            null
+                        )
+                        item.isEnabled = true
                     }
+                    true
+                }
+                R.id.search -> {
+                    showToolbarSearchLayout()
                     true
                 }
                 else ->
@@ -91,11 +129,12 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             val adapter = adapterView.adapter
             if (selectedItem is SuggestionItem) {
                 viewModel.setItemData(selectedItem.type, selectedItem.name)
-                if (adapter is ItemsSearchFieldAdapter)
+                if (adapter is ItemsSearchFieldAdapter) {
                     adapter.selectedItem = selectedItem
+                }
                 requireActivity().hideKeyboard(binding.toolbarSearchInput)
                 hideToolbarSearchLayout()
-                binding.toolbar.title =
+                binding.selectedItem.text =
                     resources.getString(R.string.items_search_title, selectedItem.text)
             }
         }
@@ -108,30 +147,6 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             }
         }
 
-        val divider = DividerItemDecoration(view.context, RecyclerView.VERTICAL)
-        ContextCompat.getDrawable(view.context, R.drawable.table_column_divider)
-            ?.let { divider.setDrawable(it) }
-
-        binding.filtersList.setHasFixedSize(true)
-        binding.filtersList.layoutManager = LinearLayoutManager(view.context)
-        binding.filtersList.adapter = ItemsFiltersListAdapter(
-            ViewFilters.AllFilters.values(),
-            viewModel.filters
-        ).apply {
-            setHasStableIds(true)
-        }
-        binding.filtersList.addItemDecoration(divider)
-
-        lifecycleScope.launchWhenCreated {
-            viewModel.viewLoadingState.collect {
-                if (it) {
-                    progressBar.show()
-                } else {
-                    progressBar.dismiss()
-                }
-            }
-        }
-
         binding.toolbarSearchInput.setAdapter(
             ItemsSearchFieldAdapter(
                 requireActivity(),
@@ -141,33 +156,21 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         )
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        scope.close()
+    private fun setupFiltersList() {
+        val divider = DividerItemDecoration(requireActivity(), RecyclerView.VERTICAL)
+        ContextCompat.getDrawable(requireActivity(), R.drawable.table_column_divider)
+            ?.let { divider.setDrawable(it) }
+
+        binding.filtersList.setHasFixedSize(true)
+        binding.filtersList.layoutManager = LinearLayoutManager(requireActivity())
+        binding.filtersList.adapter = ItemsFiltersListAdapter(
+            ViewFilters.AllFilters.values(),
+            viewModel.filters
+        ).apply {
+            setHasStableIds(true)
+        }
+        binding.filtersList.addItemDecoration(divider)
     }
-
-//    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-//        val focusedView = currentFocus
-//        if (focusedView is AutoCompleteTextView && ev?.action == MotionEvent.ACTION_UP) {
-//            val outRect = Rect()
-//            focusedView.getGlobalVisibleRect(outRect)
-//            if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
-//                focusedView.clearFocus()
-//                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//                imm.hideSoftInputFromWindow(focusedView.windowToken, 0)
-//            }
-//        }
-//        return super.dispatchTouchEvent(ev)
-//    }
-
-//    override fun onBackPressed() {
-//        if (viewBinding?.toolbarSearchLayout?.visibility == View.VISIBLE) {
-//            hideToolbarSearchLayout()
-//        }
-//        else {
-//            super.onBackPressed()
-//        }
-//    }
 
     private fun showToolbarSearchLayout() {
         binding.toolbar.visibility = View.GONE
@@ -185,6 +188,7 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
     }
 
     private fun hideToolbarSearchLayout() {
+        requireActivity().hideKeyboard(binding.toolbarSearchLayout)
         binding.toolbarSearchLayout.visibility = View.GONE
         binding.toolbar.alpha = 0f
         binding.toolbar.visibility = View.VISIBLE
@@ -195,7 +199,39 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             .start()
     }
 
+    private fun requestResult() {
+        requireActivity().hideKeyboard(binding.toolbar)
+        lifecycleScope.launch {
+            viewModel.viewLoadingState.emit(true)
+            val results = viewModel.fetchPartialResults(settings.league, 0)
+            viewModel.viewLoadingState.emit(false)
+            if (results.isNotEmpty()) {
+                ItemsSearchResultFragment.newInstance(results).show(
+                    parentFragmentManager,
+                    null
+                )
+            } else {
+                Toast.makeText(
+                    requireActivity(),
+                    "Items not found!",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
     companion object {
-        fun newInstance() = FragmentScreen { ItemsSearchMainFragment() }
+        const val NOTIFICATION_REQUESTS_TYPE = "1"
+
+        private const val ITEM_TYPE_KEY = "ITEM_TYPE_KEY"
+        private const val ITEM_NAME_KEY = "ITEM_NAME_KEY"
+
+        fun newInstance(itemType: String? = null, itemName: String? = null): FragmentScreen {
+            return FragmentScreen {
+                ItemsSearchMainFragment().apply {
+                    arguments = bundleOf(ITEM_TYPE_KEY to itemType, ITEM_NAME_KEY to itemName)
+                }
+            }
+        }
     }
 }

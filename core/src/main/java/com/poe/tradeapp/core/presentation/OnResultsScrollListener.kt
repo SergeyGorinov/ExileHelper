@@ -15,7 +15,7 @@ class OnResultsScrollListener(
             val lastVisiblePosition =
                 (recyclerView.layoutManager as? LinearLayoutManager)?.findLastVisibleItemPosition()
                     ?: 0
-            if ((totalCurrentItems - 3) <= lastVisiblePosition) {
+            if (totalCurrentItems - 1 <= lastVisiblePosition) {
                 onDownloadRequest(totalCurrentItems)
             }
         }

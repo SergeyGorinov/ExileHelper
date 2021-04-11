@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primaryDarkColor">
+    android:background="@color/primaryColor">
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signIn"
@@ -28,9 +28,22 @@
         android:fontFamily="@font/fontinsmallcaps"
         android:text="@string/sign_up_text"
         android:textColor="@color/primaryTextColor"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/noAccount"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/signIn" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/noAccount"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="128dp"
+        android:background="@drawable/image_button_border_default"
+        android:fontFamily="@font/fontinsmallcaps"
+        android:text="@string/without_account"
+        android:textColor="@color/primaryTextColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signUp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

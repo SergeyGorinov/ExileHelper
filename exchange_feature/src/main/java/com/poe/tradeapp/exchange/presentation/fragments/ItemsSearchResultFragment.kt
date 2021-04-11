@@ -35,6 +35,11 @@ internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
 
     var data: List<ItemResultViewData> = listOf()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.AppTheme_BaseBottomSheetDialog)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -115,7 +120,7 @@ internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
                 currentItem.typeLine,
                 currentItem.iconUrl,
                 currentItem.sockets,
-                currentItem.frameType,
+                currentItem.frameType ?: 0,
                 SeparatorHelper.getInfluenceIcons(currentItem),
                 itemText,
                 currentItem.hybridTypeLine,

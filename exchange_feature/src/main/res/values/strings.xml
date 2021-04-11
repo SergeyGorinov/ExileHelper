@@ -13,4 +13,12 @@
     <string name="toolbar_search_item_hint">Search item</string>
     <string name="clear_filter_description">clearFilter</string>
     <string name="items_search_title">Selected item: %s</string>
+    <string name="enter_item_name_hint">Enter item name…</string>
+    <string name="notify_me_when">Notify me when</string>
+    <string name="will_cost_less_than">Will cost less than</string>
+    <string name="enter_amount_hint">Enter amount…</string>
+    <string name="chaos_orbs_placeholder">Chaos orb(s)</string>
+    <string name="add_notification_request">Add notification request</string>
+    <string name="search">Search</string>
+    <string name="notifications">Notifications</string>
 </resources>

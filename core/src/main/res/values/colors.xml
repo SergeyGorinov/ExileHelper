@@ -16,8 +16,8 @@
 
     <color name="items_search_suggestions_header">#999999</color>
     <color name="items_search_suggestions_header_text">#000000</color>
-    <color name="even_result_row_color">#0a0a0a</color>
-    <color name="odd_result_row_color">#141414</color>
+    <color name="even_result_row_color">@color/primaryLightColor</color>
+    <color name="odd_result_row_color">@color/primaryColor</color>
     <color name="items_search_suggestions_item_text">#e2e2e2</color>
     <color name="crafted_enchanted_mod">#b4b4ff</color>
     <color name="explicit_implicit_utility_mod">#8888ff</color>

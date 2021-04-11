@@ -17,8 +17,9 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
     private var name: String? = null
     private var id: String = ""
     private var itemResultListData: List<String> = listOf()
+    private val processedItems = mutableListOf<ItemResultData>()
 
-    override fun setItemData(type: String, name: String?) {
+    override fun setItemData(type: String?, name: String?) {
         this.type = type
         this.name = name
     }
@@ -34,7 +35,8 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
         val data = getRequestData(position)
         val result = apiService.getItemExchangeResponse(data, id).await()
 
-        return processResult(result)
+        processedItems.addAll(processResult(result))
+        return processedItems
     }
 
     private suspend fun fetchAllEntries(league: String) {

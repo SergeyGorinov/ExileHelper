@@ -1,17 +1,25 @@
 package com.poe.tradeapp.exchange.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.poe.tradeapp.core.domain.usecases.GetCurrencyItemsUseCase
-import com.poe.tradeapp.core.domain.usecases.GetItemsUseCase
-import com.poe.tradeapp.core.domain.usecases.GetStatsUseCase
+import com.poe.tradeapp.core.domain.models.NotificationItemData
+import com.poe.tradeapp.core.domain.models.NotificationRequest
+import com.poe.tradeapp.core.domain.usecases.*
+import com.poe.tradeapp.core.presentation.FirebaseUtils
+import com.poe.tradeapp.core.presentation.models.NotificationRequestViewData
+import com.poe.tradeapp.exchange.data.models.ItemsRequestModel
+import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
 import com.poe.tradeapp.exchange.domain.usecases.GetFiltersUseCase
 import com.poe.tradeapp.exchange.domain.usecases.GetItemsResultDataUseCase
 import com.poe.tradeapp.exchange.domain.usecases.GetTotalItemsResultCountUseCase
 import com.poe.tradeapp.exchange.domain.usecases.SetItemDataUseCase
+import com.poe.tradeapp.exchange.presentation.fragments.ItemsSearchMainFragment
 import com.poe.tradeapp.exchange.presentation.models.*
+import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 internal class ItemsSearchViewModel(
     getCurrencyItemsUseCase: GetCurrencyItemsUseCase,
@@ -20,7 +28,9 @@ internal class ItemsSearchViewModel(
     getFiltersUseCase: GetFiltersUseCase,
     getTotalItemsResultCountUseCase: GetTotalItemsResultCountUseCase,
     private val getItemsResultDataUseCase: GetItemsResultDataUseCase,
-    private val setItemDataUseCase: SetItemDataUseCase
+    private val setItemDataUseCase: SetItemDataUseCase,
+    private val getNotificationRequestsUseCase: GetNotificationRequestsUseCase,
+    private val setNotificationRequestUseCase: SetNotificationRequestUseCase
 ) : ViewModel() {
 
     val viewLoadingState = MutableStateFlow(false)
@@ -166,7 +176,85 @@ internal class ItemsSearchViewModel(
         }
     }
 
-    fun setItemData(type: String, name: String?) {
+    fun setItemData(type: String?, name: String?) {
         setItemDataUseCase.execute(type, name)
+    }
+
+    suspend fun sendNotificationRequest(
+        buyingItem: SuggestionItem,
+        payingAmount: Int
+    ) = withContext(Dispatchers.IO) {
+        val request = NotificationRequest(
+            NotificationItemData(
+                "${buyingItem.name}${if (buyingItem.name != null) " " else ""}${buyingItem.type}",
+                ""
+            ),
+            NotificationItemData(
+                "Chaos Orb",
+                "https://www.pathofexile.com/image/Art/2DItems/Currency/CurrencyRerollRare.png?v=c60aa876dd6bab31174df91b1da1b4f9"
+            ),
+            payingAmount
+        )
+
+        val priceFilter = ItemsRequestModelFields.Filter(
+            filters = ItemsRequestModelFields.FilterFields(
+                listOf(
+                    ItemsRequestModelFields.FilterField(
+                        ViewFilters.TradeFilters.BuyoutPrice.id ?: "",
+                        ItemsRequestModelFields.Price(max = payingAmount)
+                    )
+                )
+            )
+        )
+
+        val payload = Json.encodeToString(
+            ItemsRequestModel.serializer(),
+            ItemsRequestModel().apply {
+                query.name = buyingItem.name
+                query.type = buyingItem.type
+                query.filters = ItemsRequestModelFields.Filters(
+                    mapOf(ViewFilters.AllFilters.TradeFilter.id to priceFilter)
+                )
+            }
+        )
+        return@withContext try {
+            setNotificationRequestUseCase.execute(
+                request,
+                payload,
+                0,
+                FirebaseUtils.getMessagingToken(),
+                FirebaseUtils.getAuthToken()
+            )
+        } catch (e: Exception) {
+            false
+        } finally {
+            viewLoadingState.emit(false)
+        }
+    }
+
+    suspend fun getNotificationRequests(): List<NotificationRequestViewData> {
+        viewLoadingState.emit(true)
+        return try {
+            withContext(Dispatchers.IO) {
+                getNotificationRequestsUseCase.execute(
+                    FirebaseUtils.getMessagingToken(),
+                    FirebaseUtils.getAuthToken(),
+                    ItemsSearchMainFragment.NOTIFICATION_REQUESTS_TYPE
+                ).map {
+                    NotificationRequestViewData(
+                        it.buyingItem.itemName,
+                        it.buyingItem.itemIcon,
+                        it.payingItem.itemName,
+                        it.payingItem.itemIcon,
+                        it.payingAmount
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("getNotificationRequests", e.stackTraceToString())
+            emptyList()
+        } finally {
+            viewLoadingState.emit(false)
+        }
     }
 }

@@ -39,6 +39,11 @@ internal class CurrencyExchangeResultFragment : BottomSheetDialogFragment() {
 
     private var isLoading = false
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.AppTheme_BaseBottomSheetDialog)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

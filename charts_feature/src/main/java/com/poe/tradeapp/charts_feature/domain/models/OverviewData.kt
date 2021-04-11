@@ -3,6 +3,7 @@ package com.poe.tradeapp.charts_feature.domain.models
 internal data class OverviewData(
     val id: String,
     val name: String,
+    val type: String?,
     val icon: String?,
     val tradeId: String?,
     val sellingListingData: CurrencyData?,

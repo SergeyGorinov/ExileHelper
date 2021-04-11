@@ -25,31 +25,27 @@ import com.github.mikephil.charting.utils.MPPointF
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.poe.tradeapp.charts_feature.R
 import com.poe.tradeapp.charts_feature.databinding.FragmentHistoryBinding
-import com.poe.tradeapp.charts_feature.presentation.ChartsViewModel
 import com.poe.tradeapp.charts_feature.presentation.models.HistoryModel
 import com.poe.tradeapp.core.presentation.BaseFragment
 import com.poe.tradeapp.core.presentation.dpf
 import com.squareup.picasso.Picasso
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
 internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
-    private val viewModel by sharedViewModel<ChartsViewModel>()
-
     private val isCurrency by lazy { requireArguments().getBoolean(IS_CURRENCY_KEY, false) }
 
     private lateinit var binding: FragmentHistoryBinding
+
+    internal var data: HistoryModel? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         viewBinding = FragmentHistoryBinding.bind(view)
         binding = getBinding()
-
-        val data = viewModel.currentItemHistory
 
         if (data == null) {
             router.exit()
@@ -64,33 +60,43 @@ internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
             requireActivity(),
             com.poe.tradeapp.core.R.font.fontinsmallcaps
         )
-        setupChartData(data.buyingGraphData, false, textColor, textFont)
-        setupChartData(data.sellingGraphData, true, textColor, textFont)
-        setupChart(data, textColor, textFont)
-        binding.toolbarLayout.toolbar.title = "Item history"
-        binding.itemLabel.text = data.name
-        binding.goToWiki.setOnClickListener {
-            createWikiDialog(data.name).show()
-        }
-        binding.buyButton.setOnClickListener {
-            getMainActivity()?.goToCurrencyExchange(data.tradeId, "chaos")
-        }
-        binding.leftSideBuyText.text = getString(R.string.buy_chart_text, data.name)
-        binding.rightSideBuyText.text = getString(R.string.receive_chart_text, data.buyingValue)
-        if (isCurrency) {
-            binding.sellData.visibility = View.VISIBLE
-            binding.sellButton.visibility = View.VISIBLE
-            binding.leftSideSellText.text = getString(R.string.sell_chart_text, data.name)
-
-            binding.rightSideSellText.text =
-                getString(R.string.receive_chart_text, data.sellingValue ?: 0f)
-            binding.sellButton.setOnClickListener {
-                getMainActivity()?.goToCurrencyExchange("chaos", data.tradeId)
+        data?.let { data ->
+            setupChartData(data.buyingGraphData, false, textColor, textFont)
+            setupChartData(data.sellingGraphData, true, textColor, textFont)
+            setupChart(data, textColor, textFont)
+            binding.toolbarLayout.toolbar.title = "Item history"
+            binding.itemLabel.text = data.name
+            binding.goToWiki.setOnClickListener {
+                createWikiDialog(data.name).show()
             }
-            Picasso.get().load(data.icon).fit().into(binding.leftSideSellImage)
+            binding.buyButton.setOnClickListener {
+                if (isCurrency) {
+                    getMainActivity()?.goToCurrencyExchange(data.tradeId, "chaos")
+                } else {
+                    if (data.type == null) {
+                        getMainActivity()?.goToItemsSearch(data.name, null)
+                    } else {
+                        getMainActivity()?.goToItemsSearch(data.type, data.name)
+                    }
+                }
+            }
+            binding.leftSideBuyText.text = getString(R.string.buy_chart_text, data.name)
+            binding.rightSideBuyText.text = getString(R.string.receive_chart_text, data.buyingValue)
+            if (isCurrency) {
+                binding.sellData.visibility = View.VISIBLE
+                binding.sellButton.visibility = View.VISIBLE
+                binding.leftSideSellText.text = getString(R.string.sell_chart_text, data.name)
+
+                binding.rightSideSellText.text =
+                    getString(R.string.receive_chart_text, data.sellingValue ?: 0f)
+                binding.sellButton.setOnClickListener {
+                    getMainActivity()?.goToCurrencyExchange("chaos", data.tradeId)
+                }
+                Picasso.get().load(data.icon).fit().into(binding.leftSideSellImage)
+            }
+            Picasso.get().load(data.icon).fit().into(binding.leftSideBuyImage)
+            Picasso.get().load(data.icon).fit().into(binding.itemImage)
         }
-        Picasso.get().load(data.icon).fit().into(binding.leftSideBuyImage)
-        Picasso.get().load(data.icon).fit().into(binding.itemImage)
     }
 
     private fun setupChartData(
@@ -212,9 +218,10 @@ internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     companion object {
         private const val IS_CURRENCY_KEY = "IS_CURRENCY_KEY"
 
-        fun newInstance(isCurrency: Boolean): FragmentScreen {
+        fun newInstance(isCurrency: Boolean, data: HistoryModel): FragmentScreen {
             return FragmentScreen {
                 HistoryFragment().apply {
+                    this.data = data
                     arguments = bundleOf(IS_CURRENCY_KEY to isCurrency)
                 }
             }

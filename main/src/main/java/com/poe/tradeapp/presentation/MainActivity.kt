@@ -4,9 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
@@ -16,9 +20,9 @@ import com.github.terrakok.cicerone.*
 import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.github.terrakok.cicerone.androidx.TransactionInfo
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.FirebaseMessaging
 import com.poe.tradeapp.MyFirebaseMessaging
 import com.poe.tradeapp.R
 import com.poe.tradeapp.charts_feature.presentation.fragments.ChartsMainFragment
@@ -35,8 +39,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.component.inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalCoroutinesApi
 class MainActivity : FragmentActivity(), IMainActivity {
@@ -47,6 +49,11 @@ class MainActivity : FragmentActivity(), IMainActivity {
     private val router by DI.inject<Router>()
 
     private lateinit var viewBinding: ActivityMainBinding
+
+    private var currencyExchangeWantItemId: String? = null
+    private var currencyExchangeHaveItemId: String? = null
+    private var itemSearchType: String? = null
+    private var itemSearchName: String? = null
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -148,8 +155,6 @@ class MainActivity : FragmentActivity(), IMainActivity {
         }
     }
 
-    override val leagues by lazy { viewModel.leagues }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -159,13 +164,16 @@ class MainActivity : FragmentActivity(), IMainActivity {
             return@setOnNavigationItemSelectedListener when (it.itemId) {
                 R.id.currencyExchangeMenu -> {
                     router.newRootScreen(
-                        CurrencyExchangeMainFragment.newInstance(null, null)
+                        CurrencyExchangeMainFragment.newInstance(
+                            currencyExchangeWantItemId,
+                            currencyExchangeHaveItemId
+                        )
                     )
                     true
                 }
                 R.id.itemsSearchMenu -> {
                     router.newRootScreen(
-                        ItemsSearchMainFragment.newInstance()
+                        ItemsSearchMainFragment.newInstance(itemSearchType, itemSearchName)
                     )
                     true
                 }
@@ -180,40 +188,6 @@ class MainActivity : FragmentActivity(), IMainActivity {
         }
         viewBinding.bottomNavBar.setOnNavigationItemReselectedListener {
             return@setOnNavigationItemReselectedListener
-        }
-        lifecycleScope.launch {
-            val user = Firebase.auth.currentUser ?: return@launch
-            val result = withContext(Dispatchers.IO) {
-                try {
-                    val authToken = suspendCoroutine<String?> { coroutine ->
-                        user.getIdToken(false).addOnCompleteListener {
-                            coroutine.resume(it.result?.token)
-                        }
-                    }
-                    val messagingToken = suspendCoroutine<String?> { coroutine ->
-                        FirebaseMessaging.getInstance().token.addOnCompleteListener {
-                            coroutine.resume(it.result)
-                        }
-                    }
-                    return@withContext if (authToken != null && messagingToken != null) {
-                        viewModel.addToken(messagingToken, authToken)
-                    } else {
-                        false
-                    }
-                } catch (e: Exception) {
-                    false
-                }
-            }
-            if (!result) {
-                AlertDialog.Builder(this@MainActivity, R.style.AppTheme_AlertDialog)
-                    .setTitle("Error")
-                    .setMessage("Cannot connect to server!\nNotification requests were not synced.")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .create()
-                    .show()
-            }
         }
     }
 
@@ -231,6 +205,32 @@ class MainActivity : FragmentActivity(), IMainActivity {
         super.onPause()
     }
 
+    override fun onBackPressed() {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.mainContainer)
+        if (currentFragment is ItemsSearchMainFragment && currentFragment.closeToolbarSearchLayoutIfNeeded()) {
+            return
+        }
+        super.onBackPressed()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        val focusedView = currentFocus
+        if (focusedView is AutoCompleteTextView && ev?.action == MotionEvent.ACTION_UP) {
+            val outRect = Rect()
+            focusedView.getGlobalVisibleRect(outRect)
+            if (!outRect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+                focusedView.clearFocus()
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(focusedView.windowToken, 0)
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+    override fun getLeagues(): List<String> {
+        return viewModel.getLeagues()
+    }
+
     override fun showBottomNavBarIfNeeded() {
         if (viewBinding.bottomNavBar.visibility == View.GONE) {
             viewBinding.bottomNavBar.visibility = View.VISIBLE
@@ -242,11 +242,52 @@ class MainActivity : FragmentActivity(), IMainActivity {
         router.newRootScreen(StartFragment.newInstance())
     }
 
-    override fun goToCurrencyExchange(wantItemId: String?, haveItemId: String?) {
-        if (viewBinding.bottomNavBar.selectedItemId == R.id.currencyExchangeMenu) {
-            router.newRootScreen(CurrencyExchangeMainFragment.newInstance(wantItemId, haveItemId))
+    override fun goToCurrencyExchange(
+        wantItemId: String?,
+        haveItemId: String?,
+        firstTime: Boolean
+    ) {
+        if (firstTime) {
+            router.newRootScreen(
+                CurrencyExchangeMainFragment.newInstance(
+                    currencyExchangeWantItemId,
+                    currencyExchangeHaveItemId
+                )
+            )
         } else {
+            currencyExchangeWantItemId = wantItemId
+            currencyExchangeHaveItemId = haveItemId
             viewBinding.bottomNavBar.selectedItemId = R.id.currencyExchangeMenu
+        }
+    }
+
+    override fun goToItemsSearch(itemType: String, itemName: String?) {
+        itemSearchType = itemType
+        itemSearchName = itemName
+        viewBinding.bottomNavBar.selectedItemId = R.id.itemsSearchMenu
+    }
+
+    override fun checkApiConnection() {
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            lifecycleScope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    try {
+                        return@withContext viewModel.addToken()
+                    } catch (e: Exception) {
+                        false
+                    }
+                }
+                if (!result) {
+                    AlertDialog.Builder(this@MainActivity, R.style.AppTheme_AlertDialog)
+                        .setTitle("Error")
+                        .setMessage("Cannot connect to server!\nNotification requests were not synced.")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .create()
+                        .show()
+                }
+            }
         }
     }
 }

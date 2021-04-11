@@ -1,12 +1,9 @@
 package com.poe.tradeapp.currency.presentation.fragments
 
 import android.content.Context
-import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -17,10 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.poe.tradeapp.core.presentation.*
 import com.poe.tradeapp.currency.R
+import com.poe.tradeapp.currency.databinding.CurrencyFeatureToolbarBinding
 import com.poe.tradeapp.currency.databinding.FragmentCurrencyExchangeMainBinding
 import com.poe.tradeapp.currency.presentation.CurrencyExchangeViewModel
 import com.poe.tradeapp.currency.presentation.SwipeToDeleteCallback
-import com.poe.tradeapp.currency.presentation.TabLayoutListener
 import com.poe.tradeapp.currency.presentation.adapters.CurrencySelectedAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
@@ -43,17 +40,14 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
     private lateinit var binding: FragmentCurrencyExchangeMainBinding
     private lateinit var adapter: CurrencySelectedAdapter
+    private lateinit var toolbarLayout: CurrencyFeatureToolbarBinding
 
     private var searchJob: Job? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         getMainActivity()?.showBottomNavBarIfNeeded()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(TAB_POSITION_KEY, binding.tabLayout.selectedTabPosition)
-        super.onSaveInstanceState(outState)
+        getMainActivity()?.checkApiConnection()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,10 +56,13 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         viewBinding = FragmentCurrencyExchangeMainBinding.bind(view)
         binding = getBinding()
 
-        setupToolbar()
+        toolbarLayout = CurrencyFeatureToolbarBinding.bind(binding.root)
+
         setupCurrencyList()
-        setupTabLayout(savedInstanceState?.getInt(TAB_POSITION_KEY) ?: 0)
+        setupToolbar(savedState.getInt(TAB_POSITION_KEY, 0))
         setupOnClickListeners()
+
+        binding.fullfilable.isChecked = savedState.getBoolean(FULFILLABLE_STATE_KEY, true)
 
         wantItemId?.let {
             viewModel.wantCurrencies.clear()
@@ -79,16 +76,12 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             requestResults()
             requireArguments().clear()
         }
+    }
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.viewLoadingState.collect {
-                if (it) {
-                    binding.toolbarProgressBar.show()
-                } else {
-                    binding.toolbarProgressBar.hide()
-                }
-            }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        savedState.putInt(TAB_POSITION_KEY, toolbarLayout.tabLayout.selectedTabPosition)
+        savedState.putBoolean(FULFILLABLE_STATE_KEY, binding.fullfilable.isChecked)
     }
 
     override fun onDestroy() {
@@ -97,10 +90,10 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         scope.close()
     }
 
-    private fun setupToolbar() {
-        binding.toolbar.inflateMenu(R.menu.menu_currency)
-        binding.toolbar.title = "Currency Exchange"
-        binding.toolbar.setOnMenuItemClickListener { item ->
+    private fun setupToolbar(selectedTabPosition: Int) {
+        toolbarLayout.toolbar.inflateMenu(R.menu.menu_currency)
+        toolbarLayout.toolbar.title = "Currency Exchange"
+        toolbarLayout.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.notifications -> {
                     lifecycleScope.launch {
@@ -116,6 +109,46 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
                 }
                 else ->
                     false
+            }
+        }
+        toolbarLayout.tabLayout.changeTabsFont(
+            ResourcesCompat.getFont(
+                requireActivity(),
+                R.font.fontinsmallcaps
+            )
+        )
+
+        updateCurrencyList(
+            if (selectedTabPosition == 0) viewModel.wantCurrencies else viewModel.haveCurrencies,
+            selectedTabPosition == 0
+        )
+
+        if (toolbarLayout.tabLayout.selectedTabPosition != selectedTabPosition) {
+            toolbarLayout.tabLayout.getTabAt(selectedTabPosition)?.let {
+                toolbarLayout.tabLayout.selectTab(it, true)
+            }
+        }
+
+        toolbarLayout.tabLayout.addOnTabSelectedListener(
+            TabLayoutListener(
+                binding.currenciesContainer,
+                binding.currencies,
+                binding.emptyPlaceholder
+            ) {
+                updateCurrencyList(
+                    if (it == 0) viewModel.wantCurrencies else viewModel.haveCurrencies,
+                    it == 0
+                )
+            }
+        )
+
+        lifecycleScope.launchWhenResumed {
+            viewModel.viewLoadingState.collect {
+                if (it) {
+                    toolbarLayout.toolbarProgressBar.show()
+                } else {
+                    toolbarLayout.toolbarProgressBar.hide()
+                }
             }
         }
     }
@@ -141,43 +174,16 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         binding.currencies.layoutManager = LinearLayoutManager(requireActivity())
         binding.currencies.adapter = adapter
         binding.currencies.addItemDecoration(
-            requireActivity().generateCustomDividerDecoration(R.drawable.currency_list_divider)
+            requireActivity().generateCustomDividerDecoration(R.drawable.colored_list_divider, 52)
         )
         itemSwipeHelper.attachToRecyclerView(binding.currencies)
-    }
-
-    private fun setupTabLayout(selectedTabPosition: Int) {
-        changeTabsFont(ResourcesCompat.getFont(requireActivity(), R.font.fontinsmallcaps))
-        if (binding.tabLayout.selectedTabPosition == selectedTabPosition) {
-            updateCurrencyList(
-                if (selectedTabPosition == 0) viewModel.wantCurrencies else viewModel.haveCurrencies,
-                selectedTabPosition == 0
-            )
-        } else {
-            binding.tabLayout.getTabAt(selectedTabPosition)?.let {
-                binding.tabLayout.selectTab(it, true)
-            }
-        }
-
-        binding.tabLayout.addOnTabSelectedListener(
-            TabLayoutListener(
-                binding.currenciesContainer,
-                binding.currencies,
-                binding.emptyPlaceholder
-            ) {
-                updateCurrencyList(
-                    if (it == 0) viewModel.wantCurrencies else viewModel.haveCurrencies,
-                    it == 0
-                )
-            }
-        )
     }
 
     private fun setupOnClickListeners() {
         binding.add.setOnClickListener {
             router.navigateTo(
                 CurrencyExchangeGroupsFragment.newInstance(
-                    binding.tabLayout.selectedTabPosition == 0
+                    toolbarLayout.tabLayout.selectedTabPosition == 0
                 )
             )
         }
@@ -207,22 +213,6 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         } else {
             binding.emptyPlaceholder.visibility = View.GONE
             binding.currencies.visibility = View.VISIBLE
-        }
-    }
-
-    private fun changeTabsFont(font: Typeface?) {
-        font ?: return
-        val vg = binding.tabLayout.getChildAt(0) as ViewGroup
-        val tabsCount = vg.childCount
-        for (j in 0 until tabsCount) {
-            val vgTab = vg.getChildAt(j) as ViewGroup
-            val tabChildCount = vgTab.childCount
-            for (i in 0 until tabChildCount) {
-                val tabViewChild = vgTab.getChildAt(i)
-                if (tabViewChild is TextView) {
-                    tabViewChild.typeface = font
-                }
-            }
         }
     }
 
@@ -275,10 +265,14 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         private const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
         private const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
         private const val TAB_POSITION_KEY = "TAB_POSITION_KEY"
+        private const val FULFILLABLE_STATE_KEY = "FULFILLABLE_STATE_KEY"
 
-        fun newInstance(wantItemId: String? = null, haveItemId: String? = null) = FragmentScreen {
-            CurrencyExchangeMainFragment().apply {
-                arguments = bundleOf(WANT_ITEM_ID_KEY to wantItemId, HAVE_ITEM_ID_KEY to haveItemId)
+        fun newInstance(wantItemId: String? = null, haveItemId: String? = null): FragmentScreen {
+            return FragmentScreen {
+                CurrencyExchangeMainFragment().apply {
+                    arguments =
+                        bundleOf(WANT_ITEM_ID_KEY to wantItemId, HAVE_ITEM_ID_KEY to haveItemId)
+                }
             }
         }
     }

@@ -25,6 +25,5 @@ class BottomNavigationViewCompat(context: Context, attrs: AttributeSet) :
             (itemTitle.getChildAt(0) as TextView).typeface = fontFamilyCompat
             (itemTitle.getChildAt(1) as TextView).typeface = fontFamilyCompat
         }
-
     }
 }

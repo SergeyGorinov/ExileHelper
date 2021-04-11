@@ -5,9 +5,8 @@ import com.poe.tradeapp.core.data.models.*
 import io.objectbox.kotlin.boxFor
 import kotlinx.serialization.json.Json
 import retrofit2.Response
-import retrofit2.await
 
-class CoreRepository(
+internal class CoreRepository(
     private val staticApi: StaticApi,
     private val poeTradeApi: PoeTradeApi
 ) : BaseCoreRepository() {
@@ -18,19 +17,19 @@ class CoreRepository(
     override var statData: List<StatGroup> = listOf()
 
     override suspend fun getCurrencyItems() {
-        staticData = staticApi.getStaticData().await().result
+        staticData = staticApi.getStaticData().result
     }
 
     override suspend fun getItems() {
-        itemData = staticApi.getItemsData().await().result
+        itemData = staticApi.getItemsData().result
     }
 
     override suspend fun getStats() {
-        statData = staticApi.getStatsData().await().result
+        statData = staticApi.getStatsData().result
     }
 
     override suspend fun getLeagues() {
-        leagues = staticApi.getLeagueData().await().result.map { it.id }
+        leagues = staticApi.getLeagueData().result.map { it.id }
     }
 
     override suspend fun setNotificationRequestRemote(request: RemoteNotificationRequest): Response<Void> {

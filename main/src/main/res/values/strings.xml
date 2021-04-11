@@ -15,4 +15,5 @@
     <string name="main_search_items_button">Items</string>
     <string name="main_exchange_currency_button">Currency</string>
     <string name="main_charts_button">Charts</string>
+    <string name="without_account">Go without account</string>
 </resources>
