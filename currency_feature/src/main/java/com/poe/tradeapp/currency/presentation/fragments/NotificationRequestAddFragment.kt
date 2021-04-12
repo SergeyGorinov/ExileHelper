@@ -10,6 +10,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -19,7 +20,7 @@ import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
 import com.poe.tradeapp.core.presentation.hideKeyboard
 import com.poe.tradeapp.core.presentation.scopedViewModel
 import com.poe.tradeapp.currency.R
-import com.poe.tradeapp.currency.databinding.FragmentNotificationRequestAddBinding
+import com.poe.tradeapp.currency.databinding.FragmentCurrencyNotificationRequestAddBinding
 import com.poe.tradeapp.currency.presentation.CurrencyExchangeViewModel
 import com.poe.tradeapp.currency.presentation.adapters.CurrencySearchListAdapter
 import com.poe.tradeapp.currency.presentation.models.CurrencyViewData
@@ -32,7 +33,10 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         FragmentScopes.CURRENCY_FEATURE
     )
 
-    private var viewBinding: FragmentNotificationRequestAddBinding? = null
+    private val wantItemId by lazy { requireArguments().getString(WANT_ITEM_ID_KEY) }
+    private val haveItemId by lazy { requireArguments().getString(HAVE_ITEM_ID_KEY) }
+
+    private var viewBinding: FragmentCurrencyNotificationRequestAddBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,18 +61,22 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_notification_request_add, container, false)
+        return inflater.inflate(
+            R.layout.fragment_currency_notification_request_add,
+            container,
+            false
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewBinding = FragmentNotificationRequestAddBinding.bind(view)
+        viewBinding = FragmentCurrencyNotificationRequestAddBinding.bind(view)
 
         val progressDialog = requireActivity().getTransparentProgressDialog()
 
         viewBinding?.let { binding ->
-            setupCurrencyList(binding.wantCurrencyList)
-            setupCurrencyList(binding.haveCurrencyList)
+            setupCurrencyList(binding.wantCurrencyList, wantItemId)
+            setupCurrencyList(binding.haveCurrencyList, haveItemId)
             binding.addRequest.setOnClickListener {
                 val wantItem =
                     (binding.wantCurrencyList.adapter as? CurrencySearchListAdapter)?.selectedItem
@@ -115,34 +123,47 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewBinding?.wantCurrencyList?.setAdapter(null)
+        viewBinding?.haveCurrencyList?.setAdapter(null)
         viewBinding = null
     }
 
-    private fun setupCurrencyList(list: AutoCompleteTextView) {
-        list.typeface = ResourcesCompat.getFont(requireActivity(), R.font.fontinsmallcaps)
-        list.setAdapter(
-            CurrencySearchListAdapter(
-                requireActivity(),
-                R.layout.dropdown_image_item,
-                viewModel.allCurrencies.flatMap { group -> group.staticItems }
-            )
+    private fun setupCurrencyList(list: AutoCompleteTextView, preselectedCurrencyId: String?) {
+        val items = viewModel.allCurrencies.flatMap { group -> group.staticItems }
+        val preselectedItem = items.firstOrNull { it.id == preselectedCurrencyId }
+        val adapter = CurrencySearchListAdapter(
+            requireActivity(),
+            R.layout.dropdown_image_item,
+            items
         )
+        list.typeface = ResourcesCompat.getFont(requireActivity(), R.font.fontinsmallcaps)
+        list.setAdapter(adapter)
         list.setOnClickListener { (it as? AutoCompleteTextView)?.showDropDown() }
         list.setOnItemClickListener { adapterView, _, position, _ ->
             val selectedItem = adapterView.getItemAtPosition(position)
-            val adapter = adapterView.adapter
             if (selectedItem is CurrencyViewData) {
-                if (adapter is CurrencySearchListAdapter)
-                    adapter.selectedItem = selectedItem
+                adapter.selectedItem = selectedItem
                 viewBinding?.root?.let {
                     requireActivity().hideKeyboard(it)
                 }
                 list.setSelection(0)
             }
         }
+        adapter.selectedItem = preselectedItem
+        list.setText(preselectedItem?.label)
     }
 
     companion object {
-        fun newInstance() = NotificationRequestAddFragment()
+        private const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
+        private const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
+
+        fun newInstance(
+            wantItemId: String? = null,
+            haveItemId: String? = null
+        ): NotificationRequestAddFragment {
+            return NotificationRequestAddFragment().apply {
+                arguments = bundleOf(WANT_ITEM_ID_KEY to wantItemId, HAVE_ITEM_ID_KEY to haveItemId)
+            }
+        }
     }
 }

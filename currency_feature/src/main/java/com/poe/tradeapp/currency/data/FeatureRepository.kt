@@ -1,12 +1,10 @@
 package com.poe.tradeapp.currency.data
 
-import android.util.Log
 import com.poe.tradeapp.currency.data.models.*
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import retrofit2.await
 
 internal class FeatureRepository(private val apiService: ApiService) : BaseFeatureRepository() {
 
@@ -40,21 +38,16 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
         }
 
         val data = currencyResultListData?.let {
-            try {
-                apiService.getCurrencyExchangeResponse(
-                    if (it.result.size - position >= 20) {
-                        it.result.subList(position, position + 20).joinToString(separator = ",")
-                    } else {
-                        it.result.subList(position, position + (it.result.size - position))
-                            .joinToString(separator = ",")
-                    },
-                    it.id,
-                    "exchange"
-                ).await()
-            } catch (e: Exception) {
-                Log.e("getCurrencyExchangeData", e.stackTraceToString())
-                null
-            }
+            apiService.getCurrencyExchangeResponse(
+                if (it.result.size - position >= 20) {
+                    it.result.subList(position, position + 20).joinToString(separator = ",")
+                } else {
+                    it.result.subList(position, position + (it.result.size - position))
+                        .joinToString(separator = ",")
+                },
+                it.id,
+                "exchange"
+            )
         } ?: return emptyList()
 
         totalResultCount = currencyResultListData?.result?.size ?: 0
@@ -68,12 +61,7 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
         league: String,
         body: CurrencyRequest
     ): CurrencyListResponse? {
-        return try {
-            return apiService.getCurrencyExchangeList(league, body).await()
-        } catch (e: Exception) {
-            Log.e("getCurrencyExchangeList", e.stackTraceToString())
-            null
-        }
+        return apiService.getCurrencyExchangeList(league, body)
     }
 
     private fun parseCurrencyExchangeData(data: JsonObject): List<CurrencyResultItem> {

@@ -5,6 +5,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
@@ -22,6 +23,12 @@ import com.poe.tradeapp.currency.presentation.adapters.CurrencySelectedAdapter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import retrofit2.HttpException
 
 class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exchange_main) {
 
@@ -37,6 +44,12 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
     private val wantItemId by lazy { requireArguments().getString(WANT_ITEM_ID_KEY) }
     private val haveItemId by lazy { requireArguments().getString(HAVE_ITEM_ID_KEY) }
+    private val withNotificationRequest by lazy {
+        requireArguments().getBoolean(
+            WITH_NOTIFICATION_REQUEST_KEY,
+            false
+        )
+    }
 
     private lateinit var binding: FragmentCurrencyExchangeMainBinding
     private lateinit var adapter: CurrencySelectedAdapter
@@ -73,9 +86,15 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             viewModel.haveCurrencies.add(it)
         }
         if (wantItemId != null && haveItemId != null) {
-            requestResults()
-            requireArguments().clear()
+            if (withNotificationRequest) {
+                NotificationRequestAddFragment
+                    .newInstance(wantItemId, haveItemId)
+                    .show(parentFragmentManager, null)
+            } else {
+                requestResults()
+            }
         }
+        requireArguments().clear()
     }
 
     override fun onDestroyView() {
@@ -238,23 +257,44 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         }
         searchJob = lifecycleScope.launch {
             binding.search.isEnabled = false
-            val result = viewModel.requestResult(
-                settings.league,
-                binding.fullfilable.isSelected,
-                binding.minimumStockValue.text.toString(),
-                0
-            )
-            if (result.isEmpty()) {
-                Toast.makeText(requireActivity(), "Nothing found!", Toast.LENGTH_LONG).show()
-                binding.search.isEnabled = true
-                return@launch
-            }
-            CurrencyExchangeResultFragment
-                .newInstance(
-                    result,
+            val result = try {
+                viewModel.requestResult(
+                    settings.league,
                     binding.fullfilable.isSelected,
-                    binding.minimumStockValue.text.toString()
-                ).show(parentFragmentManager, null)
+                    binding.minimumStockValue.text.toString(),
+                    0
+                )
+            } catch (e: Exception) {
+                val message = if (e is HttpException) {
+                    if (e.code() == 404) {
+                        "Nothing found"
+                    } else {
+                        e.response()?.errorBody()?.string()?.run {
+                            val errorBody = Json.decodeFromString<JsonObject>(this)
+                            val jsonMessage = errorBody["error"]?.jsonObject?.get("message")
+                            jsonMessage?.jsonPrimitive?.content ?: "Unknown error"
+                        }
+                    }
+                } else {
+                    "Fetching failed"
+                }
+                AlertDialog.Builder(requireActivity(), R.style.AppTheme_AlertDialog)
+                    .setTitle("Error")
+                    .setMessage(message)
+                    .setPositiveButton("OK") { dialogInterface, _ ->
+                        dialogInterface.dismiss()
+                    }
+                    .show()
+                emptyList()
+            }
+            if (result.isNotEmpty()) {
+                CurrencyExchangeResultFragment
+                    .newInstance(
+                        result,
+                        binding.fullfilable.isSelected,
+                        binding.minimumStockValue.text.toString()
+                    ).show(parentFragmentManager, null)
+            }
             binding.search.isEnabled = true
         }
     }
@@ -264,14 +304,22 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
         private const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
         private const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
+        private const val WITH_NOTIFICATION_REQUEST_KEY = "WITH_NOTIFICATION_REQUEST_KEY"
         private const val TAB_POSITION_KEY = "TAB_POSITION_KEY"
         private const val FULFILLABLE_STATE_KEY = "FULFILLABLE_STATE_KEY"
 
-        fun newInstance(wantItemId: String? = null, haveItemId: String? = null): FragmentScreen {
+        fun newInstance(
+            wantItemId: String? = null,
+            haveItemId: String? = null,
+            withNotificationRequest: Boolean = false
+        ): FragmentScreen {
             return FragmentScreen {
                 CurrencyExchangeMainFragment().apply {
-                    arguments =
-                        bundleOf(WANT_ITEM_ID_KEY to wantItemId, HAVE_ITEM_ID_KEY to haveItemId)
+                    arguments = bundleOf(
+                        WANT_ITEM_ID_KEY to wantItemId,
+                        HAVE_ITEM_ID_KEY to haveItemId,
+                        WITH_NOTIFICATION_REQUEST_KEY to withNotificationRequest
+                    )
                 }
             }
         }

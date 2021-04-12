@@ -66,19 +66,14 @@ internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
             setupChart(data, textColor, textFont)
             binding.toolbarLayout.toolbar.title = "Item history"
             binding.itemLabel.text = data.name
+            binding.addNotification.setOnClickListener {
+                goToExchange(data, true)
+            }
             binding.goToWiki.setOnClickListener {
                 createWikiDialog(data.name).show()
             }
             binding.buyButton.setOnClickListener {
-                if (isCurrency) {
-                    getMainActivity()?.goToCurrencyExchange(data.tradeId, "chaos")
-                } else {
-                    if (data.type == null) {
-                        getMainActivity()?.goToItemsSearch(data.name, null)
-                    } else {
-                        getMainActivity()?.goToItemsSearch(data.type, data.name)
-                    }
-                }
+                goToExchange(data, false)
             }
             binding.leftSideBuyText.text = getString(R.string.buy_chart_text, data.name)
             binding.rightSideBuyText.text = getString(R.string.receive_chart_text, data.buyingValue)
@@ -197,6 +192,18 @@ internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
             }
             .setTitle("Open page on PoeWiki?")
             .create()
+    }
+
+    private fun goToExchange(data: HistoryModel, withNotification: Boolean) {
+        if (isCurrency) {
+            getMainActivity()?.goToCurrencyExchange(data.tradeId, "chaos", false, withNotification)
+        } else {
+            if (data.type == null) {
+                getMainActivity()?.goToItemsSearch(data.name, null, withNotification)
+            } else {
+                getMainActivity()?.goToItemsSearch(data.type, data.name, withNotification)
+            }
+        }
     }
 
     private class CustomMarkerView(context: Context, resId: Int) : MarkerView(context, resId) {

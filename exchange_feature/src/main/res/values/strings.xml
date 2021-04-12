@@ -18,7 +18,7 @@
     <string name="will_cost_less_than">Will cost less than</string>
     <string name="enter_amount_hint">Enter amount…</string>
     <string name="chaos_orbs_placeholder">Chaos orb(s)</string>
-    <string name="add_notification_request">Add notification request</string>
+    <string name="add_notification_request">Add notification</string>
     <string name="search">Search</string>
     <string name="notifications">Notifications</string>
 </resources>

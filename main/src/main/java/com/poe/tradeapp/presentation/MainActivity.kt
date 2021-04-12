@@ -54,6 +54,7 @@ class MainActivity : FragmentActivity(), IMainActivity {
     private var currencyExchangeHaveItemId: String? = null
     private var itemSearchType: String? = null
     private var itemSearchName: String? = null
+    private var withNotificationRequest = false
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -165,16 +166,27 @@ class MainActivity : FragmentActivity(), IMainActivity {
                 R.id.currencyExchangeMenu -> {
                     router.newRootScreen(
                         CurrencyExchangeMainFragment.newInstance(
-                            currencyExchangeWantItemId,
-                            currencyExchangeHaveItemId
+                            wantItemId = currencyExchangeWantItemId,
+                            haveItemId = currencyExchangeHaveItemId,
+                            withNotificationRequest = withNotificationRequest
                         )
                     )
+                    currencyExchangeWantItemId = null
+                    currencyExchangeHaveItemId = null
+                    withNotificationRequest = false
                     true
                 }
                 R.id.itemsSearchMenu -> {
                     router.newRootScreen(
-                        ItemsSearchMainFragment.newInstance(itemSearchType, itemSearchName)
+                        ItemsSearchMainFragment.newInstance(
+                            itemSearchType,
+                            itemSearchName,
+                            withNotificationRequest
+                        )
                     )
+                    itemSearchType = null
+                    itemSearchName = null
+                    withNotificationRequest = false
                     true
                 }
                 R.id.chartsMenu -> {
@@ -245,7 +257,8 @@ class MainActivity : FragmentActivity(), IMainActivity {
     override fun goToCurrencyExchange(
         wantItemId: String?,
         haveItemId: String?,
-        firstTime: Boolean
+        firstTime: Boolean,
+        withNotificationRequest: Boolean
     ) {
         if (firstTime) {
             router.newRootScreen(
@@ -257,13 +270,19 @@ class MainActivity : FragmentActivity(), IMainActivity {
         } else {
             currencyExchangeWantItemId = wantItemId
             currencyExchangeHaveItemId = haveItemId
+            this.withNotificationRequest = withNotificationRequest
             viewBinding.bottomNavBar.selectedItemId = R.id.currencyExchangeMenu
         }
     }
 
-    override fun goToItemsSearch(itemType: String, itemName: String?) {
+    override fun goToItemsSearch(
+        itemType: String,
+        itemName: String?,
+        withNotificationRequest: Boolean
+    ) {
         itemSearchType = itemType
         itemSearchName = itemName
+        this.withNotificationRequest = withNotificationRequest
         viewBinding.bottomNavBar.selectedItemId = R.id.itemsSearchMenu
     }
 

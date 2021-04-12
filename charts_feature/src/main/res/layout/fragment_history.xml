@@ -13,6 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/primaryColor"
         android:padding="8dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -36,9 +37,18 @@
             android:textSize="22sp"
             app:fontFamily="@font/fontinsmallcaps"
             app:layout_constraintBottom_toBottomOf="@id/itemImage"
-            app:layout_constraintEnd_toStartOf="@id/goToWiki"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/itemImage"
             app:layout_constraintTop_toTopOf="@id/itemImage" />
+
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/additional_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:constraint_referenced_ids="addNotification,goToWiki"
+            app:flow_horizontalStyle="spread_inside"
+            app:layout_constraintTop_toBottomOf="@id/itemImage" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/goToWiki"
@@ -52,9 +62,20 @@
             android:padding="4dp"
             android:text="@string/open_wiki_button_text"
             android:textColor="@color/primaryTextColor"
-            app:layout_constraintBottom_toBottomOf="@id/itemImage"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/itemImage"
+            tools:ignore="ContentDescription" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/addNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@null"
+            android:drawableStart="@drawable/add_notification_24"
+            android:drawablePadding="4dp"
+            android:fontFamily="@font/fontinsmallcaps"
+            android:gravity="center"
+            android:padding="4dp"
+            android:text="Add notification"
+            android:textColor="@color/primaryTextColor"
             tools:ignore="ContentDescription" />
 
         <androidx.constraintlayout.helper.widget.Flow
@@ -62,12 +83,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             app:constraint_referenced_ids="leftSideBuyText,leftSideBuyImage,rightSideBuyText,rightSideBuyImage"
             app:flow_horizontalGap="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/itemImage" />
+            app:layout_constraintTop_toBottomOf="@id/additional_buttons" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/leftSideBuyText"
@@ -106,7 +127,7 @@
             android:id="@+id/buyButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:background="@drawable/rounded_button"
             android:src="@drawable/exchange_24"
             app:layout_constraintTop_toBottomOf="@id/buyData" />

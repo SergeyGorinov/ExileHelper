@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primaryDarkColor">
+    android:background="@color/primaryColor">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/emailHeader"
@@ -23,6 +23,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="@drawable/default_bordered_background"
         android:hint="@string/enter_email_text"
         android:textColorHint="@color/secondaryLightColor"
         app:hintTextColor="@color/secondaryLightColor"
@@ -35,7 +36,7 @@
             android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/default_bordered_background"
+            android:background="@color/transparent"
             android:fontFamily="@font/fontinsmallcaps"
             android:textColor="@color/primaryTextColor"
             android:textCursorDrawable="@null"
@@ -60,6 +61,7 @@
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="@drawable/default_bordered_background"
         android:hint="@string/enter_password_text"
         android:textColorHint="@color/secondaryLightColor"
         app:hintTextColor="@color/secondaryLightColor"
@@ -72,7 +74,7 @@
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/default_bordered_background"
+            android:background="@color/transparent"
             android:fontFamily="@font/fontinsmallcaps"
             android:inputType="textPassword"
             android:textColor="@color/primaryTextColor"
@@ -87,11 +89,11 @@
         android:layout_marginTop="64dp"
         android:background="@drawable/image_button_border_default"
         android:fontFamily="@font/fontinsmallcaps"
+        android:paddingHorizontal="8dp"
         android:textColor="@color/primaryTextColor"
         android:textSize="22sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/passwordLayout" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

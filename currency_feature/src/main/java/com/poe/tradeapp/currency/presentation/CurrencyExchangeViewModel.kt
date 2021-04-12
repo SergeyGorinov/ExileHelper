@@ -1,6 +1,5 @@
 package com.poe.tradeapp.currency.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.poe.tradeapp.core.domain.models.NotificationItemData
 import com.poe.tradeapp.core.domain.models.NotificationRequest
@@ -78,9 +77,6 @@ internal class CurrencyExchangeViewModel(
                     item.status
                 )
             }
-        } catch (e: Exception) {
-            Log.e("requestResult", e.stackTraceToString())
-            listOf()
         } finally {
             viewLoadingState.emit(false)
         }
@@ -91,6 +87,7 @@ internal class CurrencyExchangeViewModel(
         payingItem: CurrencyViewData,
         payingAmount: Int
     ) = withContext(Dispatchers.IO) {
+        viewLoadingState.emit(true)
         val request = NotificationRequest(
             NotificationItemData(buyingItem.label, buyingItem.imageUrl ?: ""),
             NotificationItemData(payingItem.label, payingItem.imageUrl ?: ""),
@@ -109,44 +106,33 @@ internal class CurrencyExchangeViewModel(
                 )
             )
         )
-        return@withContext try {
-            setNotificationRequestUseCase.execute(
-                request,
-                payload,
-                0,
-                FirebaseUtils.getMessagingToken(),
-                FirebaseUtils.getAuthToken()
-            )
-        } catch (e: Exception) {
-            false
-        } finally {
-            viewLoadingState.emit(false)
-        }
+        val result = setNotificationRequestUseCase.execute(
+            request,
+            payload,
+            0,
+            FirebaseUtils.getMessagingToken(),
+            FirebaseUtils.getAuthToken()
+        )
+        viewLoadingState.emit(false)
+        return@withContext result
     }
 
-    suspend fun getNotificationRequests(): List<NotificationRequestViewData> {
+    suspend fun getNotificationRequests() = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
-        return try {
-            withContext(Dispatchers.IO) {
-                getNotificationRequestsUseCase.execute(
-                    FirebaseUtils.getMessagingToken(),
-                    FirebaseUtils.getAuthToken(),
-                    CurrencyExchangeMainFragment.NOTIFICATION_REQUESTS_TYPE
-                ).map {
-                    NotificationRequestViewData(
-                        it.buyingItem.itemName,
-                        it.buyingItem.itemIcon,
-                        it.payingItem.itemName,
-                        it.payingItem.itemIcon,
-                        it.payingAmount
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("getNotificationRequests", e.stackTraceToString())
-            emptyList()
-        } finally {
-            viewLoadingState.emit(false)
+        val result = getNotificationRequestsUseCase.execute(
+            FirebaseUtils.getMessagingToken(),
+            FirebaseUtils.getAuthToken(),
+            CurrencyExchangeMainFragment.NOTIFICATION_REQUESTS_TYPE
+        ).map {
+            NotificationRequestViewData(
+                it.buyingItem.itemName,
+                it.buyingItem.itemIcon,
+                it.payingItem.itemName,
+                it.payingItem.itemIcon,
+                it.payingAmount
+            )
         }
+        viewLoadingState.emit(false)
+        return@withContext result
     }
 }

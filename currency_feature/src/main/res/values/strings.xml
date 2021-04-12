@@ -16,4 +16,5 @@
     <string name="add_new_notification_request">Add request</string>
     <string name="currency_list_hint">Enter currency name…</string>
     <string name="minimum_stock_hint">Min</string>
+    <string name="enter_amount_hint">Enter amount…</string>
 </resources>

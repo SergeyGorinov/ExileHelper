@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -66,14 +67,24 @@ internal class CurrencyExchangeResultFragment : BottomSheetDialogFragment() {
                     adapter.addLoader()
                 }
                 lifecycleScope.launch {
-                    adapter.addData(
+                    val result = try {
                         viewModel.requestResult(
                             settings.league,
                             isFullfilable,
                             minimum,
                             it
                         )
-                    )
+                    } catch (e: Exception) {
+                        AlertDialog.Builder(requireActivity(), R.style.AppTheme_AlertDialog)
+                            .setTitle("Error")
+                            .setMessage(e.message ?: "Fetching failed")
+                            .setPositiveButton("OK") { dialogInterface, _ ->
+                                dialogInterface.dismiss()
+                            }
+                            .show()
+                        emptyList()
+                    }
+                    adapter.addData(result)
                     isLoading = false
                 }
             }

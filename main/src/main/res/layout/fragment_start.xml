@@ -7,10 +7,12 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signIn"
-        android:layout_width="200dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:background="@drawable/image_button_border_default"
+        android:drawableStart="@drawable/sign_in_24"
         android:fontFamily="@font/fontinsmallcaps"
+        android:paddingHorizontal="8dp"
         android:text="@string/sign_in_text"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toTopOf="@id/signUp"
@@ -21,11 +23,13 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signUp"
-        android:layout_width="200dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:background="@drawable/image_button_border_default"
+        android:drawableStart="@drawable/sign_up_24"
         android:fontFamily="@font/fontinsmallcaps"
+        android:paddingHorizontal="8dp"
         android:text="@string/sign_up_text"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toTopOf="@id/noAccount"
@@ -35,11 +39,13 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/noAccount"
-        android:layout_width="200dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="128dp"
         android:background="@drawable/image_button_border_default"
+        android:drawableStart="@drawable/no_account_24"
         android:fontFamily="@font/fontinsmallcaps"
+        android:paddingHorizontal="8dp"
         android:text="@string/without_account"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toBottomOf="parent"

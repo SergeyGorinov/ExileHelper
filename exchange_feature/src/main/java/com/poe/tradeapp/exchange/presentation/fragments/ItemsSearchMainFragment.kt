@@ -37,6 +37,11 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 
     private val itemType by lazy { requireArguments().getString(ITEM_TYPE_KEY) }
     private val itemName by lazy { requireArguments().getString(ITEM_NAME_KEY) }
+    private val withNotificationRequest by lazy {
+        requireArguments().getBoolean(
+            WITH_NOTIFICATION_REQUEST_KEY, false
+        )
+    }
 
     private lateinit var binding: FragmentItemsSearchMainBinding
 
@@ -60,9 +65,15 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             requestResult()
         }
 
-        itemType?.let {
-            viewModel.setItemData(it, itemName)
-            requestResult()
+        if (withNotificationRequest) {
+            NotificationRequestAddFragment
+                .newInstance(itemType, itemName)
+                .show(parentFragmentManager, null)
+        } else {
+            itemType?.let {
+                viewModel.setItemData(it, itemName)
+                requestResult()
+            }
         }
 
         lifecycleScope.launchWhenCreated {
@@ -225,11 +236,20 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 
         private const val ITEM_TYPE_KEY = "ITEM_TYPE_KEY"
         private const val ITEM_NAME_KEY = "ITEM_NAME_KEY"
+        private const val WITH_NOTIFICATION_REQUEST_KEY = "WITH_NOTIFICATION_REQUEST_KEY"
 
-        fun newInstance(itemType: String? = null, itemName: String? = null): FragmentScreen {
+        fun newInstance(
+            itemType: String? = null,
+            itemName: String? = null,
+            withNotificationRequest: Boolean = false
+        ): FragmentScreen {
             return FragmentScreen {
                 ItemsSearchMainFragment().apply {
-                    arguments = bundleOf(ITEM_TYPE_KEY to itemType, ITEM_NAME_KEY to itemName)
+                    arguments = bundleOf(
+                        ITEM_TYPE_KEY to itemType,
+                        ITEM_NAME_KEY to itemName,
+                        WITH_NOTIFICATION_REQUEST_KEY to withNotificationRequest
+                    )
                 }
             }
         }

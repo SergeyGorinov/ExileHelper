@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primaryColor"
+    android:focusableInTouchMode="true"
     android:padding="16dp">
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -81,14 +82,14 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/amount_container"
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-        android:layout_width="150dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/default_bordered_background"
         android:hint="@string/empty_hint"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="4dp"
+        android:paddingVertical="8dp"
         app:boxStrokeWidth="0dp"
         app:hintTextColor="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="@id/add_request"
@@ -115,10 +116,11 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/chaos_orbs_placeholder"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:fontFamily="@font/fontinsmallcaps"
+        android:gravity="center"
         android:text="@string/chaos_orbs_placeholder"
         android:textColor="@color/primaryTextColor"
         android:textSize="20sp"

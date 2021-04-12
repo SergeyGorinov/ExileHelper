@@ -6,7 +6,6 @@ import com.poe.tradeapp.charts_feature.data.models.ItemGroup
 import com.poe.tradeapp.charts_feature.domain.models.CurrencyData
 import com.poe.tradeapp.charts_feature.domain.models.OverviewData
 import kotlinx.serialization.json.*
-import retrofit2.await
 
 internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatureRepository() {
 
@@ -16,7 +15,7 @@ internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatu
         league: String,
         type: String
     ) {
-        val result = api.getCurrenciesOverview(league, type).await()
+        val result = api.getCurrenciesOverview(league, type)
         val currenciesOverview = result.lines
         val currenciesDetails = result.currencyDetails
         overviewData = currenciesOverview.map { currencyOverview ->
@@ -54,12 +53,8 @@ internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatu
     }
 
     override suspend fun getItemsOverview(league: String, type: String) {
-        val result = try {
-            api.getItemsOverview(league, type).await().getValue("lines").jsonArray
-        } catch (e: Exception) {
-            emptyList()
-        }
-        overviewData = result.mapNotNull { itemOverview ->
+        val result = api.getItemsOverview(league, type)
+        overviewData = result.getValue("lines").jsonArray.mapNotNull { itemOverview ->
             try {
                 val id = itemOverview.jsonObject.getValue("id").jsonPrimitive.content
                 val name = itemOverview.jsonObject.getValue("name").jsonPrimitive.content
@@ -108,11 +103,11 @@ internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatu
         type: String,
         id: String
     ): HistoryModel {
-        return api.getCurrencyHistory(league, type, id).await()
+        return api.getCurrencyHistory(league, type, id)
     }
 
     override suspend fun getItemHistory(league: String, type: String, id: String): List<GraphData> {
-        return api.getItemHistory(league, type, id).await()
+        return api.getItemHistory(league, type, id)
     }
 
     override fun getItemsGroups() = listOf(

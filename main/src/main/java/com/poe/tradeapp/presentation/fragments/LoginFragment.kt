@@ -5,6 +5,7 @@ import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.github.terrakok.cicerone.androidx.FragmentScreen
@@ -12,6 +13,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.poe.tradeapp.R
 import com.poe.tradeapp.core.presentation.BaseFragment
+import com.poe.tradeapp.core.presentation.dp
 import com.poe.tradeapp.databinding.FragmentLoginBinding
 import com.poe.tradeapp.presentation.MainActivityViewModel
 import kotlinx.coroutines.launch
@@ -45,6 +47,13 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
         } else {
             getString(R.string.sign_up_text)
         }
+        val drawable = ContextCompat.getDrawable(
+            requireActivity(),
+            if (isSignIn) R.drawable.sign_in_24 else R.drawable.sign_up_24
+        )?.apply {
+            setBounds(0, 0, 24.dp, 24.dp)
+        }
+        binding.accept.setCompoundDrawablesRelative(drawable, null, null, null)
         binding.accept.setOnClickListener {
             if (!binding.email.text.isEmailValid()) {
                 dialog.setMessage(R.string.email_not_match_alert_text).show()
@@ -80,11 +89,13 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
                     if (it.isSuccessful) {
                         router.navigateTo(EmailVerificationFragment.newInstance())
                     } else {
-                        Toast.makeText(
-                            requireActivity(),
-                            "Registration failed!",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        AlertDialog.Builder(requireActivity(), R.style.AppTheme_AlertDialog)
+                            .setTitle("Registration error")
+                            .setMessage(it.exception?.message ?: "Failed")
+                            .setPositiveButton("OK") { dialogInterface, _ ->
+                                dialogInterface.dismiss()
+                            }
+                            .show()
                     }
                 }
             }

@@ -10,6 +10,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -19,7 +20,7 @@ import com.poe.tradeapp.core.presentation.getTransparentProgressDialog
 import com.poe.tradeapp.core.presentation.hideKeyboard
 import com.poe.tradeapp.core.presentation.scopedViewModel
 import com.poe.tradeapp.exchange.R
-import com.poe.tradeapp.exchange.databinding.FragmentNotificationRequestAddBinding
+import com.poe.tradeapp.exchange.databinding.FragmentItemNotificationRequestAddBinding
 import com.poe.tradeapp.exchange.presentation.ItemsSearchViewModel
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsSearchFieldAdapter
 import com.poe.tradeapp.exchange.presentation.models.SuggestionItem
@@ -32,7 +33,10 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         FragmentScopes.EXCHANGE_FEATURE
     )
 
-    private var viewBinding: FragmentNotificationRequestAddBinding? = null
+    private val itemType by lazy { requireArguments().getString(ITEM_TYPE_KEY) }
+    private val itemName by lazy { requireArguments().getString(ITEM_NAME_KEY) }
+
+    private var viewBinding: FragmentItemNotificationRequestAddBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,12 +61,12 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_notification_request_add, container, false)
+        return inflater.inflate(R.layout.fragment_item_notification_request_add, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewBinding = FragmentNotificationRequestAddBinding.bind(view)
+        viewBinding = FragmentItemNotificationRequestAddBinding.bind(view)
 
         val progressDialog = requireActivity().getTransparentProgressDialog()
 
@@ -112,31 +116,53 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupCurrencyList(list: AutoCompleteTextView) {
-        list.typeface = ResourcesCompat.getFont(requireActivity(), R.font.fontinsmallcaps)
-        list.setAdapter(
-            ItemsSearchFieldAdapter(
-                requireActivity(),
-                R.layout.dropdown_item,
-                viewModel.itemGroups
-            )
+        val preselectedItem = if (itemType != null && itemName != null) {
+            viewModel.itemGroups.flatMap { it.entries }.firstOrNull {
+                it.type == itemType && it.name == itemName
+            }
+        } else {
+            viewModel.itemGroups.flatMap { it.entries }.firstOrNull { it.type == itemType }
+        }
+        val adapter = ItemsSearchFieldAdapter(
+            requireActivity(),
+            R.layout.dropdown_item,
+            viewModel.itemGroups
         )
+        list.typeface = ResourcesCompat.getFont(requireActivity(), R.font.fontinsmallcaps)
+        list.setAdapter(adapter)
         list.setOnClickListener { (it as? AutoCompleteTextView)?.showDropDown() }
         list.setOnItemClickListener { adapterView, _, position, _ ->
             val selectedItem = adapterView.getItemAtPosition(position)
-            val adapter = adapterView.adapter
             if (selectedItem is SuggestionItem) {
-                if (adapter is ItemsSearchFieldAdapter) {
-                    adapter.selectedItem = selectedItem
-                }
+                adapter.selectedItem = selectedItem
                 viewBinding?.root?.let {
                     requireActivity().hideKeyboard(it)
                 }
                 list.setSelection(0)
             }
         }
+        if (preselectedItem != null) {
+            adapter.selectedItem = SuggestionItem(
+                false,
+                preselectedItem.text,
+                preselectedItem.type,
+                preselectedItem.name
+            )
+            list.setText(preselectedItem.text)
+        }
     }
 
     companion object {
-        fun newInstance() = NotificationRequestAddFragment()
+        private const val ITEM_TYPE_KEY = "ITEM_TYPE_KEY"
+        private const val ITEM_NAME_KEY = "ITEM_NAME_KEY"
+
+        fun newInstance(
+            itemType: String? = null,
+            itemName: String? = null
+        ): NotificationRequestAddFragment {
+            return NotificationRequestAddFragment().apply {
+                arguments = bundleOf(ITEM_TYPE_KEY to itemType, ITEM_NAME_KEY to itemName)
+            }
+        }
     }
 }
