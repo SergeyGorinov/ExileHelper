@@ -10,7 +10,7 @@
     <color name="secondaryTextColor">#fff8e1</color>
     <color name="transparent">#00000000</color>
     <color name="half_transparent">#80000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="white">#ffffffff</color>
     <color name="disabledButtonColor">#801d262f</color>
     <color name="disabledButtonTextColor">#80fff8e1</color>
 
@@ -18,12 +18,12 @@
     <color name="items_search_suggestions_header_text">#000000</color>
     <color name="even_result_row_color">@color/primaryLightColor</color>
     <color name="odd_result_row_color">@color/primaryColor</color>
-    <color name="items_search_suggestions_item_text">#e2e2e2</color>
-    <color name="crafted_enchanted_mod">#b4b4ff</color>
-    <color name="explicit_implicit_utility_mod">#8888ff</color>
-    <color name="corrupted_mod">#d20000</color>
     <color name="primaryLineChartColor">#4682b4</color>
     <color name="secondaryLineChartColor">#f9a101</color>
     <color name="primaryLineChartFillColor">#333d49</color>
     <color name="secondaryLineChartFillColor">#3f3928</color>
+    <color name="items_search_suggestions_item_text">#e2e2e2</color>
+    <color name="crafted_enchanted_mod">#b4b4ff</color>
+    <color name="explicit_implicit_utility_mod">#8888ff</color>
+    <color name="corrupted_mod">#d20000</color>
 </resources>
