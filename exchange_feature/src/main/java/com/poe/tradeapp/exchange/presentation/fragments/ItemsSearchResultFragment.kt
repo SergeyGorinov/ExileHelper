@@ -67,13 +67,13 @@ internal class ItemsSearchResultFragment : BottomSheetDialogFragment() {
                     }
                     lifecycleScope.launch {
                         val results = viewModel.fetchPartialResults(settings.league, it)
-                        adapter.addFetchedItems(populateResponse(results))
+                        adapter.setFetchedItems(populateResponse(results))
                         isLoading = false
                     }
                 }
             }
         )
-        adapter.addFetchedItems(populateResponse(data))
+        adapter.setFetchedItems(populateResponse(data))
     }
 
     override fun onDestroy() {

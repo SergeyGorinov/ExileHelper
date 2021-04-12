@@ -71,7 +71,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         val progressDialog = requireActivity().getTransparentProgressDialog()
 
         viewBinding?.let { binding ->
-            setupCurrencyList(binding.itemsList)
+            setupItemsList(binding.itemsList)
             binding.addRequest.setOnClickListener {
                 val wantItem =
                     (binding.itemsList.adapter as? ItemsSearchFieldAdapter)?.selectedItem
@@ -98,6 +98,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
                             "Notification request added successfully",
                             Toast.LENGTH_LONG
                         ).show()
+                        dismiss()
                     } else {
                         Toast.makeText(
                             requireActivity(),
@@ -115,7 +116,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         viewBinding = null
     }
 
-    private fun setupCurrencyList(list: AutoCompleteTextView) {
+    private fun setupItemsList(list: AutoCompleteTextView) {
         val preselectedItem = if (itemType != null && itemName != null) {
             viewModel.itemGroups.flatMap { it.entries }.firstOrNull {
                 it.type == itemType && it.name == itemName

@@ -109,6 +109,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
                             "Notification request added successfully",
                             Toast.LENGTH_LONG
                         ).show()
+                        dismiss()
                     } else {
                         Toast.makeText(
                             requireActivity(),

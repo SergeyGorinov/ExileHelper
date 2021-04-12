@@ -45,35 +45,33 @@ internal class CoreRepository(
         authorizationToken: String?,
         type: String
     ) {
-        if (authorizationToken != null) {
-            val result = try {
-                val response = poeTradeApi.getRequests(authorizationToken, messagingToken, type)
-                response.body()
-            } catch (e: Exception) {
-                Log.e("GET REQUESTS ERROR", e.stackTraceToString())
-                null
-            }?.map {
-                NotificationRequest(
-                    0L,
-                    it.firebaseAuthenticationToken,
-                    it.firebaseMessagingToken,
-                    it.requestType,
-                    it.requestPayload,
-                    Json.decodeFromString(ItemData.serializer(), it.buyingItem),
-                    Json.decodeFromString(ItemData.serializer(), it.payingItem),
-                    it.payingAmount
-                )
-            }
-            if (result != null) {
-                val localRequests = ObjectBox.objectBox.boxFor<NotificationRequest>().all
-                localRequests.filterNot { result.contains(it) }.forEach {
-                    ObjectBox.objectBox.boxFor<NotificationRequest>().remove(it.id)
-                }
-            } else {
-                ObjectBox.objectBox.boxFor<NotificationRequest>().removeAll()
-            }
-            ObjectBox.objectBox.boxFor<NotificationRequest>().put(result)
+        val result = try {
+            val response = poeTradeApi.getRequests(authorizationToken, messagingToken, type)
+            response.body()
+        } catch (e: Exception) {
+            Log.e("GET REQUESTS ERROR", e.stackTraceToString())
+            null
+        }?.map {
+            NotificationRequest(
+                0L,
+                it.firebaseAuthenticationToken,
+                it.firebaseMessagingToken,
+                it.requestType,
+                it.requestPayload,
+                Json.decodeFromString(ItemData.serializer(), it.buyingItem),
+                Json.decodeFromString(ItemData.serializer(), it.payingItem),
+                it.payingAmount
+            )
         }
+        if (result != null) {
+            val localRequests = ObjectBox.objectBox.boxFor<NotificationRequest>().all
+            localRequests.filterNot { result.contains(it) }.forEach {
+                ObjectBox.objectBox.boxFor<NotificationRequest>().remove(it.id)
+            }
+        } else {
+            ObjectBox.objectBox.boxFor<NotificationRequest>().removeAll()
+        }
+        ObjectBox.objectBox.boxFor<NotificationRequest>().put(result)
     }
 
     override suspend fun getNotificationRequestsLocal(): List<NotificationRequest> {

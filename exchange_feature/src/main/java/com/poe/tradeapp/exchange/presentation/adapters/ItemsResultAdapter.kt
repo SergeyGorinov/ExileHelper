@@ -43,7 +43,7 @@ internal class ItemsResultAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder
     override fun getItemViewType(position: Int) =
         if (asyncDiffer.currentList.getOrNull(position) == null) 0 else 1
 
-    fun addFetchedItems(data: List<FetchedItem>) {
+    fun setFetchedItems(data: List<FetchedItem>) {
         asyncDiffer.submitList(data)
     }
 

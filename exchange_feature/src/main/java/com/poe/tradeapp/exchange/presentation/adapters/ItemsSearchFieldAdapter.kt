@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat
 import com.poe.tradeapp.core.presentation.toLowerCaseLocalized
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.presentation.models.ItemGroupViewData
-import com.poe.tradeapp.exchange.presentation.models.ItemViewData
 import com.poe.tradeapp.exchange.presentation.models.SuggestionItem
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -121,7 +120,7 @@ internal class ItemsSearchFieldAdapter(
         }
 
         override fun convertResultToString(resultValue: Any?): CharSequence {
-            return if (resultValue is ItemViewData)
+            return if (resultValue is SuggestionItem)
                 resultValue.text
             else
                 ""

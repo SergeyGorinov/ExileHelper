@@ -197,6 +197,7 @@ internal class ItemsSearchViewModel(
         )
 
         val priceFilter = ItemsRequestModelFields.Filter(
+            disabled = false,
             filters = ItemsRequestModelFields.FilterFields(
                 listOf(
                     ItemsRequestModelFields.FilterField(
@@ -221,7 +222,7 @@ internal class ItemsSearchViewModel(
             setNotificationRequestUseCase.execute(
                 request,
                 payload,
-                0,
+                ItemsSearchMainFragment.NOTIFICATION_REQUESTS_TYPE.toInt(),
                 FirebaseUtils.getMessagingToken(),
                 FirebaseUtils.getAuthToken()
             )

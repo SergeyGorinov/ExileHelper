@@ -15,7 +15,7 @@ interface PoeTradeApi {
     @GET("getRequests")
     suspend fun getRequests(
         @Query("authorizationToken")
-        authorizationToken: String,
+        authorizationToken: String?,
         @Query("messagingToken")
         messagingToken: String,
         @Query("type")

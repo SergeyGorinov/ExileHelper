@@ -38,8 +38,12 @@ class NotificationRequestsAdapter(private val items: List<NotificationRequestVie
             val payingItemText = "${item.payingItemAmount} ${item.payingItemText}"
             viewBinding.buyingItemText.text = item.buyingItemText
             viewBinding.payingItemText.text = payingItemText
-            Picasso.get().load(item.buyingItemImage).into(viewBinding.buyingItemImage)
-            Picasso.get().load(item.payingItemImage).into(viewBinding.payingItemImage)
+            if (item.buyingItemImage.isNotBlank()) {
+                Picasso.get().load(item.buyingItemImage).into(viewBinding.buyingItemImage)
+            }
+            if (item.payingItemImage.isNotBlank()) {
+                Picasso.get().load(item.payingItemImage).into(viewBinding.payingItemImage)
+            }
         }
     }
 }

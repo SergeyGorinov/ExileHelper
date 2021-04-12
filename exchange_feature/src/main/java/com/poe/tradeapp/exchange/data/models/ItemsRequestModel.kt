@@ -139,7 +139,8 @@ internal class ItemsRequestModelFields {
             "Int" to serializer<Int>(),
             "Sockets" to Sockets.serializer(),
             "MinMax" to MinMax.serializer(),
-            "DropDown" to DropDown.serializer()
+            "DropDown" to DropDown.serializer(),
+            "Price" to Price.serializer()
         ).mapValues { (_, v) ->
             v as KSerializer<Any>
         }
@@ -162,6 +163,7 @@ internal class ItemsRequestModelFields {
                 is Sockets -> "Sockets"
                 is MinMax -> "MinMax"
                 is DropDown -> "DropDown"
+                is Price -> "Price"
                 else -> "Any"
             }
             encoder.encodeSerializableValue(getValueSerializer(dataType), value)
