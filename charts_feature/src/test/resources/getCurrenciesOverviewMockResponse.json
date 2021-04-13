@@ -1,0 +1,99 @@
+{
+  "lines": [
+    {
+      "currencyTypeName": "Mirror of Kalandra",
+      "pay": {
+        "id": 0,
+        "league_id": 100,
+        "pay_currency_id": 22,
+        "get_currency_id": 2,
+        "sample_time_utc": "2021-04-12T22:35:40.8036209Z",
+        "count": 63,
+        "value": 0.000011621904,
+        "data_point_count": 1,
+        "includes_secondary": true,
+        "listing_count": 129
+      },
+      "receive": {
+        "id": 0,
+        "league_id": 100,
+        "pay_currency_id": 1,
+        "get_currency_id": 22,
+        "sample_time_utc": "2021-04-12T22:35:40.8036209Z",
+        "count": 41,
+        "value": 91229.3918918919,
+        "data_point_count": 1,
+        "includes_secondary": true,
+        "listing_count": 124
+      },
+      "paySparkLine": {
+        "data": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0
+        ],
+        "totalChange": 0
+      },
+      "receiveSparkLine": {
+        "data": [
+          0,
+          2.04,
+          6.56,
+          7.45,
+          11.16,
+          11.65,
+          11.8
+        ],
+        "totalChange": 11.8
+      },
+      "chaosEquivalent": 88088.5,
+      "lowConfidencePaySparkLine": {
+        "data": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0
+        ],
+        "totalChange": 0
+      },
+      "lowConfidenceReceiveSparkLine": {
+        "data": [
+          0,
+          2.04,
+          6.56,
+          7.45,
+          11.16,
+          11.65,
+          11.8
+        ],
+        "totalChange": 11.8
+      },
+      "detailsId": "mirror-of-kalandra"
+    }
+  ],
+  "currencyDetails": [
+    {
+      "id": 1,
+      "icon": "https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyRerollRare.png?scale=1&w=1&h=1",
+      "name": "Chaos Orb",
+      "tradeId": "chaos"
+    },
+    {
+      "id": 22,
+      "icon": "https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyDuplicate.png?scale=1&w=1&h=1",
+      "name": "Mirror of Kalandra",
+      "tradeId": "mirror"
+    }
+  ],
+  "language": {
+    "name": "en",
+    "translations": {}
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "lines": [
+    {
+      "id": 36712,
+      "name": "Misinformation",
+      "icon": "https://web.poecdn.com/image/Art/2DItems/Currency/Strongholds/IvoryWatchstone3.png?v=18db05af11a9b8104cc3cf97729dd004&w=1&h=1&scale=1",
+      "mapTier": 1,
+      "levelRequired": 0,
+      "baseType": null,
+      "stackSize": 0,
+      "variant": "1",
+      "prophecyText": null,
+      "artFilename": null,
+      "links": 0,
+      "itemClass": 3,
+      "sparkline": {
+        "data": [],
+        "totalChange": 0
+      },
+      "lowConfidenceSparkline": {
+        "data": [
+          0,
+          0.49,
+          0.49,
+          2049.27,
+          2070.11,
+          2080.5,
+          19276.1
+        ],
+        "totalChange": 19276.1
+      },
+      "implicitModifiers": [],
+      "explicitModifiers": [
+        {
+          "text": "+1 to Monster Level of Area",
+          "optional": false
+        },
+        {
+          "text": "(21-30)% increased effect of Modifiers on non-unique Maps",
+          "optional": false
+        },
+        {
+          "text": "1 uses remaining",
+          "optional": false
+        }
+      ],
+      "flavourText": "The King's Eye returned from the west.\nFertile pastures lay just beyond sight.\nJust a little farther, he said.\nIt was always just a little farther.",
+      "corrupted": false,
+      "gemLevel": 0,
+      "gemQuality": 0,
+      "itemType": "Unknown",
+      "chaosValue": 26149.98,
+      "exaltedValue": 249.0,
+      "count": 2,
+      "detailsId": "misinformation-ivory-watchstone-1",
+      "tradeInfo": null,
+      "mapRegion": null,
+      "listingCount": 13
+    }
+  ],
+  "language": {
+    "name": "en",
+    "translations": {}
+  }
+}
