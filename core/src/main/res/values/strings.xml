@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PoeTradeApp</string>
+    <string name="app_name">Exile Helper</string>
     <string name="search">Search</string>
     <string name="empty_hint">" "</string>
     <string name="select_league_text">Select league:</string>
