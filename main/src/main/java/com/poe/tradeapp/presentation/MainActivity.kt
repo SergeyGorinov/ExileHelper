@@ -50,6 +50,7 @@ class MainActivity : FragmentActivity(), IMainActivity {
 
     private lateinit var viewBinding: ActivityMainBinding
 
+    private var isApiConnectionChecked = false
     private var currencyExchangeWantItemId: String? = null
     private var currencyExchangeHaveItemId: String? = null
     private var itemSearchType: String? = null
@@ -148,8 +149,8 @@ class MainActivity : FragmentActivity(), IMainActivity {
                 }
                 is Replace -> {
                     fragmentTransaction.setCustomAnimations(
-                        R.animator.fade_in,
-                        R.animator.fade_out
+                        R.anim.fade_in,
+                        R.anim.fade_out
                     )
                 }
             }
@@ -287,7 +288,7 @@ class MainActivity : FragmentActivity(), IMainActivity {
     }
 
     override fun checkApiConnection() {
-        if (FirebaseAuth.getInstance().currentUser != null) {
+        if (FirebaseAuth.getInstance().currentUser != null && !isApiConnectionChecked) {
             lifecycleScope.launch {
                 val result = withContext(Dispatchers.IO) {
                     try {
@@ -306,6 +307,7 @@ class MainActivity : FragmentActivity(), IMainActivity {
                         .create()
                         .show()
                 }
+                isApiConnectionChecked = true
             }
         }
     }

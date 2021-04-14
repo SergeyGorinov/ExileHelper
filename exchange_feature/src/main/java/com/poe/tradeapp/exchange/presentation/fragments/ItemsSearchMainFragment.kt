@@ -2,6 +2,7 @@ package com.poe.tradeapp.exchange.presentation.fragments
 
 import android.os.Bundle
 import android.view.View
+import android.view.animation.Animation
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -22,6 +23,7 @@ import com.poe.tradeapp.exchange.presentation.models.SuggestionItem
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+
 
 class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main) {
 
@@ -92,6 +94,16 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         scope.close()
     }
 
+//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+//        val anim: Animation = AnimationUtils.loadAnimation(activity, nextAnim)
+//        anim.setAnimationListener(AnimationListener(enter) {
+//            Handler(requireActivity().mainLooper).postDelayed({
+//                setupFiltersList()
+//            }, 50L)
+//        })
+//        return anim
+//    }
+
     fun closeToolbarSearchLayoutIfNeeded(): Boolean {
         return if (binding.toolbarSearchLayout.visibility == View.VISIBLE) {
             hideToolbarSearchLayout()
@@ -157,14 +169,6 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
                 focusedView.setText("", false)
             }
         }
-
-        binding.toolbarSearchInput.setAdapter(
-            ItemsSearchFieldAdapter(
-                requireActivity(),
-                R.layout.dropdown_item,
-                viewModel.itemGroups
-            )
-        )
     }
 
     private fun setupFiltersList() {
@@ -184,6 +188,15 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
     }
 
     private fun showToolbarSearchLayout() {
+        if (binding.toolbarSearchInput.adapter == null) {
+            binding.toolbarSearchInput.setAdapter(
+                ItemsSearchFieldAdapter(
+                    requireActivity(),
+                    R.layout.dropdown_item,
+                    viewModel.itemGroups
+                )
+            )
+        }
         binding.toolbar.visibility = View.GONE
         binding.toolbarSearchLayout.alpha = 0f
         binding.toolbarSearchLayout.visibility = View.VISIBLE
@@ -227,6 +240,22 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
                     "Items not found!",
                     Toast.LENGTH_LONG
                 ).show()
+            }
+        }
+    }
+
+    private class AnimationListener(
+        private val enter: Boolean,
+        private val onEndAction: () -> Unit
+    ) : Animation.AnimationListener {
+
+        override fun onAnimationStart(animation: Animation) = Unit
+
+        override fun onAnimationRepeat(animation: Animation) = Unit
+
+        override fun onAnimationEnd(animation: Animation) {
+            if (enter) {
+                onEndAction()
             }
         }
     }

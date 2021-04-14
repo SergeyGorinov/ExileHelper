@@ -12,26 +12,14 @@ import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.data.models.Filter
 import com.poe.tradeapp.exchange.databinding.FiltersHeaderItemBinding
 import com.poe.tradeapp.exchange.presentation.adapters.ItemsFilterAdapter
-import com.poe.tradeapp.exchange.presentation.models.enums.IBindableViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.ViewFilters
 
-internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-    IBindableViewHolder {
+internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val viewBinding = FiltersHeaderItemBinding.bind(itemView)
     private val animator = SlideUpDownAnimator(viewBinding.filterItemsLayout)
 
-    init {
-        val divider = DividerItemDecoration(itemView.context, RecyclerView.VERTICAL)
-        ContextCompat.getDrawable(itemView.context, R.drawable.table_column_divider)
-            ?.let { divider.setDrawable(it) }
-
-        viewBinding.filterItemsLayout.layoutManager = LinearLayoutManager(itemView.context)
-        viewBinding.filterItemsLayout.setHasFixedSize(true)
-        viewBinding.filterItemsLayout.addItemDecoration(divider)
-    }
-
-    override fun bind(item: ViewFilters.AllFilters, filters: MutableList<Filter>) {
+    fun bind(item: ViewFilters.AllFilters, filters: MutableList<Filter>) {
         var filter = filters.firstOrNull { it.name == item.id }
         if (filter == null) {
             filter = Filter(item.id) {
@@ -63,6 +51,13 @@ internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
 
         viewBinding.filterShowHideButton.setOnClickListener {
             if (viewBinding.filterItemsLayout.adapter == null) {
+                val divider = DividerItemDecoration(itemView.context, RecyclerView.VERTICAL)
+                ContextCompat.getDrawable(itemView.context, R.drawable.table_column_divider)
+                    ?.let { divider.setDrawable(it) }
+
+                viewBinding.filterItemsLayout.layoutManager = LinearLayoutManager(itemView.context)
+                viewBinding.filterItemsLayout.setHasFixedSize(true)
+                viewBinding.filterItemsLayout.addItemDecoration(divider)
                 viewBinding.filterItemsLayout.adapter = ItemsFilterAdapter(item.values, filter)
                 animator.setHeight(viewBinding.filterItemsLayout.measureForAnimator())
             }

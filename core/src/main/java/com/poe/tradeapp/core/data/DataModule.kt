@@ -18,7 +18,7 @@ internal val dataModule = module {
     } bind StaticApi::class
     single {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/")
+            .baseUrl("http://18.156.126.44:8080/")//18.156.126.44//10.0.2.2
             .addConverterFactory(Json.asConverterFactory(MediaType.get("application/json")))
             .build()
             .create(PoeTradeApi::class.java)
