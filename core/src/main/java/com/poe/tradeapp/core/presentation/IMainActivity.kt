@@ -1,5 +1,7 @@
 package com.poe.tradeapp.core.presentation
 
+import android.os.Bundle
+
 interface IMainActivity {
 
     fun getLeagues(): List<String>
@@ -17,6 +19,10 @@ interface IMainActivity {
         withNotificationRequest: Boolean = false
     )
 
+    fun saveCurrencyExchangeFragmentState(state: Bundle)
+    fun saveItemsSearchFragmentState(state: Bundle)
+    fun restoreCurrencyExchangeFragmentState(): Bundle?
+    fun restoreItemsSearchFragmentState(): Bundle?
     fun showBottomNavBarIfNeeded()
     fun signOut()
     fun checkApiConnection()

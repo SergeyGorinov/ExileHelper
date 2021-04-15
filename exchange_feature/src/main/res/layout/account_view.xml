@@ -1,34 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="32dp"
-    android:orientation="horizontal">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.4" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/filterName"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="1dp"
-        android:layout_weight="2"
+        android:layout_marginEnd="2dp"
         android:background="@drawable/filter_textfield_default"
         android:fontFamily="@font/fontinsmallcaps"
         android:gravity="center_vertical"
         android:paddingStart="10dp"
         android:textColor="@color/primaryTextColor"
         android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
         tools:ignore="RtlSymmetry,SelectableText" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/filterValue"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginStart="1dp"
-        android:layout_weight="3"
         android:hint="@string/empty_hint"
-        app:hintTextColor="@android:color/transparent">
+        app:hintTextColor="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/filterAccount"
@@ -42,7 +48,6 @@
             android:padding="0dp"
             android:textColor="@color/primaryTextColor"
             android:textColorHint="@color/secondaryLightColor"
-            android:textSize="13sp"
             android:textStyle="bold" />
     </com.google.android.material.textfield.TextInputLayout>
-</LinearLayout>
+</merge>

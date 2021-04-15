@@ -18,4 +18,5 @@
     <string name="add_notification_request">Add notification</string>
     <string name="search">Search</string>
     <string name="notifications">Notifications</string>
+    <string name="buyout_price">Buyout Price</string>
 </resources>

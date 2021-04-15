@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="FilterView">
+        <attr name="android:checked" format="boolean" />
+        <attr name="fieldName" format="string" />
+    </declare-styleable>
+</resources>

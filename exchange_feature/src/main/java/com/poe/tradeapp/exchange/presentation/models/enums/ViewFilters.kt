@@ -217,7 +217,7 @@ internal class ViewFilters {
     }
 
     enum class TradeFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?

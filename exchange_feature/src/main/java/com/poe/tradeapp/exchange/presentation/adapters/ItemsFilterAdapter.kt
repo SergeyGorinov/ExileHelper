@@ -37,7 +37,7 @@ internal class ItemsFilterAdapter(private val items: Array<*>, private val filte
         return when (viewType) {
             ViewType.Dropdown.ordinal -> {
                 val view = layoutInflater.inflate(
-                    R.layout.filters_dropdown_item,
+                    R.layout.dropdown_view,
                     parent,
                     false
                 )
@@ -61,7 +61,7 @@ internal class ItemsFilterAdapter(private val items: Array<*>, private val filte
             }
             ViewType.Account.ordinal -> {
                 val view = layoutInflater.inflate(
-                    R.layout.filters_account_item,
+                    R.layout.account_view,
                     parent,
                     false
                 )
@@ -69,7 +69,7 @@ internal class ItemsFilterAdapter(private val items: Array<*>, private val filte
             }
             ViewType.Buyout.ordinal -> {
                 val view = layoutInflater.inflate(
-                    R.layout.filters_buyout_item,
+                    R.layout.buyout_view,
                     parent,
                     false
                 )
@@ -77,7 +77,7 @@ internal class ItemsFilterAdapter(private val items: Array<*>, private val filte
             }
             else -> {
                 val view = layoutInflater.inflate(
-                    R.layout.filters_dropdown_item,
+                    R.layout.dropdown_view,
                     parent,
                     false
                 )

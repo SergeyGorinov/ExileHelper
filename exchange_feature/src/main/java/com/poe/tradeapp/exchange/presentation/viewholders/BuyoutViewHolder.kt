@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.poe.tradeapp.exchange.R
 import com.poe.tradeapp.exchange.data.models.Filter
 import com.poe.tradeapp.exchange.data.models.ItemsRequestModelFields
-import com.poe.tradeapp.exchange.databinding.FiltersBuyoutItemBinding
+import com.poe.tradeapp.exchange.databinding.BuyoutViewBinding
 import com.poe.tradeapp.exchange.presentation.adapters.DropDownAdapter
 import com.poe.tradeapp.exchange.presentation.models.enums.IBindableFieldViewHolder
 import com.poe.tradeapp.exchange.presentation.models.enums.IEnum
@@ -17,7 +17,7 @@ import com.poe.tradeapp.exchange.presentation.models.enums.IFilter
 internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
 
-    private val viewBinding = FiltersBuyoutItemBinding.bind(itemView)
+    private val viewBinding = BuyoutViewBinding.bind(itemView)
     private val textFont = ResourcesCompat.getFont(
         itemView.context,
         com.poe.tradeapp.core.R.font.fontinsmallcaps

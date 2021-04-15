@@ -12,6 +12,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
@@ -51,8 +52,6 @@ class MainActivity : FragmentActivity(), IMainActivity {
     private lateinit var viewBinding: ActivityMainBinding
 
     private var isApiConnectionChecked = false
-    private var currencyExchangeWantItemId: String? = null
-    private var currencyExchangeHaveItemId: String? = null
     private var itemSearchType: String? = null
     private var itemSearchName: String? = null
     private var withNotificationRequest = false
@@ -165,16 +164,7 @@ class MainActivity : FragmentActivity(), IMainActivity {
         viewBinding.bottomNavBar.setOnNavigationItemSelectedListener {
             return@setOnNavigationItemSelectedListener when (it.itemId) {
                 R.id.currencyExchangeMenu -> {
-                    router.newRootScreen(
-                        CurrencyExchangeMainFragment.newInstance(
-                            wantItemId = currencyExchangeWantItemId,
-                            haveItemId = currencyExchangeHaveItemId,
-                            withNotificationRequest = withNotificationRequest
-                        )
-                    )
-                    currencyExchangeWantItemId = null
-                    currencyExchangeHaveItemId = null
-                    withNotificationRequest = false
+                    router.newRootScreen(CurrencyExchangeMainFragment.newInstance())
                     true
                 }
                 R.id.itemsSearchMenu -> {
@@ -261,17 +251,20 @@ class MainActivity : FragmentActivity(), IMainActivity {
         firstTime: Boolean,
         withNotificationRequest: Boolean
     ) {
-        if (firstTime) {
-            router.newRootScreen(
-                CurrencyExchangeMainFragment.newInstance(
-                    currencyExchangeWantItemId,
-                    currencyExchangeHaveItemId
-                )
+        val savedExchangeCurrencyFragmentState =
+            viewModel.currencyExchangeMainFragmentState ?: bundleOf()
+
+        savedExchangeCurrencyFragmentState.putAll(
+            bundleOf(
+                CurrencyExchangeMainFragment.WANT_ITEM_ID_KEY to wantItemId,
+                CurrencyExchangeMainFragment.HAVE_ITEM_ID_KEY to haveItemId,
+                CurrencyExchangeMainFragment.WITH_NOTIFICATION_REQUEST_KEY to withNotificationRequest
             )
+        )
+
+        if (firstTime) {
+            router.newRootScreen(CurrencyExchangeMainFragment.newInstance())
         } else {
-            currencyExchangeWantItemId = wantItemId
-            currencyExchangeHaveItemId = haveItemId
-            this.withNotificationRequest = withNotificationRequest
             viewBinding.bottomNavBar.selectedItemId = R.id.currencyExchangeMenu
         }
     }
@@ -310,5 +303,21 @@ class MainActivity : FragmentActivity(), IMainActivity {
                 isApiConnectionChecked = true
             }
         }
+    }
+
+    override fun saveCurrencyExchangeFragmentState(state: Bundle) {
+        viewModel.currencyExchangeMainFragmentState = state
+    }
+
+    override fun saveItemsSearchFragmentState(state: Bundle) {
+        viewModel.itemsSearchMainFragmentState = state
+    }
+
+    override fun restoreCurrencyExchangeFragmentState(): Bundle? {
+        return viewModel.currencyExchangeMainFragmentState
+    }
+
+    override fun restoreItemsSearchFragmentState(): Bundle? {
+        return viewModel.itemsSearchMainFragmentState
     }
 }

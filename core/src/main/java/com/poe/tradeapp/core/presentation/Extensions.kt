@@ -27,7 +27,7 @@ import org.koin.core.scope.Scope
 import org.koin.java.KoinJavaComponent.getKoin
 import java.util.*
 
-fun RecyclerView.measureForAnimator(): Int {
+fun View.measureForAnimator(): Int {
     val layoutParams = this.layoutParams
     layoutParams.height = 1
     this.layoutParams = layoutParams

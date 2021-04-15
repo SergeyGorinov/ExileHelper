@@ -42,15 +42,6 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         FragmentScopes.CURRENCY_FEATURE
     )
 
-    private val wantItemId by lazy { requireArguments().getString(WANT_ITEM_ID_KEY) }
-    private val haveItemId by lazy { requireArguments().getString(HAVE_ITEM_ID_KEY) }
-    private val withNotificationRequest by lazy {
-        requireArguments().getBoolean(
-            WITH_NOTIFICATION_REQUEST_KEY,
-            false
-        )
-    }
-
     private lateinit var binding: FragmentCurrencyExchangeMainBinding
     private lateinit var adapter: CurrencySelectedAdapter
     private lateinit var toolbarLayout: CurrencyFeatureToolbarBinding
@@ -61,6 +52,7 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         super.onAttach(context)
         getMainActivity()?.showBottomNavBarIfNeeded()
         getMainActivity()?.checkApiConnection()
+        restoreState()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,44 +61,72 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         viewBinding = FragmentCurrencyExchangeMainBinding.bind(view)
         binding = getBinding()
 
+        savedState.getString(SAVED_STOCK_KEY)?.let { stock ->
+            binding.minimumStockValue.setText(stock)
+        }
+
         toolbarLayout = CurrencyFeatureToolbarBinding.bind(binding.root)
+        binding.fullfilable.isChecked = savedState.getBoolean(SAVED_FULFILLABLE_STATE_KEY, false)
 
         setupCurrencyList()
-        setupToolbar(savedState.getInt(TAB_POSITION_KEY, 0))
         setupOnClickListeners()
-
-        binding.fullfilable.isChecked = savedState.getBoolean(FULFILLABLE_STATE_KEY, true)
-
-        wantItemId?.let {
-            viewModel.wantCurrencies.clear()
-            viewModel.wantCurrencies.add(it)
-        }
-        haveItemId?.let {
-            viewModel.haveCurrencies.clear()
-            viewModel.haveCurrencies.add(it)
-        }
-        if (wantItemId != null && haveItemId != null) {
-            if (withNotificationRequest) {
-                NotificationRequestAddFragment
-                    .newInstance(wantItemId, haveItemId)
-                    .show(parentFragmentManager, null)
-            } else {
-                requestResults()
-            }
-        }
-        requireArguments().clear()
+        setupToolbar(savedState.getInt(SAVED_TAB_POSITION_KEY, 0))
+        savedState.clear()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        savedState.putInt(TAB_POSITION_KEY, toolbarLayout.tabLayout.selectedTabPosition)
-        savedState.putBoolean(FULFILLABLE_STATE_KEY, binding.fullfilable.isChecked)
+        savedState.clear()
+        savedState.putAll(
+            bundleOf(
+                SAVED_WANT_ITEMS_IDS_KEY to ArrayList(viewModel.wantCurrencies),
+                SAVED_HAVE_ITEMS_IDS_KEY to ArrayList(viewModel.haveCurrencies),
+                SAVED_TAB_POSITION_KEY to toolbarLayout.tabLayout.selectedTabPosition,
+                SAVED_FULFILLABLE_STATE_KEY to binding.fullfilable.isChecked,
+                SAVED_STOCK_KEY to binding.minimumStockValue.text?.toString()
+            )
+        )
     }
 
     override fun onDestroy() {
         super.onDestroy()
         binding.currencies.adapter = null
         scope.close()
+        getMainActivity()?.saveCurrencyExchangeFragmentState(savedState)
+    }
+
+    private fun restoreState() {
+        savedState.clear()
+        getMainActivity()?.restoreCurrencyExchangeFragmentState()?.let {
+            savedState.putAll(it)
+        }
+        savedState.let {
+            val wantItemId = it.getString(WANT_ITEM_ID_KEY)
+            val haveItemId = it.getString(HAVE_ITEM_ID_KEY)
+            val withNotificationRequest = it.getBoolean(WITH_NOTIFICATION_REQUEST_KEY, false)
+
+            if (wantItemId != null && haveItemId != null) {
+                if (withNotificationRequest) {
+                    NotificationRequestAddFragment
+                        .newInstance(wantItemId, haveItemId)
+                        .show(parentFragmentManager, null)
+                } else {
+                    viewModel.wantCurrencies.clear()
+                    viewModel.wantCurrencies.add(wantItemId)
+                    viewModel.haveCurrencies.clear()
+                    viewModel.haveCurrencies.add(haveItemId)
+                    requestResults()
+                    return@let
+                }
+            }
+
+            it.getStringArrayList(SAVED_WANT_ITEMS_IDS_KEY)?.let { wantCurrencies ->
+                viewModel.wantCurrencies.addAll(wantCurrencies)
+            }
+            it.getStringArrayList(SAVED_HAVE_ITEMS_IDS_KEY)?.let { haveCurrencies ->
+                viewModel.haveCurrencies.addAll(haveCurrencies)
+            }
+        }
     }
 
     private fun setupToolbar(selectedTabPosition: Int) {
@@ -301,27 +321,15 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
     companion object {
         const val NOTIFICATION_REQUESTS_TYPE = "0"
+        const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
+        const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
+        const val WITH_NOTIFICATION_REQUEST_KEY = "WITH_NOTIFICATION_REQUEST_KEY"
+        const val SAVED_TAB_POSITION_KEY = "TAB_POSITION_KEY"
+        const val SAVED_FULFILLABLE_STATE_KEY = "FULFILLABLE_STATE_KEY"
+        const val SAVED_WANT_ITEMS_IDS_KEY = "WANT_ITEMS_IDS_KEY"
+        const val SAVED_HAVE_ITEMS_IDS_KEY = "HAVE_ITEMS_IDS_KEY"
+        const val SAVED_STOCK_KEY = "SAVED_STOCK_KEY"
 
-        private const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
-        private const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
-        private const val WITH_NOTIFICATION_REQUEST_KEY = "WITH_NOTIFICATION_REQUEST_KEY"
-        private const val TAB_POSITION_KEY = "TAB_POSITION_KEY"
-        private const val FULFILLABLE_STATE_KEY = "FULFILLABLE_STATE_KEY"
-
-        fun newInstance(
-            wantItemId: String? = null,
-            haveItemId: String? = null,
-            withNotificationRequest: Boolean = false
-        ): FragmentScreen {
-            return FragmentScreen {
-                CurrencyExchangeMainFragment().apply {
-                    arguments = bundleOf(
-                        WANT_ITEM_ID_KEY to wantItemId,
-                        HAVE_ITEM_ID_KEY to haveItemId,
-                        WITH_NOTIFICATION_REQUEST_KEY to withNotificationRequest
-                    )
-                }
-            }
-        }
+        fun newInstance() = FragmentScreen { CurrencyExchangeMainFragment() }
     }
 }

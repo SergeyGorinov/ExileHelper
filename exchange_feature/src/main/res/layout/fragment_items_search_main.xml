@@ -118,13 +118,32 @@
             android:padding="4dp"
             android:src="@drawable/clear_24" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/filtersList"
+        <com.poe.tradeapp.exchange.presentation.views.FilterView
+            android:id="@+id/testFilter1"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            android:checked="true"
+            app:fieldName="Test filter 1"
             app:layout_constraintTop_toBottomOf="@id/selected_item" />
+
+        <com.poe.tradeapp.exchange.presentation.views.BuyoutFilterView
+            android:id="@+id/testFilterField1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/testFilter1" />
+
+        <!--        <androidx.recyclerview.widget.RecyclerView-->
+        <!--            android:id="@+id/filtersList"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="0dp"-->
+        <!--            android:layout_marginTop="16dp"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/selected_item" />-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
