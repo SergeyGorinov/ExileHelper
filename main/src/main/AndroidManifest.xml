@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.poe.tradeapp">
+    package="com.sgorinov.exilehelper">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name="PoeTradeApplication"
+        android:name="com.sgorinov.exilehelper.PoeTradeApplication"
         android:allowBackup="true"
         android:icon="@mipmap/launcher_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/launcher_icon_round"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".presentation.MainActivity">
+        <activity android:name="com.sgorinov.exilehelper.presentation.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,7 +22,7 @@
         </activity>
 
         <service
-            android:name=".MyFirebaseMessaging"
+            android:name="com.sgorinov.exilehelper.MyFirebaseMessaging"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

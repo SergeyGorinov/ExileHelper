@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <com.poe.tradeapp.exchange.presentation.views.AccountView
+    <com.sgorinov.exilehelper.exchange.presentation.views.AccountView
         android:id="@+id/account"
         android:layout_width="match_parent"
         android:layout_height="@dimen/default_filter_height"
         app:fieldName="Seller Account"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.poe.tradeapp.exchange.presentation.views.DropDownView
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
         android:id="@+id/listedDropdown"
         android:layout_width="match_parent"
         android:layout_height="@dimen/default_filter_height"
@@ -19,7 +19,7 @@
         app:fieldName="Listed"
         app:layout_constraintTop_toBottomOf="@id/account" />
 
-    <com.poe.tradeapp.exchange.presentation.views.DropDownView
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
         android:id="@+id/saleTypeDropdown"
         android:layout_width="match_parent"
         android:layout_height="@dimen/default_filter_height"
@@ -27,7 +27,7 @@
         app:fieldName="Sale Type"
         app:layout_constraintTop_toBottomOf="@id/listedDropdown" />
 
-    <com.poe.tradeapp.exchange.presentation.views.BuyoutView
+    <com.sgorinov.exilehelper.exchange.presentation.views.BuyoutView
         android:id="@+id/buyoutDropdown"
         android:layout_width="match_parent"
         android:layout_height="66dp"

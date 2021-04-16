@@ -11,7 +11,7 @@
         app:layout_constraintBottom_toTopOf="@id/bottomNavBar"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.poe.tradeapp.core.presentation.BottomNavigationViewCompat
+    <com.sgorinov.exilehelper.core.presentation.BottomNavigationViewCompat
         android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
