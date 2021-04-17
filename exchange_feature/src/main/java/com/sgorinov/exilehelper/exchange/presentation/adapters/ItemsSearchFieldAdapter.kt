@@ -13,15 +13,19 @@ import com.sgorinov.exilehelper.exchange.R
 import com.sgorinov.exilehelper.exchange.presentation.models.ItemGroupViewData
 import com.sgorinov.exilehelper.exchange.presentation.models.SuggestionItem
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.properties.Delegates
 
 internal class ItemsSearchFieldAdapter(
     context: Context,
     resId: Int,
     private val allItems: List<ItemGroupViewData>,
-    private val items: CopyOnWriteArrayList<SuggestionItem> = CopyOnWriteArrayList()
+    private val items: CopyOnWriteArrayList<SuggestionItem> = CopyOnWriteArrayList(),
+    onSelectItem: (SuggestionItem?) -> Unit,
 ) : ArrayAdapter<SuggestionItem>(context, resId, items) {
 
-    var selectedItem: SuggestionItem? = null
+    var selectedItem: SuggestionItem? by Delegates.observable(null) { _, _, newValue ->
+        onSelectItem(newValue)
+    }
     private var currentCount = 0
 
     private val suggestions: CopyOnWriteArrayList<SuggestionItem> = CopyOnWriteArrayList()

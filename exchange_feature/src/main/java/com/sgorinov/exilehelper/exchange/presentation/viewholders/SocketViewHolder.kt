@@ -5,18 +5,18 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.sgorinov.exilehelper.exchange.data.models.Filter
 import com.sgorinov.exilehelper.exchange.data.models.ItemsRequestModelFields
-import com.sgorinov.exilehelper.exchange.databinding.FiltersSocketItemBinding
+import com.sgorinov.exilehelper.exchange.databinding.SocketsViewBinding
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.IBindableFieldViewHolder
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.IFilter
 
 internal class SocketViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
 
-    private val viewBinding = FiltersSocketItemBinding.bind(itemView)
+    private val viewBinding = SocketsViewBinding.bind(itemView)
 
     override fun bind(item: IFilter, filter: Filter) {
         val fieldId = item.id ?: return
-        val field = filter.getField(fieldId)
+        val field = filter.getOrCreateField(fieldId)
         viewBinding.filterName.text = item.text
         viewBinding.filterRed.doOnTextChanged { _, _, _, _ ->
             field.value = getSocketGroupData()

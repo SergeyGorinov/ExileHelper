@@ -16,7 +16,7 @@ internal class ViewFilters {
     }
 
     enum class TypeFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?
@@ -26,7 +26,7 @@ internal class ViewFilters {
     }
 
     enum class WeaponFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?
@@ -40,7 +40,7 @@ internal class ViewFilters {
     }
 
     enum class ArmourFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?
@@ -52,7 +52,7 @@ internal class ViewFilters {
     }
 
     enum class SocketFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?
@@ -62,7 +62,7 @@ internal class ViewFilters {
     }
 
     enum class ReqFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?
@@ -74,7 +74,7 @@ internal class ViewFilters {
     }
 
     enum class MapFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?
@@ -91,7 +91,7 @@ internal class ViewFilters {
     }
 
     enum class HeistFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?
@@ -136,7 +136,7 @@ internal class ViewFilters {
     }
 
     enum class MiscFilters(
-        override val id: String?,
+        override val id: String,
         override val text: String,
         override val viewType: ViewType,
         override val dropDownValues: Array<*>?

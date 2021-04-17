@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.sgorinov.exilehelper.charts_feature.R
+import com.sgorinov.exilehelper.charts_feature.databinding.ChartsFeatureToolbarBinding
 import com.sgorinov.exilehelper.charts_feature.databinding.FragmentOverviewBinding
 import com.sgorinov.exilehelper.charts_feature.presentation.ChartsViewModel
 import com.sgorinov.exilehelper.charts_feature.presentation.adapters.OverviewAdapter
@@ -31,24 +32,33 @@ internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
     }
 
     private lateinit var binding: FragmentOverviewBinding
+    private lateinit var toolbarLayout: ChartsFeatureToolbarBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewBinding = FragmentOverviewBinding.bind(view)
         binding = getBinding()
 
+        toolbarLayout = ChartsFeatureToolbarBinding.bind(binding.root)
+
         val adapter = OverviewAdapter {
             lifecycleScope.launchWhenResumed {
-                val data = if (isCurrency) {
-                    viewModel.getCurrencyHistory(settings.league, itemType, it)
-                } else {
-                    viewModel.getItemHistory(settings.league, itemType, it)
+                val data = try {
+                    if (isCurrency) {
+                        viewModel.getCurrencyHistory(settings.league, itemType, it)
+                    } else {
+                        viewModel.getItemHistory(settings.league, itemType, it)
+                    }
+                } catch (e: Exception) {
+                    null
                 }
-                router.navigateTo(HistoryFragment.newInstance(isCurrency, data))
+                if (data != null) {
+                    router.navigateTo(HistoryFragment.newInstance(isCurrency, data))
+                }
             }
         }
 
-        binding.toolbar.title = "Select currency"
+        toolbarLayout.toolbar.title = "Select currency"
 
         binding.overviewList.apply {
             addItemDecoration(
@@ -82,47 +92,47 @@ internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
         if (isCurrency) {
             setupTabLayout(savedState.getInt(TAB_POSITION_KEY, 0), adapter)
         } else {
-            binding.tabLayout.visibility = View.GONE
+            toolbarLayout.tabLayout.visibility = View.GONE
             adapter.selling = false
         }
         lifecycleScope.launchWhenResumed {
             viewModel.viewLoadingState.collect {
                 if (it) {
-                    binding.toolbarProgressBar.show()
+                    toolbarLayout.toolbarProgressBar.show()
                 } else {
-                    binding.toolbarProgressBar.hide()
+                    toolbarLayout.toolbarProgressBar.hide()
                 }
             }
         }
     }
 
     override fun onDestroyView() {
-        savedState.putInt(TAB_POSITION_KEY, binding.tabLayout.selectedTabPosition)
+        savedState.putInt(TAB_POSITION_KEY, toolbarLayout.tabLayout.selectedTabPosition)
         binding.overviewList.adapter = null
         super.onDestroyView()
     }
 
     private fun setupTabLayout(selectedTabPosition: Int, adapter: OverviewAdapter) {
-        binding.tabLayout.changeTabsFont(
+        toolbarLayout.tabLayout.changeTabsFont(
             ResourcesCompat.getFont(
                 requireActivity(),
                 R.font.fontinsmallcaps
             )
         )
         adapter.selling = selectedTabPosition == 0
-        if (binding.tabLayout.selectedTabPosition != selectedTabPosition) {
-            binding.tabLayout.getTabAt(selectedTabPosition)?.let {
-                binding.tabLayout.selectTab(it, true)
+        if (toolbarLayout.tabLayout.selectedTabPosition != selectedTabPosition) {
+            toolbarLayout.tabLayout.getTabAt(selectedTabPosition)?.let {
+                toolbarLayout.tabLayout.selectTab(it, true)
             }
         }
 
-        binding.tabLayout.addOnTabSelectedListener(
+        toolbarLayout.tabLayout.addOnTabSelectedListener(
             TabLayoutListener(
                 binding.overviewListContainer,
                 binding.overviewList,
                 binding.emptyPlaceholder
             ) {
-                adapter.selling = binding.tabLayout.selectedTabPosition == 0
+                adapter.selling = toolbarLayout.tabLayout.selectedTabPosition == 0
             }
         )
     }

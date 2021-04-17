@@ -15,7 +15,7 @@
         android:id="@+id/listedDropdown"
         android:layout_width="match_parent"
         android:layout_height="@dimen/default_filter_height"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         app:fieldName="Listed"
         app:layout_constraintTop_toBottomOf="@id/account" />
 
@@ -23,7 +23,7 @@
         android:id="@+id/saleTypeDropdown"
         android:layout_width="match_parent"
         android:layout_height="@dimen/default_filter_height"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         app:fieldName="Sale Type"
         app:layout_constraintTop_toBottomOf="@id/listedDropdown" />
 
@@ -31,7 +31,7 @@
         android:id="@+id/buyoutDropdown"
         android:layout_width="match_parent"
         android:layout_height="66dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         app:fieldName="Buyout Price"
         app:layout_constraintTop_toBottomOf="@id/saleTypeDropdown" />
 </merge>

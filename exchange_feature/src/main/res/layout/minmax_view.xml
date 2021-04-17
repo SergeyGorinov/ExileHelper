@@ -1,34 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="32dp">
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.4" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/filterName"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:layout_marginEnd="1dp"
-        android:layout_weight="4"
+        android:layout_marginEnd="2dp"
         android:background="@drawable/filter_textfield_default"
         android:fontFamily="@font/fontinsmallcaps"
         android:gravity="center_vertical"
         android:paddingStart="10dp"
         android:textColor="@color/primaryTextColor"
         android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
         tools:ignore="RtlSymmetry,SelectableText" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/minValue"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginStart="1dp"
-        android:layout_weight="3"
+        android:layout_marginEnd="2dp"
         android:hint="@string/empty_hint"
-        android:paddingEnd="1dp"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
         app:hintTextColor="@android:color/transparent"
+        app:layout_constraintEnd_toStartOf="@id/maxValue"
+        app:layout_constraintStart_toEndOf="@id/guideline"
         tools:ignore="RtlSymmetry">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -44,7 +53,6 @@
             android:padding="0dp"
             android:textColor="@color/primaryTextColor"
             android:textColorHint="@color/secondaryLightColor"
-            android:textSize="13sp"
             android:textStyle="bold" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -52,10 +60,12 @@
         android:id="@+id/maxValue"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="3"
         android:hint="@string/empty_hint"
-        android:paddingStart="1dp"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
         app:hintTextColor="@android:color/transparent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/minValue"
         tools:ignore="RtlSymmetry">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -71,7 +81,6 @@
             android:padding="0dp"
             android:textColor="@color/primaryTextColor"
             android:textColorHint="@color/secondaryLightColor"
-            android:textSize="13sp"
             android:textStyle="bold" />
     </com.google.android.material.textfield.TextInputLayout>
-</LinearLayout>
+</merge>

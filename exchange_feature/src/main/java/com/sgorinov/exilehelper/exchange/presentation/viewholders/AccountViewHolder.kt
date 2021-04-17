@@ -15,7 +15,7 @@ internal class AccountViewHolder(itemView: View) : RecyclerView.ViewHolder(itemV
 
     override fun bind(item: IFilter, filter: Filter) {
         val fieldId = item.id ?: return
-        val field = filter.getField(fieldId)
+        val field = filter.getOrCreateField(fieldId)
 
         viewBinding.filterName.text = item.text
         viewBinding.filterAccount.doOnTextChanged { text, _, _, _ ->

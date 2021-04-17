@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="FilterView">
+    <declare-styleable name="ConstraintLayout">
         <attr name="android:checked" format="boolean" />
         <attr name="fieldName" format="string" />
     </declare-styleable>

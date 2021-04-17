@@ -6,22 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.sgorinov.exilehelper.exchange.R
-import com.sgorinov.exilehelper.exchange.databinding.FilterViewBinding
+import com.sgorinov.exilehelper.exchange.databinding.FilterHeaderViewBinding
 
-class FilterView(ctx: Context, attrs: AttributeSet) : ConstraintLayout(ctx, attrs) {
+class FilterHeaderView(ctx: Context, attrs: AttributeSet) : ConstraintLayout(ctx, attrs) {
 
-    private var viewBinding: FilterViewBinding? = null
+    var viewBinding: FilterHeaderViewBinding? = null
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.filter_view, this, true)
-        viewBinding = FilterViewBinding.bind(this)
+        LayoutInflater.from(context).inflate(R.layout.filter_header_view, this, true)
+        viewBinding = FilterHeaderViewBinding.bind(this)
 
-        context.theme.obtainStyledAttributes(attrs, R.styleable.FilterView, 0, 0).apply {
+        context.theme.obtainStyledAttributes(attrs, R.styleable.ConstraintLayout, 0, 0).apply {
             try {
                 viewBinding?.filterEnabled?.isChecked =
-                    getBoolean(R.styleable.FilterView_android_checked, false)
+                    getBoolean(R.styleable.ConstraintLayout_android_checked, false)
                 viewBinding?.filterShowHideButton?.text =
-                    getString(R.styleable.FilterView_fieldName)
+                    getString(R.styleable.ConstraintLayout_fieldName)
             } finally {
                 recycle()
             }

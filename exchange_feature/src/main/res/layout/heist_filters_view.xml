@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/contractObjectiveValueDropdown"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Listed"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/areaLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Area Level"
+        app:layout_constraintTop_toBottomOf="@id/contractObjectiveValueDropdown" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/wingsRevealedMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Wings Revealed"
+        app:layout_constraintTop_toBottomOf="@id/areaLevelMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/totalWingsMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Total Wings"
+        app:layout_constraintTop_toBottomOf="@id/wingsRevealedMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/escapeRoutesRevealedMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Escape Routes Revealed"
+        app:layout_constraintTop_toBottomOf="@id/totalWingsMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/totalEscapeRoutesMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Total Escape Routes"
+        app:layout_constraintTop_toBottomOf="@id/escapeRoutesRevealedMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/rewardRoomsRevealedMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Reward Rooms Revealed"
+        app:layout_constraintTop_toBottomOf="@id/totalEscapeRoutesMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/totalRewardRoomsMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Total Reward Rooms"
+        app:layout_constraintTop_toBottomOf="@id/rewardRoomsRevealedMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/lockpickingLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Lockpicking Level"
+        app:layout_constraintTop_toBottomOf="@id/totalRewardRoomsMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/bruteForceLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Brute Force Level"
+        app:layout_constraintTop_toBottomOf="@id/lockpickingLevelMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/perceptionLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Perception Level"
+        app:layout_constraintTop_toBottomOf="@id/bruteForceLevelMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/demolitionLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Demolition Level"
+        app:layout_constraintTop_toBottomOf="@id/perceptionLevelMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/counterThaumLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Counter-Thaum. Level"
+        app:layout_constraintTop_toBottomOf="@id/demolitionLevelMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/trapDisarmamentLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Trap Disarmament Level"
+        app:layout_constraintTop_toBottomOf="@id/counterThaumLevelMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/agilityLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Agility Level"
+        app:layout_constraintTop_toBottomOf="@id/trapDisarmamentLevelMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/deceptionLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Deception Level"
+        app:layout_constraintTop_toBottomOf="@id/agilityLevelMinMax" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/engineeringLevelMinMax"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Engineering Level"
+        app:layout_constraintTop_toBottomOf="@id/deceptionLevelMinMax" />
+</merge>

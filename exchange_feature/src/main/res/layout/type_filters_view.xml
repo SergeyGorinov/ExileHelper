@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/itemCategoryDropDown"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        app:fieldName="Item Category"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/itemRarityDropDown"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Item Rarity"
+        app:layout_constraintTop_toBottomOf="@id/itemCategoryDropDown" />
+</merge>

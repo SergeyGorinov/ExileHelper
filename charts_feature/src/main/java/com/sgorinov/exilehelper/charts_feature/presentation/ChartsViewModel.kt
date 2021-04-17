@@ -108,11 +108,15 @@ internal class ChartsViewModel(
         val overViewData = overviewData.firstOrNull { it.id == id }
         val data = getCurrencyHistoryUseCase.execute(league, type, id)
         val maxDay = max(
-            data.buyingGraphData.filter { it.daysAgo <= 50 }.maxOfOrNull { it.daysAgo } ?: 0,
+            data.buyingGraphData?.filter { it.daysAgo <= 50 }?.maxOfOrNull { it.daysAgo } ?: 0,
             data.sellingGraphData.filter { it.daysAgo <= 50 }.maxOfOrNull { it.daysAgo } ?: 0
         )
         val sellingGraphDataSet = getFilteredGraphData(maxDay, data.sellingGraphData, true)
-        val buyingGraphDataSet = getFilteredGraphData(maxDay, data.buyingGraphData, false)
+        val buyingGraphDataSet = if (data.buyingGraphData != null) {
+            getFilteredGraphData(maxDay, data.buyingGraphData, false)
+        } else {
+            null
+        }
         val sellingValue = overViewData?.sellingListingData?.value?.toFloat() ?: 0f
         val buyingValue = overViewData?.buyingListingData?.value?.toFloat() ?: 0f
         viewLoadingState.emit(false)

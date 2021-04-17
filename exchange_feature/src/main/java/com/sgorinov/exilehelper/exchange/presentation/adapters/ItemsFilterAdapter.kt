@@ -45,7 +45,7 @@ internal class ItemsFilterAdapter(private val items: Array<*>, private val filte
             }
             ViewType.Minmax.ordinal -> {
                 val view = layoutInflater.inflate(
-                    R.layout.filters_minmax_item,
+                    R.layout.minmax_view,
                     parent,
                     false
                 )
@@ -53,7 +53,7 @@ internal class ItemsFilterAdapter(private val items: Array<*>, private val filte
             }
             ViewType.Socket.ordinal -> {
                 val view = layoutInflater.inflate(
-                    R.layout.filters_socket_item,
+                    R.layout.sockets_view,
                     parent,
                     false
                 )

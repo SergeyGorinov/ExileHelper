@@ -5,9 +5,9 @@ import com.sgorinov.exilehelper.exchange.domain.models.ItemResultData
 
 internal interface IFeatureRepository {
 
-    val filters: MutableList<Filter>
     val totalItemsResultCount: Int
 
     fun setItemData(type: String?, name: String?)
+    fun getOrCreateFilter(id: String, onFieldsChanged: (Boolean) -> Unit): Filter
     suspend fun getItemsExchangeData(league: String, position: Int): List<ItemResultData>
 }

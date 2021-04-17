@@ -18,6 +18,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="2dp"
         android:background="@drawable/filter_textfield_default"
+        android:focusableInTouchMode="true"
         android:fontFamily="@font/fontinsmallcaps"
         android:gravity="center_vertical"
         android:paddingStart="10dp"

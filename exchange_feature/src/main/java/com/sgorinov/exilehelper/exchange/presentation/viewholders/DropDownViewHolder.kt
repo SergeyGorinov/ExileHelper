@@ -23,7 +23,7 @@ internal class DropDownViewHolder(itemView: View) : RecyclerView.ViewHolder(item
     )
 
     override fun bind(item: IFilter, filter: Filter) {
-        val field = filter.getField(item.id ?: "")
+        val field = filter.getOrCreateField(item.id ?: "")
         viewBinding.filterDropDown.typeface = textFont
         viewBinding.filterName.text = item.text
         viewBinding.filterDropDown.setAdapter(

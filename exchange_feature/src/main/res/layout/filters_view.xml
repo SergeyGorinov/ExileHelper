@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/typeFiltersHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="Type Filters"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.TypeFiltersView
+            android:id="@+id/typeFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/typeFiltersHeader" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/weaponFiltersHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="Weapon Filters"
+            app:layout_constraintTop_toBottomOf="@id/typeFilters" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.WeaponFiltersView
+            android:id="@+id/weaponFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/weaponFiltersHeader" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/armourFiltersHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="Armour Filters"
+            app:layout_constraintTop_toBottomOf="@id/weaponFilters" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.ArmourFiltersView
+            android:id="@+id/armourFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/armourFiltersHeader" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/socketFiltersHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="Socket Filters"
+            app:layout_constraintTop_toBottomOf="@id/armourFilters" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.SocketFiltersView
+            android:id="@+id/socketFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/socketFiltersHeader" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/requirementsFiltersHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="Requirements"
+            app:layout_constraintTop_toBottomOf="@id/socketFilters" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.RequirementsFiltersView
+            android:id="@+id/requirementsFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/requirementsFiltersHeader" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/mapFiltersHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="Map Filters"
+            app:layout_constraintTop_toBottomOf="@id/requirementsFilters" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.MapFiltersView
+            android:id="@+id/mapFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/mapFiltersHeader" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/heistFilterHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="@string/heist_filters"
+            app:layout_constraintTop_toBottomOf="@+id/mapFilters" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.HeistFiltersView
+            android:id="@+id/heistFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/heistFilterHeader" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/miscFilterHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="Miscellaneous"
+            app:layout_constraintTop_toBottomOf="@id/heistFilter" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.MiscFiltersView
+            android:id="@+id/miscFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/filter_button_default"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/miscFilterHeader" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
+            android:id="@+id/tradeFilterHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/filter_button_default"
+            app:fieldName="@string/trade_filters"
+            app:layout_constraintTop_toBottomOf="@id/miscFilter" />
+
+        <com.sgorinov.exilehelper.exchange.presentation.views.TradeFiltersView
+            android:id="@+id/tradeFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/tradeFilterHeader" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

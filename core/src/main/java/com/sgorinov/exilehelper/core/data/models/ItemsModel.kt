@@ -9,6 +9,7 @@ data class ItemsModel(
 
 @Serializable
 data class ItemGroup(
+    val id: String,
     val label: String,
     val entries: List<Item>
 )

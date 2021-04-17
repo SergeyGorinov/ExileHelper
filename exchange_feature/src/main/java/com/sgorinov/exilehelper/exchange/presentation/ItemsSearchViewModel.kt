@@ -9,7 +9,7 @@ import com.sgorinov.exilehelper.core.presentation.FirebaseUtils
 import com.sgorinov.exilehelper.core.presentation.models.NotificationRequestViewData
 import com.sgorinov.exilehelper.exchange.data.models.ItemsRequestModel
 import com.sgorinov.exilehelper.exchange.data.models.ItemsRequestModelFields
-import com.sgorinov.exilehelper.exchange.domain.usecases.GetFiltersUseCase
+import com.sgorinov.exilehelper.exchange.domain.usecases.GetFilterUseCase
 import com.sgorinov.exilehelper.exchange.domain.usecases.GetItemsResultDataUseCase
 import com.sgorinov.exilehelper.exchange.domain.usecases.GetTotalItemsResultCountUseCase
 import com.sgorinov.exilehelper.exchange.domain.usecases.SetItemDataUseCase
@@ -25,8 +25,8 @@ internal class ItemsSearchViewModel(
     getCurrencyItemsUseCase: GetCurrencyItemsUseCase,
     getItemsUseCase: GetItemsUseCase,
     getStatsUseCase: GetStatsUseCase,
-    getFiltersUseCase: GetFiltersUseCase,
     getTotalItemsResultCountUseCase: GetTotalItemsResultCountUseCase,
+    private val getFilterUseCase: GetFilterUseCase,
     private val getItemsResultDataUseCase: GetItemsResultDataUseCase,
     private val setItemDataUseCase: SetItemDataUseCase,
     private val getNotificationRequestsUseCase: GetNotificationRequestsUseCase,
@@ -64,7 +64,8 @@ internal class ItemsSearchViewModel(
         CurrencyViewData(it.id, it.label, it.imageUrl)
     }
 
-    val filters = getFiltersUseCase.execute()
+    fun getFilter(id: String, onFieldsChanged: (Boolean) -> Unit) =
+        getFilterUseCase.execute(id, onFieldsChanged)
 
     val totalItemsCount = getTotalItemsResultCountUseCase.execute()
 

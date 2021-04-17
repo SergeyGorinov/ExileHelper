@@ -20,7 +20,7 @@ internal class ItemsFiltersListAdapter(
         val view =
             LayoutInflater
                 .from(parent.context)
-                .inflate(R.layout.filter_view, parent, false)
+                .inflate(R.layout.filter_header_view, parent, false)
         return FilterViewHolder(view)
     }
 

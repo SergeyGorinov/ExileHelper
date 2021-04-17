@@ -4,12 +4,12 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.sgorinov.exilehelper.core.presentation.hideKeyboard
 import com.sgorinov.exilehelper.exchange.data.models.Filter
-import com.sgorinov.exilehelper.exchange.databinding.FilterViewBinding
+import com.sgorinov.exilehelper.exchange.databinding.FilterHeaderViewBinding
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.ViewFilters
 
 internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    private val viewBinding = FilterViewBinding.bind(itemView)
+    private val viewBinding = FilterHeaderViewBinding.bind(itemView)
 //    private val animator = SlideUpDownAnimator(viewBinding.filterItemsLayout)
 
     fun bind(item: ViewFilters.AllFilters, filters: MutableList<Filter>) {

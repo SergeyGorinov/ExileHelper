@@ -5,18 +5,18 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.sgorinov.exilehelper.exchange.data.models.Filter
 import com.sgorinov.exilehelper.exchange.data.models.ItemsRequestModelFields
-import com.sgorinov.exilehelper.exchange.databinding.FiltersMinmaxItemBinding
+import com.sgorinov.exilehelper.exchange.databinding.MinmaxViewBinding
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.IBindableFieldViewHolder
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.IFilter
 
 internal class MinMaxViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
     IBindableFieldViewHolder {
 
-    private val viewBinding = FiltersMinmaxItemBinding.bind(itemView)
+    private val viewBinding = MinmaxViewBinding.bind(itemView)
 
     override fun bind(item: IFilter, filter: Filter) {
         val fieldId = item.id ?: return
-        val field = filter.getField(fieldId)
+        val field = filter.getOrCreateField(fieldId)
         viewBinding.filterName.text = item.text
         viewBinding.filterMin.doOnTextChanged { _, _, _, _ ->
             val min = viewBinding.filterMin.text?.toString()?.toIntOrNull()

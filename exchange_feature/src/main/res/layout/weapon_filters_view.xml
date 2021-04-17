@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/damage"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Damage"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/criticalChance"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Critical Chance"
+        app:layout_constraintTop_toBottomOf="@id/damage" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/physicalDps"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Physical DPS"
+        app:layout_constraintTop_toBottomOf="@id/criticalChance" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/attacksPerSecond"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Attacks per Second"
+        app:layout_constraintTop_toBottomOf="@id/physicalDps" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/damagePerSecond"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Damage per Second"
+        app:layout_constraintTop_toBottomOf="@id/attacksPerSecond" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/elementalDps"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Elemental DPS"
+        app:layout_constraintTop_toBottomOf="@id/damagePerSecond" />
+</merge>

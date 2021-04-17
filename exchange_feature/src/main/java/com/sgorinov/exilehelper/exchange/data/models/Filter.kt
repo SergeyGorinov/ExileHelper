@@ -10,7 +10,7 @@ internal class Filter(val name: String, private val onFieldsChanged: (Boolean) -
     private val isFieldsEmpty
         get() = fields.isEmpty() || fields.all { it.value == null }
 
-    fun getField(id: String): Field {
+    fun getOrCreateField(id: String): Field {
         var field = fields.singleOrNull { s -> s.name == id }
         if (field == null) {
             field = Field(id) {

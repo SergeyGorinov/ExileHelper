@@ -8,7 +8,7 @@ internal data class HistoryModel(
     val icon: String?,
     val tradeId: String?,
     val sellingGraphData: LineDataSet?,
-    val buyingGraphData: LineDataSet,
+    val buyingGraphData: LineDataSet?,
     val sellingValue: Float?,
     val buyingValue: Float
 )

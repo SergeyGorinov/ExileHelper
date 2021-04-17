@@ -18,37 +18,47 @@ internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatu
         val result = api.getCurrenciesOverview(league, type)
         val currenciesOverview = result.lines
         val currenciesDetails = result.currencyDetails
-        overviewData = currenciesOverview.map { currencyOverview ->
+        overviewData = currenciesOverview.mapNotNull { currencyOverview ->
             val sellingData = if (currencyOverview.pay != null) {
                 CurrencyData(currencyOverview.pay.listing_count, 1 / currencyOverview.pay.value)
             } else {
                 null
             }
             val buyingData =
-                CurrencyData(currencyOverview.receive.listing_count, currencyOverview.receive.value)
-            val currencyDetail =
-                currenciesDetails.firstOrNull { it.id == currencyOverview.receive.get_currency_id }
-            OverviewData(
-                currencyOverview.receive.get_currency_id.toString(),
-                currencyOverview.currencyTypeName,
-                null,
-                currencyDetail?.icon,
-                currencyDetail?.tradeId ?: currencyOverview.detailsId,
-                sellingData,
-                buyingData,
-                if (currencyOverview.receiveSparkLine.data.any { it == null }) {
-                    null
-                } else {
-                    currencyOverview.receiveSparkLine.data.filterNotNull()
-                },
-                if (currencyOverview.paySparkLine.data.any { it == null }) {
-                    listOf()
-                } else {
-                    currencyOverview.paySparkLine.data.filterNotNull()
-                },
-                currencyOverview.receiveSparkLine.totalChange,
-                currencyOverview.paySparkLine.totalChange
-            )
+                CurrencyData(
+                    currencyOverview.receive?.listing_count ?: 0,
+                    currencyOverview.receive?.value ?: 0.0
+                )
+            val currencyDetail = currenciesDetails.firstOrNull {
+                val currencyId = currencyOverview.receive?.get_currency_id
+                    ?: currencyOverview.pay?.pay_currency_id
+                it.id == currencyId
+            }
+            if (currencyDetail == null) {
+                null
+            } else {
+                OverviewData(
+                    currencyDetail.id.toString(),
+                    currencyOverview.currencyTypeName,
+                    null,
+                    currencyDetail.icon,
+                    currencyDetail.tradeId ?: currencyOverview.detailsId,
+                    sellingData,
+                    buyingData,
+                    if (currencyOverview.receiveSparkLine.data.any { it == null }) {
+                        null
+                    } else {
+                        currencyOverview.receiveSparkLine.data.filterNotNull()
+                    },
+                    if (currencyOverview.paySparkLine.data.any { it == null }) {
+                        listOf()
+                    } else {
+                        currencyOverview.paySparkLine.data.filterNotNull()
+                    },
+                    currencyOverview.receiveSparkLine.totalChange,
+                    currencyOverview.paySparkLine.totalChange
+                )
+            }
         }
     }
 

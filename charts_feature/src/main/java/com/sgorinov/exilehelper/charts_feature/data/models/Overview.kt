@@ -13,7 +13,7 @@ internal data class OverviewResponse(
 internal data class Overview(
     val currencyTypeName: String,
     val pay: Info?,
-    val receive: Info,
+    val receive: Info?,
     val paySparkLine: SparkLine,
     val receiveSparkLine: SparkLine,
     val chaosEquivalent: Float,

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/itemLevel"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Item Level"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/gemQualityType"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Gem Quality Type"
+        app:layout_constraintTop_toBottomOf="@id/itemLevel" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/quality"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Quality"
+        app:layout_constraintTop_toBottomOf="@id/gemQualityType" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/gemLevel"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Gem Level"
+        app:layout_constraintTop_toBottomOf="@id/quality" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/gemExperience"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Gem Experience %"
+        app:layout_constraintTop_toBottomOf="@id/gemLevel" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/shaperInfluence"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Shaper Influence"
+        app:layout_constraintTop_toBottomOf="@id/gemExperience" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/elderInfluence"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Elder Influence"
+        app:layout_constraintTop_toBottomOf="@id/shaperInfluence" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/crusaderInfluence"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Crusader Influence"
+        app:layout_constraintTop_toBottomOf="@id/elderInfluence" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/redeemerInfluence"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Redeemer Influence"
+        app:layout_constraintTop_toBottomOf="@id/crusaderInfluence" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/hunterInfluence"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Hunter Influence"
+        app:layout_constraintTop_toBottomOf="@id/redeemerInfluence" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/warlordInfluence"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Warlord Influence"
+        app:layout_constraintTop_toBottomOf="@id/hunterInfluence" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/fracturedItem"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Fractured Item"
+        app:layout_constraintTop_toBottomOf="@id/warlordInfluence" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/synthesisedItem"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Synthesised Item"
+        app:layout_constraintTop_toBottomOf="@id/fracturedItem" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/alternateArt"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Alternate Art"
+        app:layout_constraintTop_toBottomOf="@id/synthesisedItem" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/identified"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Identified"
+        app:layout_constraintTop_toBottomOf="@id/alternateArt" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/corrupted"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Corrupted"
+        app:layout_constraintTop_toBottomOf="@id/identified" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/mirrored"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Mirrored"
+        app:layout_constraintTop_toBottomOf="@id/corrupted" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/crafted"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Crafted"
+        app:layout_constraintTop_toBottomOf="@id/mirrored" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/veiled"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Veiled"
+        app:layout_constraintTop_toBottomOf="@id/crafted" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.DropDownView
+        android:id="@+id/enchanted"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Enchanted"
+        app:layout_constraintTop_toBottomOf="@id/veiled" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/talismanTier"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Talisman Tier"
+        app:layout_constraintTop_toBottomOf="@id/enchanted" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/storedExperience"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Stored Experience"
+        app:layout_constraintTop_toBottomOf="@id/talismanTier" />
+
+    <com.sgorinov.exilehelper.exchange.presentation.views.MinMaxView
+        android:id="@+id/stackSize"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/default_filter_height"
+        android:layout_marginTop="4dp"
+        app:fieldName="Stack Size"
+        app:layout_constraintTop_toBottomOf="@id/storedExperience" />
+</merge>

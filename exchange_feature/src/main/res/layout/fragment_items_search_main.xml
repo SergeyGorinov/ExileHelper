@@ -6,145 +6,26 @@
     android:layout_height="match_parent"
     android:background="@color/primaryColor">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <include layout="@layout/items_search_feature_toolbar" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
-
-            <LinearLayout
-                android:id="@+id/toolbar_search_layout"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <ImageButton
-                    android:id="@+id/toolbar_search_close"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center|center_vertical"
-                    android:layout_marginEnd="24dp"
-                    android:backgroundTint="@android:color/transparent"
-                    android:src="@drawable/back_24"
-                    tools:ignore="ContentDescription" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="@string/empty_hint"
-                    app:endIconMode="clear_text"
-                    app:endIconTint="@color/primaryTextColor"
-                    app:hintTextColor="@android:color/transparent">
-
-                    <AutoCompleteTextView
-                        android:id="@+id/toolbar_search_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@color/primaryColor"
-                        android:completionThreshold="0"
-                        android:dropDownWidth="match_parent"
-                        android:gravity="center_vertical"
-                        android:hint="@string/toolbar_search_item_hint"
-                        android:inputType="textNoSuggestions"
-                        android:paddingVertical="0dp"
-                        android:textColor="@color/primaryTextColor"
-                        android:textColorHint="@color/secondaryColor"
-                        android:textCursorDrawable="@color/primaryTextColor"
-                        android:textStyle="bold"
-                        tools:ignore="LabelFor" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                style="@style/Widget.MaterialComponents.Toolbar.Primary"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                app:menu="@menu/menu_items"
-                app:navigationIcon="@drawable/menu_24"
-                app:titleTextAppearance="@style/AppTheme.TitleFontStyle" />
-
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/toolbarProgressBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:elevation="4dp"
-                android:indeterminate="true"
-                android:visibility="gone"
-                app:indicatorColor="@color/secondaryLightColor"
-                app:trackColor="@color/secondaryColor"
-                app:trackCornerRadius="4dp"
-                app:trackThickness="2dp" />
-        </FrameLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.constraintlayout.helper.widget.Flow
-            android:id="@+id/selected_item_container"
+        <ViewStub
+            android:id="@+id/viewStub"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:constraint_referenced_ids="selected_item,selected_item_remove"
-            app:flow_horizontalGap="8dp"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="match_parent"
+            android:layout="@layout/filters_view" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/selected_item"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="@font/fontinsmallcaps"
-            android:maxLines="1"
-            android:textColor="@color/primaryTextColor"
-            android:textSize="20sp" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/selected_item_remove"
+        <ProgressBar
+            android:id="@+id/filtersLoading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/image_button_border_default"
-            android:padding="4dp"
-            android:src="@drawable/clear_24" />
-
-        <com.sgorinov.exilehelper.exchange.presentation.views.FilterView
-            android:id="@+id/testFilter1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/filter_button_default"
-            android:checked="true"
-            app:fieldName="Test filter 1"
-            app:layout_constraintTop_toBottomOf="@id/selected_item" />
-
-        <com.sgorinov.exilehelper.exchange.presentation.views.BuyoutFilterView
-            android:id="@+id/testFilterField1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="4dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/testFilter1" />
-
-        <!--        <androidx.recyclerview.widget.RecyclerView-->
-        <!--            android:id="@+id/filtersList"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="0dp"-->
-        <!--            android:layout_marginTop="16dp"-->
-        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--            app:layout_constraintTop_toBottomOf="@id/selected_item" />-->
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/accept"

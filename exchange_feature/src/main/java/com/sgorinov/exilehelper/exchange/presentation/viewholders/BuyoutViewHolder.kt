@@ -27,7 +27,7 @@ internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
 
     override fun bind(item: IFilter, filter: Filter) {
         val fieldId = item.id ?: return
-        val field = filter.getField(fieldId)
+        val field = filter.getOrCreateField(fieldId)
 
         viewBinding.filterDropDown.typeface = textFont
         viewBinding.filterName.text = item.text

@@ -128,7 +128,9 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
             requireActivity(),
             R.layout.dropdown_item,
             viewModel.itemGroups
-        )
+        ) {
+            return@ItemsSearchFieldAdapter
+        }
         list.typeface = ResourcesCompat.getFont(requireActivity(), R.font.fontinsmallcaps)
         list.setAdapter(adapter)
         list.setOnClickListener { (it as? AutoCompleteTextView)?.showDropDown() }

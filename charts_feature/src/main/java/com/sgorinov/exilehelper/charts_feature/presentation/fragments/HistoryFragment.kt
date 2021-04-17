@@ -124,8 +124,8 @@ internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
     }
 
     private fun setupChart(data: HistoryModel, textColor: Int, textFont: Typeface?) {
-        val xMax = maxOf(data.sellingGraphData?.xMax ?: 0f, data.buyingGraphData.xMax)
-        val xMin = minOf(data.sellingGraphData?.xMin ?: 0f, data.buyingGraphData.xMin)
+        val xMax = maxOf(data.sellingGraphData?.xMax ?: 0f, data.buyingGraphData?.xMax ?: 0f)
+        val xMin = minOf(data.sellingGraphData?.xMin ?: 0f, data.buyingGraphData?.xMin ?: 0f)
         binding.chart.xAxis.apply {
             axisMinimum = xMin
             axisMaximum = xMax + 5f

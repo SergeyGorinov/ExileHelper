@@ -19,4 +19,6 @@
     <string name="search">Search</string>
     <string name="notifications">Notifications</string>
     <string name="buyout_price">Buyout Price</string>
+    <string name="trade_filters">Trade Filters</string>
+    <string name="heist_filters">Heist Filters</string>
 </resources>
