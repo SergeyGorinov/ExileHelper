@@ -8,10 +8,10 @@ import com.sgorinov.exilehelper.exchange.data.models.Filter
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.ViewFilters
 import com.sgorinov.exilehelper.exchange.presentation.viewholders.FilterViewHolder
 
-internal class ItemsFiltersListAdapter(
-    private val items: Array<ViewFilters.AllFilters>,
-    private val filters: MutableList<Filter>
-) : RecyclerView.Adapter<FilterViewHolder>() {
+internal class ItemsFiltersListAdapter(private val filters: MutableList<Filter>) :
+    RecyclerView.Adapter<FilterViewHolder>() {
+
+    private var items: List<ViewFilters.AllFilters> = listOf()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -29,4 +29,9 @@ internal class ItemsFiltersListAdapter(
     }
 
     override fun getItemCount() = items.size
+
+    fun setupData(data: Array<ViewFilters.AllFilters>) {
+        items = data.toList()
+        notifyDataSetChanged()
+    }
 }

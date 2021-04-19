@@ -1,6 +1,8 @@
 package com.sgorinov.exilehelper.exchange.presentation.fragments
 
+import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
@@ -9,18 +11,17 @@ import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.sgorinov.exilehelper.core.presentation.*
 import com.sgorinov.exilehelper.exchange.R
-import com.sgorinov.exilehelper.exchange.databinding.FiltersViewBinding
 import com.sgorinov.exilehelper.exchange.databinding.FragmentItemsSearchMainBinding
 import com.sgorinov.exilehelper.exchange.databinding.ItemsSearchFeatureToolbarBinding
 import com.sgorinov.exilehelper.exchange.presentation.ItemsSearchViewModel
+import com.sgorinov.exilehelper.exchange.presentation.adapters.ItemsFiltersListAdapter
 import com.sgorinov.exilehelper.exchange.presentation.adapters.ItemsSearchFieldAdapter
 import com.sgorinov.exilehelper.exchange.presentation.models.SuggestionItem
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.ViewFilters
-import com.sgorinov.exilehelper.exchange.presentation.views.BaseExpandableView
-import com.sgorinov.exilehelper.exchange.presentation.views.FilterHeaderView
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -44,9 +45,14 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         )
     }
 
-    internal lateinit var binding: FragmentItemsSearchMainBinding
+    private lateinit var binding: FragmentItemsSearchMainBinding
     private lateinit var toolbarLayout: ItemsSearchFeatureToolbarBinding
-    private lateinit var filtersBinding: FiltersViewBinding
+    private lateinit var adapter: ItemsFiltersListAdapter
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        adapter = ItemsFiltersListAdapter(viewModel.getFilters())
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -57,11 +63,8 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         toolbarLayout = ItemsSearchFeatureToolbarBinding.bind(binding.root)
 
         setupToolbar()
-        binding.viewStub.setOnInflateListener { _, inflated ->
-            binding.filtersLoading.visibility = View.GONE
-            filtersBinding = FiltersViewBinding.bind(inflated)
-            setupFilters()
-        }
+        binding.filters.layoutManager = LinearLayoutManager(requireActivity())
+        binding.filters.adapter = adapter
 
         binding.accept.setOnClickListener {
             requestResult()
@@ -79,40 +82,9 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        lifecycleScope.launchWhenResumed {
-            viewModel.viewLoadingState.collect {
-                if (it) {
-                    toolbarLayout.toolbarProgressBar.show()
-                } else {
-                    toolbarLayout.toolbarProgressBar.hide()
-                }
-            }
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         scope.close()
-    }
-
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-        return if (enter) {
-            val anim = AnimationUtils.loadAnimation(requireActivity(), nextAnim)
-            anim.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationStart(animation: Animation?) = Unit
-
-                override fun onAnimationEnd(animation: Animation?) {
-                    binding.viewStub.postDelayed({
-                        binding.viewStub.inflate()
-                    }, 100L)
-                }
-
-                override fun onAnimationRepeat(animation: Animation?) = Unit
-            })
-            anim
-        } else null
     }
 
     fun closeToolbarSearchLayoutIfNeeded(): Boolean {
@@ -186,82 +158,27 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         }
     }
 
-    private fun setupFilters() {
-        setupFilter(
-            ViewFilters.AllFilters.TypeFilter.id,
-            filtersBinding.typeFiltersHeader,
-            filtersBinding.typeFilters
-        )
-        setupFilter(
-            ViewFilters.AllFilters.WeaponFilter.id,
-            filtersBinding.weaponFiltersHeader,
-            filtersBinding.weaponFilters
-        )
-        setupFilter(
-            ViewFilters.AllFilters.ArmourFilter.id,
-            filtersBinding.armourFiltersHeader,
-            filtersBinding.armourFilters
-        )
-        setupFilter(
-            ViewFilters.AllFilters.SocketFilter.id,
-            filtersBinding.socketFiltersHeader,
-            filtersBinding.socketFilters
-        )
-        setupFilter(
-            ViewFilters.AllFilters.ReqFilter.id,
-            filtersBinding.requirementsFiltersHeader,
-            filtersBinding.requirementsFilters
-        )
-        setupFilter(
-            ViewFilters.AllFilters.MapFilter.id,
-            filtersBinding.mapFiltersHeader,
-            filtersBinding.mapFilters
-        )
-        setupFilter(
-            ViewFilters.AllFilters.HeistFilter.id,
-            filtersBinding.heistFilterHeader,
-            filtersBinding.heistFilter
-        )
-        setupFilter(
-            ViewFilters.AllFilters.MiscFilter.id,
-            filtersBinding.miscFilterHeader,
-            filtersBinding.miscFilter
-        )
-        setupFilter(
-            ViewFilters.AllFilters.TradeFilter.id,
-            filtersBinding.tradeFilterHeader,
-            filtersBinding.tradeFilter
-        )
-    }
-
-    private fun setupFilter(
-        filterId: String,
-        filterHeaderView: FilterHeaderView,
-        filterView: BaseExpandableView
-    ) {
-        val filter = viewModel.getFilter(filterId) { isFieldsEmpty ->
-            val visibility = if (isFieldsEmpty) View.GONE else View.VISIBLE
-            filterHeaderView.viewBinding?.filterClearAll?.visibility = visibility
-        }
-        filterHeaderView.setOnClickListener {
-            if (filterView.visibility == View.GONE) {
-                val height = filterView.measureForAnimator()
-                filterView.animator.setHeight(height)
-                filterView.animator.slideDown()
-            } else {
-                filterView.animator.slideUp()
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+        return if (enter) {
+            AnimationUtils.loadAnimation(requireActivity(), nextAnim).apply {
+                setAnimationListener(
+                    AnimationListener(Handler(requireActivity().mainLooper)) {
+                        lifecycleScope.launchWhenResumed {
+                            viewModel.viewLoadingState.collect {
+                                if (it) {
+                                    toolbarLayout.toolbarProgressBar.show()
+                                } else {
+                                    toolbarLayout.toolbarProgressBar.hide()
+                                }
+                            }
+                        }
+                        adapter.setupData(ViewFilters.AllFilters.values())
+                    }
+                )
             }
+        } else {
+            null
         }
-        filterHeaderView.viewBinding?.filterEnabled?.setOnCheckedChangeListener { _, isChecked ->
-            filter.isEnabled = isChecked
-        }
-        filterHeaderView.viewBinding?.filterClearAll?.setOnClickListener {
-            filter.cleanFilter()
-            filterView.cleanFields()
-            filterView.setupFields(filter)
-            requireActivity().hideKeyboard(it)
-        }
-        filterView.setupFields(filter)
     }
 
     private fun showToolbarSearchLayout() {
@@ -329,6 +246,21 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
                     Toast.LENGTH_LONG
                 ).show()
             }
+        }
+    }
+
+    private class AnimationListener(
+        private val handler: Handler,
+        private val onEndAction: () -> Unit
+    ) : Animation.AnimationListener {
+
+        override fun onAnimationStart(animation: Animation?) = Unit
+
+        override fun onAnimationRepeat(animation: Animation?) = Unit
+
+        override fun onAnimationEnd(animation: Animation?) {
+            // allow animation end completely
+            handler.postDelayed({ onEndAction() }, 50L)
         }
     }
 

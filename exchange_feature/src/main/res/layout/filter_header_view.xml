@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <CheckBox
         android:id="@+id/filterEnabled"
@@ -14,7 +14,6 @@
         android:elevation="8dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,7 +27,7 @@
         android:textAllCaps="false"
         android:textColor="@color/primaryTextColor"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/filterEnabled"
         app:layout_constraintEnd_toStartOf="@id/filterClearAll"
         app:layout_constraintStart_toEndOf="@id/filterEnabled"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,7 +44,16 @@
         android:padding="0dp"
         android:src="@drawable/clear_24"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/filterEnabled"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-</merge>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/filterItemsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/filterEnabled" />
+</androidx.constraintlayout.widget.ConstraintLayout>

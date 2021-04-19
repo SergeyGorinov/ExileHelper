@@ -8,24 +8,12 @@
 
     <include layout="@layout/items_search_feature_toolbar" />
 
-    <FrameLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/filters"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <ViewStub
-            android:id="@+id/viewStub"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout="@layout/filters_view" />
-
-        <ProgressBar
-            android:id="@+id/filtersLoading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminate="true" />
-    </FrameLayout>
+        android:padding="8dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/accept"

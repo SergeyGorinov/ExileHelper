@@ -12,23 +12,12 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
 
     override var totalItemsResultCount: Int = 0
 
-    private val filters = mutableListOf<Filter>()
+    override val filters = mutableListOf<Filter>()
     private var type: String? = null
     private var name: String? = null
     private var id: String = ""
     private var itemResultListData: List<String> = listOf()
     private val processedItems = mutableListOf<ItemResultData>()
-
-    override fun getOrCreateFilter(id: String, onFieldsChanged: (Boolean) -> Unit): Filter {
-        val existingFilter = filters.firstOrNull { it.name == id }
-        return if (existingFilter == null) {
-            val newFilter = Filter(id, onFieldsChanged)
-            filters.add(newFilter)
-            newFilter
-        } else {
-            existingFilter
-        }
-    }
 
     override fun setItemData(type: String?, name: String?) {
         this.type = type
