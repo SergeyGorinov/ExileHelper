@@ -14,6 +14,7 @@ class SetNotificationRequestUseCase(private val repository: ICoreRepository) {
         payload: String,
         type: Int,
         messagingToken: String?,
+        league: String,
         authToken: String? = null
     ): Boolean {
         messagingToken ?: return false
@@ -27,7 +28,8 @@ class SetNotificationRequestUseCase(private val repository: ICoreRepository) {
                 payload,
                 buyingItem,
                 payingItem,
-                request.payingAmount
+                request.payingAmount,
+                league
             )
         )
         if (response.isSuccessful) {
@@ -39,7 +41,8 @@ class SetNotificationRequestUseCase(private val repository: ICoreRepository) {
                     requestPayload = payload,
                     buyingItem = ItemData(request.buyingItem.itemName, request.buyingItem.itemIcon),
                     payingItem = ItemData(request.payingItem.itemName, request.payingItem.itemIcon),
-                    payingAmount = request.payingAmount
+                    payingAmount = request.payingAmount,
+                    league = league
                 )
             )
         }

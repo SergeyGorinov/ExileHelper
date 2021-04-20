@@ -6,7 +6,6 @@ import com.sgorinov.exilehelper.exchange.data.models.ItemsRequestModel
 import com.sgorinov.exilehelper.exchange.data.models.ItemsRequestModelFields
 import com.sgorinov.exilehelper.exchange.domain.models.*
 import kotlinx.serialization.json.*
-import retrofit2.await
 
 internal class FeatureRepository(private val apiService: ApiService) : BaseFeatureRepository() {
 
@@ -34,14 +33,14 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
         }
 
         val data = getRequestData(position)
-        val result = apiService.getItemExchangeResponse(data, id).await()
+        val result = apiService.getItemExchangeResponse(data, id)
 
         processedItems.addAll(processResult(result))
         return processedItems
     }
 
     private suspend fun fetchAllEntries(league: String) {
-        val response = apiService.getItemsExchangeList(league, populateRequest()).await()
+        val response = apiService.getItemsExchangeList(league, populateRequest())
         id = response["id"]?.jsonPrimitive?.content ?: ""
         itemResultListData = response["result"]?.jsonArray?.map {
             it.jsonPrimitive.content

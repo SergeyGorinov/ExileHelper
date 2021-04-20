@@ -2,6 +2,7 @@ package com.sgorinov.exilehelper.exchange.presentation.models.enums
 
 @Suppress("unused")
 internal class DropDowns {
+
     enum class YesNo(override val id: String?, override val text: String) : IEnum {
         Any(null, "Any"),
         Yes("true", "Yes"),
@@ -87,8 +88,7 @@ internal class DropDowns {
         NonUnique("nonunique", "Any Non-Unique")
     }
 
-    enum class ContractObjectiveValue(override val id: String?, override val text: String) :
-        IEnum {
+    enum class ContractObjectiveValue(override val id: String?, override val text: String) : IEnum {
         Any(null, "Any"),
         Moderate("moderate", "Moderate Value"),
         High("high", "High Value"),
@@ -167,5 +167,21 @@ internal class DropDowns {
         OrbOfAlchemy("alch", "Orb of Alchemy"),
         RegalOrb("regal", "Regal Orb"),
         VaalOrb("vaal", "Vaal Orb")
+    }
+
+    enum class ChallengeType(override val id: String?, override val text: String) : IEnum {
+        Any(null, "Any"),
+        Exterminate("Exterminate", "Defeat Waves of Enemies"),
+        Survival("Survival", "Survive"),
+        Defense("Defense", "Protect the Altar"),
+        Conquer("Conquer", "Stand in the Stone Circles")
+    }
+
+    enum class RewardType(override val id: String?, override val text: String) : IEnum {
+        Any(null, "Any"),
+        DoubleCurrency("DoubleCurrency", "Currency"),
+        DoubleDivCards("DoubleDivCards", "Divination Cards"),
+        MirrorRare("MirrorRare", "Mirrored Rare Item"),
+        ExchangeUnique("ExchangeUnique", "Unique Item")
     }
 }

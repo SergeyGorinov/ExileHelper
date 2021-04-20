@@ -16,6 +16,7 @@ interface IMainActivity {
     fun goToItemsSearch(
         itemType: String,
         itemName: String?,
+        withExchangeRequest: Boolean = false,
         withNotificationRequest: Boolean = false
     )
 

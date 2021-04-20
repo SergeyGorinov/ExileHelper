@@ -4,12 +4,12 @@ import kotlinx.serialization.Required
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class CurrencyRequest(
+data class CurrencyRequest(
     val exchange: Exchange
 )
 
 @Serializable
-internal data class Exchange(
+data class Exchange(
     @Required
     val status: Status = Status(),
     val have: List<String>,
@@ -20,7 +20,7 @@ internal data class Exchange(
 )
 
 @Serializable
-internal data class Status(
+data class Status(
     @Required
     val option: String = "online"
 )

@@ -12,5 +12,6 @@ data class RemoteNotificationRequest(
     var requestPayload: String,
     var buyingItem: String,
     var payingItem: String,
-    var payingAmount: Int
+    var payingAmount: Int,
+    var league: String
 )

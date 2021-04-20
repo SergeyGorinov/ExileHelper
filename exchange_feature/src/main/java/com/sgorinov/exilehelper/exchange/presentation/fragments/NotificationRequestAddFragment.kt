@@ -15,16 +15,15 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.sgorinov.exilehelper.core.presentation.FragmentScopes
-import com.sgorinov.exilehelper.core.presentation.getTransparentProgressDialog
-import com.sgorinov.exilehelper.core.presentation.hideKeyboard
-import com.sgorinov.exilehelper.core.presentation.scopedViewModel
+import com.sgorinov.exilehelper.core.DI
+import com.sgorinov.exilehelper.core.presentation.*
 import com.sgorinov.exilehelper.exchange.R
 import com.sgorinov.exilehelper.exchange.databinding.FragmentItemNotificationRequestAddBinding
 import com.sgorinov.exilehelper.exchange.presentation.ItemsSearchViewModel
 import com.sgorinov.exilehelper.exchange.presentation.adapters.ItemsSearchFieldAdapter
 import com.sgorinov.exilehelper.exchange.presentation.models.SuggestionItem
 import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 
 class NotificationRequestAddFragment : BottomSheetDialogFragment() {
 
@@ -32,6 +31,8 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         FragmentScopes.EXCHANGE_FEATURE.scopeId,
         FragmentScopes.EXCHANGE_FEATURE
     )
+
+    private val settings by DI.inject<ApplicationSettings>()
 
     private val itemType by lazy { requireArguments().getString(ITEM_TYPE_KEY) }
     private val itemName by lazy { requireArguments().getString(ITEM_NAME_KEY) }
@@ -90,7 +91,8 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
                 }
                 lifecycleScope.launch {
                     progressDialog.show()
-                    val result = viewModel.sendNotificationRequest(wantItem, amount)
+                    val result =
+                        viewModel.sendNotificationRequest(wantItem, amount, settings.league)
                     progressDialog.hide()
                     if (result) {
                         Toast.makeText(

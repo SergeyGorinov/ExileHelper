@@ -137,7 +137,7 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
                 R.id.notifications -> {
                     lifecycleScope.launch {
                         item.isEnabled = false
-                        val items = viewModel.getNotificationRequests()
+                        val items = viewModel.getNotificationRequests(settings.league)
                         NotificationRequestsFragment.newInstance(items).show(
                             parentFragmentManager,
                             null

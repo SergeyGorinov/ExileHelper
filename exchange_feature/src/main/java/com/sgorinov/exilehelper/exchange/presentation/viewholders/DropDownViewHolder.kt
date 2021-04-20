@@ -24,27 +24,35 @@ internal class DropDownViewHolder(itemView: View) : RecyclerView.ViewHolder(item
 
     override fun bind(item: IFilter, filter: Filter) {
         val field = filter.getOrCreateField(item.id ?: "")
+        val adapter = DropDownAdapter(
+            itemView.context,
+            R.layout.dropdown_item,
+            item.dropDownValues ?: listOf()
+        )
         viewBinding.filterDropDown.typeface = textFont
         viewBinding.filterName.text = item.text
-        viewBinding.filterDropDown.setAdapter(
-            DropDownAdapter(
-                itemView.context,
-                R.layout.dropdown_item,
-                item.dropDownValues?.toList() ?: listOf()
-            )
-        )
-        viewBinding.filterDropDown.setText((item.dropDownValues?.first() as IEnum?)?.text, false)
+        viewBinding.filterDropDown.setAdapter(adapter)
+
+        val selectedOption =
+            (field.value as? ItemsRequestModelFields.DropDown)?.option?.let { selectedOption ->
+                item.dropDownValues?.firstOrNull { it.id.equals(selectedOption, true) }
+            }
+
+        if (selectedOption != null) {
+            adapter.selectedItem = selectedOption
+            viewBinding.filterDropDown.setText(selectedOption.text, false)
+        } else {
+            viewBinding.filterDropDown.setText((item.dropDownValues?.firstOrNull())?.text, false)
+        }
+
         viewBinding.filterDropDown.setOnItemClickListener { adapterView, _, position, _ ->
             val value = adapterView.getItemAtPosition(position) as IEnum?
-            val adapter = adapterView.adapter
             field.value =
                 if (value?.id != null) ItemsRequestModelFields.DropDown(value.id) else null
-            if (adapter is DropDownAdapter)
-                adapter.selectedItem = value
+            adapter.selectedItem = value
         }
         viewBinding.filterDropDown.setOnFocusChangeListener { view, focused ->
-            val adapter = (view as AutoCompleteTextView).adapter
-            if (adapter is DropDownAdapter) {
+            if (view is AutoCompleteTextView) {
                 if (focused) {
                     view.hint = adapter.selectedItem?.text
                     view.setText("", false)
@@ -52,12 +60,6 @@ internal class DropDownViewHolder(itemView: View) : RecyclerView.ViewHolder(item
                     view.setText(adapter.selectedItem?.text, false)
                 }
             }
-        }
-        if (field.value != null) {
-            val currentValue = field.value as ItemsRequestModelFields.DropDown
-            val value =
-                (item.dropDownValues?.singleOrNull { s -> (s as IEnum).id == currentValue.option }) as IEnum
-            viewBinding.filterDropDown.setText(value.text, false)
         }
     }
 }

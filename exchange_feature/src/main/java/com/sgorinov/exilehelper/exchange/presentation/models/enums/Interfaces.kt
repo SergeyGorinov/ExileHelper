@@ -13,5 +13,5 @@ internal interface IEnum {
 
 internal interface IFilter : IEnum {
     val viewType: ViewType
-    val dropDownValues: Array<*>?
+    val dropDownValues: List<IEnum>?
 }

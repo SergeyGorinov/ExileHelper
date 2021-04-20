@@ -85,7 +85,8 @@ internal class CurrencyExchangeViewModel(
     suspend fun sendNotificationRequest(
         buyingItem: CurrencyViewData,
         payingItem: CurrencyViewData,
-        payingAmount: Int
+        payingAmount: Int,
+        league: String
     ) = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
         val request = NotificationRequest(
@@ -111,18 +112,20 @@ internal class CurrencyExchangeViewModel(
             payload,
             0,
             FirebaseUtils.getMessagingToken(),
+            league,
             FirebaseUtils.getAuthToken()
         )
         viewLoadingState.emit(false)
         return@withContext result
     }
 
-    suspend fun getNotificationRequests() = withContext(Dispatchers.IO) {
+    suspend fun getNotificationRequests(league: String) = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
         val result = getNotificationRequestsUseCase.execute(
             FirebaseUtils.getMessagingToken(),
             FirebaseUtils.getAuthToken(),
-            CurrencyExchangeMainFragment.NOTIFICATION_REQUESTS_TYPE
+            CurrencyExchangeMainFragment.NOTIFICATION_REQUESTS_TYPE,
+            league
         ).map {
             NotificationRequestViewData(
                 it.buyingItem.itemName,

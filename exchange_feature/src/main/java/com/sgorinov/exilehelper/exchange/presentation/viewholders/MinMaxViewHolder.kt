@@ -17,6 +17,9 @@ internal class MinMaxViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
     override fun bind(item: IFilter, filter: Filter) {
         val fieldId = item.id ?: return
         val field = filter.getOrCreateField(fieldId)
+
+        restoreState(field.value as? ItemsRequestModelFields.MinMax)
+
         viewBinding.filterName.text = item.text
         viewBinding.filterMin.doOnTextChanged { _, _, _, _ ->
             val min = viewBinding.filterMin.text?.toString()?.toIntOrNull()
@@ -39,5 +42,11 @@ internal class MinMaxViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
                 viewBinding.filterMax.setText(value.max.toString())
             }
         }
+    }
+
+    private fun restoreState(field: ItemsRequestModelFields.MinMax?) {
+        field ?: return
+        viewBinding.filterMin.setText(field.min?.toString())
+        viewBinding.filterMax.setText(field.max?.toString())
     }
 }

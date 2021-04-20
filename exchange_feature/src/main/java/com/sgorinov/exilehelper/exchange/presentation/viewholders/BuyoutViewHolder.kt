@@ -28,20 +28,21 @@ internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
     override fun bind(item: IFilter, filter: Filter) {
         val fieldId = item.id ?: return
         val field = filter.getOrCreateField(fieldId)
+        val adapter = DropDownAdapter(
+            itemView.context,
+            R.layout.dropdown_item,
+            item.dropDownValues ?: listOf()
+        )
+
+        restoreState(field.value as? ItemsRequestModelFields.Price, item, adapter)
 
         viewBinding.filterDropDown.typeface = textFont
         viewBinding.filterName.text = item.text
-        viewBinding.filterDropDown.setAdapter(
-            DropDownAdapter(
-                itemView.context,
-                R.layout.dropdown_item,
-                item.dropDownValues?.toList() ?: listOf()
-            )
-        )
-        viewBinding.filterDropDown.setText((item.dropDownValues?.first() as IEnum?)?.text, false)
+        viewBinding.filterDropDown.setAdapter(adapter)
+
+        viewBinding.filterDropDown.setText((item.dropDownValues?.firstOrNull())?.text, false)
         viewBinding.filterDropDown.setOnFocusChangeListener { view, focused ->
-            val adapter = (view as AutoCompleteTextView).adapter
-            if (adapter is DropDownAdapter) {
+            if (view is AutoCompleteTextView) {
                 if (focused) {
                     view.hint = adapter.selectedItem?.text
                     view.setText("", false)
@@ -52,15 +53,13 @@ internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
         }
         viewBinding.filterDropDown.setOnItemClickListener { adapterView, _, position, _ ->
             selectedItem = adapterView.getItemAtPosition(position) as IEnum?
-            val adapter = adapterView.adapter
             val min = viewBinding.minValue.text?.toString()?.toIntOrNull()
             val max = viewBinding.maxValue.text?.toString()?.toIntOrNull()
             val value = ItemsRequestModelFields.Price(min, max, selectedItem?.id)
             field.value = if (value.isEmpty()) null else value
-            if (adapter is DropDownAdapter) {
-                adapter.selectedItem = selectedItem
-            }
+            adapter.selectedItem = selectedItem
         }
+
         viewBinding.minValue.doOnTextChanged { _, _, _, _ ->
             val min = viewBinding.minValue.text?.toString()?.toIntOrNull()
             val max = viewBinding.maxValue.text?.toString()?.toIntOrNull()
@@ -77,7 +76,7 @@ internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
             val value = field.value as ItemsRequestModelFields.Price
             if (!value.option.isNullOrBlank()) {
                 val valueText =
-                    (item.dropDownValues?.singleOrNull { s -> (s as IEnum).id == value.option }) as IEnum
+                    (item.dropDownValues?.singleOrNull { s -> s.id == value.option }) as IEnum
                 viewBinding.filterDropDown.setText(valueText.text, false)
             }
             if (value.min != null) {
@@ -87,5 +86,26 @@ internal class BuyoutViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
                 viewBinding.maxValue.setText(value.max.toString())
             }
         }
+    }
+
+    private fun restoreState(
+        field: ItemsRequestModelFields.Price?,
+        item: IFilter,
+        adapter: DropDownAdapter
+    ) {
+        field ?: return
+        val selectedOption = field.option?.let { selectedOption ->
+            item.dropDownValues?.firstOrNull { it.id.equals(selectedOption, true) }
+        }
+
+        if (selectedOption != null) {
+            selectedItem = selectedOption
+            adapter.selectedItem = selectedOption
+            viewBinding.filterDropDown.setText(selectedOption.text, false)
+        } else {
+            viewBinding.filterDropDown.setText((item.dropDownValues?.firstOrNull())?.text, false)
+        }
+        viewBinding.minValue.setText(field.min?.toString())
+        viewBinding.maxValue.setText(field.max?.toString())
     }
 }

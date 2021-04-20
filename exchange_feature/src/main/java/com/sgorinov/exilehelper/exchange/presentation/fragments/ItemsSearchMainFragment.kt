@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.sgorinov.exilehelper.core.presentation.*
 import com.sgorinov.exilehelper.exchange.R
+import com.sgorinov.exilehelper.exchange.data.models.Filter
 import com.sgorinov.exilehelper.exchange.databinding.FragmentItemsSearchMainBinding
 import com.sgorinov.exilehelper.exchange.databinding.ItemsSearchFeatureToolbarBinding
 import com.sgorinov.exilehelper.exchange.presentation.ItemsSearchViewModel
@@ -24,6 +25,8 @@ import com.sgorinov.exilehelper.exchange.presentation.models.SuggestionItem
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.ViewFilters
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 
 class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main) {
 
@@ -37,20 +40,13 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         FragmentScopes.EXCHANGE_FEATURE
     )
 
-    private val itemType by lazy { requireArguments().getString(ITEM_TYPE_KEY) }
-    private val itemName by lazy { requireArguments().getString(ITEM_NAME_KEY) }
-    private val withNotificationRequest by lazy {
-        requireArguments().getBoolean(
-            WITH_NOTIFICATION_REQUEST_KEY, false
-        )
-    }
-
     private lateinit var binding: FragmentItemsSearchMainBinding
     private lateinit var toolbarLayout: ItemsSearchFeatureToolbarBinding
     private lateinit var adapter: ItemsFiltersListAdapter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        restoreState()
         adapter = ItemsFiltersListAdapter(viewModel.getFilters())
     }
 
@@ -69,22 +65,53 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         binding.accept.setOnClickListener {
             requestResult()
         }
+    }
 
-        if (withNotificationRequest) {
-            NotificationRequestAddFragment
-                .newInstance(itemType, itemName)
-                .show(parentFragmentManager, null)
-        } else {
-            itemType?.let {
-                viewModel.setItemData(it, itemName)
-                requestResult()
-            }
-        }
+    override fun onDestroyView() {
+        val selectedItem =
+            (toolbarLayout.toolbarSearchInput.adapter as? ItemsSearchFieldAdapter)?.selectedItem
+        savedState.putAll(
+            bundleOf(
+                SAVED_ITEM_NAME to selectedItem?.name,
+                SAVED_ITEM_TYPE to selectedItem?.type,
+                SAVED_FILTERS to Json.encodeToString(
+                    ListSerializer(Filter.serializer()),
+                    viewModel.getFilters()
+                )
+            )
+        )
+
+        super.onDestroyView()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        binding.filters.adapter = null
         scope.close()
+        getMainActivity()?.saveItemsSearchFragmentState(savedState)
+    }
+
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+        return if (enter) {
+            AnimationUtils.loadAnimation(requireActivity(), nextAnim).apply {
+                setAnimationListener(
+                    AnimationListener(Handler(requireActivity().mainLooper)) {
+                        lifecycleScope.launchWhenResumed {
+                            viewModel.viewLoadingState.collect {
+                                if (it) {
+                                    toolbarLayout.toolbarProgressBar.show()
+                                } else {
+                                    toolbarLayout.toolbarProgressBar.hide()
+                                }
+                            }
+                        }
+                        adapter.setupData(ViewFilters.allFilters)
+                    }
+                )
+            }
+        } else {
+            null
+        }
     }
 
     fun closeToolbarSearchLayoutIfNeeded(): Boolean {
@@ -93,6 +120,36 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             true
         } else {
             false
+        }
+    }
+
+    private fun restoreState() {
+        savedState.clear()
+        getMainActivity()?.restoreItemsSearchFragmentState()?.let {
+            savedState.putAll(it)
+        }
+        val savedItemName = savedState.getString(SAVED_ITEM_NAME)
+        val savedItemType = savedState.getString(SAVED_ITEM_TYPE)
+        val savedFilters = savedState.getString(SAVED_FILTERS)
+        val withExchangeRequest = savedState.getBoolean(WITH_EXCHANGE_REQUEST_KEY, false)
+        val withNotificationRequest = savedState.getBoolean(WITH_NOTIFICATION_REQUEST_KEY, false)
+        if (withNotificationRequest) {
+            NotificationRequestAddFragment
+                .newInstance(savedItemType, savedItemName)
+                .show(parentFragmentManager, null)
+            return
+        }
+        if (withExchangeRequest) {
+            savedItemType?.let {
+                viewModel.setItemData(it, savedItemName)
+                requestResult()
+            }
+            return
+        }
+        savedFilters?.run {
+            Json.decodeFromString(ListSerializer(Filter.serializer()), this)
+        }?.let {
+            viewModel.getFilters().addAll(it)
         }
     }
 
@@ -105,7 +162,7 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
                 R.id.notifications -> {
                     lifecycleScope.launch {
                         item.isEnabled = false
-                        val items = viewModel.getNotificationRequests()
+                        val items = viewModel.getNotificationRequests(settings.league)
                         NotificationRequestsFragment.newInstance(items).show(
                             parentFragmentManager,
                             null
@@ -150,34 +207,38 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             }
         }
 
-        toolbarLayout.selectedItem.text = resources.getString(R.string.items_search_title, "None")
+        val savedItemName = savedState.getString(SAVED_ITEM_NAME)
+        val savedItemType = savedState.getString(SAVED_ITEM_TYPE)
+        val savedSelectedItem = when {
+            savedItemName != null && savedItemType != null -> {
+                viewModel.itemGroups.flatMap {
+                    it.entries
+                }.firstOrNull {
+                    it.type == savedItemType && it.name == savedItemName
+                }
+            }
+            savedItemType != null -> {
+                viewModel.itemGroups.flatMap {
+                    it.entries
+                }.firstOrNull {
+                    it.type == savedItemType
+                }
+            }
+            else -> null
+        }
+        val selectedItemText = savedSelectedItem?.let {
+            (toolbarLayout.toolbarSearchInput.adapter as? ItemsSearchFieldAdapter)?.selectedItem =
+                SuggestionItem(false, it.text, it.type, it.name)
+            toolbarLayout.selectedItemRemove.visibility = View.VISIBLE
+            it.text
+        } ?: "None"
+
+        toolbarLayout.selectedItem.text =
+            resources.getString(R.string.items_search_title, selectedItemText)
 
         toolbarLayout.selectedItemRemove.setOnClickListener {
             (toolbarLayout.toolbarSearchInput.adapter as? ItemsSearchFieldAdapter)?.selectedItem =
                 null
-        }
-    }
-
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-        return if (enter) {
-            AnimationUtils.loadAnimation(requireActivity(), nextAnim).apply {
-                setAnimationListener(
-                    AnimationListener(Handler(requireActivity().mainLooper)) {
-                        lifecycleScope.launchWhenResumed {
-                            viewModel.viewLoadingState.collect {
-                                if (it) {
-                                    toolbarLayout.toolbarProgressBar.show()
-                                } else {
-                                    toolbarLayout.toolbarProgressBar.hide()
-                                }
-                            }
-                        }
-                        adapter.setupData(ViewFilters.AllFilters.values())
-                    }
-                )
-            }
-        } else {
-            null
         }
     }
 
@@ -266,25 +327,12 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 
     companion object {
         const val NOTIFICATION_REQUESTS_TYPE = "1"
+        const val WITH_NOTIFICATION_REQUEST_KEY = "WITH_NOTIFICATION_REQUEST_KEY"
+        const val WITH_EXCHANGE_REQUEST_KEY = "WITH_EXCHANGE_REQUEST_KEY"
+        const val SAVED_FILTERS = "SAVED_FILTERS"
+        const val SAVED_ITEM_NAME = "SAVED_ITEM_NAME"
+        const val SAVED_ITEM_TYPE = "SAVED_ITEM_TYPE"
 
-        private const val ITEM_TYPE_KEY = "ITEM_TYPE_KEY"
-        private const val ITEM_NAME_KEY = "ITEM_NAME_KEY"
-        private const val WITH_NOTIFICATION_REQUEST_KEY = "WITH_NOTIFICATION_REQUEST_KEY"
-
-        fun newInstance(
-            itemType: String? = null,
-            itemName: String? = null,
-            withNotificationRequest: Boolean = false
-        ): FragmentScreen {
-            return FragmentScreen {
-                ItemsSearchMainFragment().apply {
-                    arguments = bundleOf(
-                        ITEM_TYPE_KEY to itemType,
-                        ITEM_NAME_KEY to itemName,
-                        WITH_NOTIFICATION_REQUEST_KEY to withNotificationRequest
-                    )
-                }
-            }
-        }
+        fun newInstance() = FragmentScreen { ItemsSearchMainFragment() }
     }
 }

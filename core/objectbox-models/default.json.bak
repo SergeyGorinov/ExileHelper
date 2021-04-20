@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:2145128458785260503",
-      "lastPropertyId": "5:8545110366015618358",
+      "lastPropertyId": "8:1980431308599487848",
       "name": "NotificationRequest",
       "properties": [
         {
@@ -34,6 +34,22 @@
           "id": "5:8545110366015618358",
           "name": "requestPayload",
           "type": 9
+        },
+        {
+          "id": "6:3483992540012508725",
+          "name": "buyingItem",
+          "type": 9
+        },
+        {
+          "id": "7:189976127977305433",
+          "name": "payingItem",
+          "type": 9
+        },
+        {
+          "id": "8:1980431308599487848",
+          "name": "payingAmount",
+          "type": 5,
+          "flags": 4
         }
       ],
       "relations": []

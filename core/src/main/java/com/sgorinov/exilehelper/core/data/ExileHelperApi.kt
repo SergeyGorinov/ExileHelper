@@ -7,7 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-interface PoeTradeApi {
+interface ExileHelperApi {
 
     @POST("addRequest")
     suspend fun sendRequest(@Body userRequest: RemoteNotificationRequest): Response<Void>
@@ -19,7 +19,9 @@ interface PoeTradeApi {
         @Query("messagingToken")
         messagingToken: String,
         @Query("type")
-        type: String
+        type: String,
+        @Query("league")
+        league: String
     ): Response<List<RemoteNotificationRequest>>
 
     @GET("addToken")

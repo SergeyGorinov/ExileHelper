@@ -17,6 +17,9 @@ internal class SocketViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
     override fun bind(item: IFilter, filter: Filter) {
         val fieldId = item.id ?: return
         val field = filter.getOrCreateField(fieldId)
+
+        restoreState(field.value as? ItemsRequestModelFields.Sockets)
+
         viewBinding.filterName.text = item.text
         viewBinding.filterRed.doOnTextChanged { _, _, _, _ ->
             field.value = getSocketGroupData()
@@ -36,6 +39,16 @@ internal class SocketViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
         viewBinding.filterMax.doOnTextChanged { _, _, _, _ ->
             field.value = getSocketGroupData()
         }
+    }
+
+    private fun restoreState(field: ItemsRequestModelFields.Sockets?) {
+        field ?: return
+        viewBinding.filterRed.setText(field.r?.toString())
+        viewBinding.filterGreen.setText(field.g?.toString())
+        viewBinding.filterBlue.setText(field.b?.toString())
+        viewBinding.filterWhite.setText(field.w?.toString())
+        viewBinding.filterMin.setText(field.min?.toString())
+        viewBinding.filterMax.setText(field.max?.toString())
     }
 
     private fun getSocketGroupData(): ItemsRequestModelFields.Sockets? {

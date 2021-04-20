@@ -19,7 +19,8 @@ interface ICoreRepository {
     suspend fun syncRemoteNotificationRequests(
         messagingToken: String,
         authorizationToken: String? = null,
-        type: String
+        type: String,
+        league: String
     )
 
     suspend fun getNotificationRequestsLocal(): List<NotificationRequest>

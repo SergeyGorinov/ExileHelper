@@ -10,14 +10,14 @@ import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonObject
 
 @Serializable
-internal data class ItemsRequestModel(
+data class ItemsRequestModel(
     @Required
     val query: ItemsRequestModelFields.Query = ItemsRequestModelFields.Query(),
     @Required
     val sort: ItemsRequestModelFields.Sorting = ItemsRequestModelFields.Sorting()
 )
 
-internal class ItemsRequestModelFields {
+class ItemsRequestModelFields {
 
     @Serializable
     data class Query(
@@ -146,8 +146,9 @@ internal class ItemsRequestModelFields {
         }
 
         private fun getValueSerializer(dataType: String): KSerializer<Any> {
-            return anyDataTypeSerializers[dataType]
-                ?: throw SerializationException("Serializer for class $dataType is not registered in PacketSerializer")
+            return anyDataTypeSerializers[dataType] ?: throw SerializationException(
+                "Serializer for class $dataType is not registered in AnySerializer"
+            )
         }
 
         override val descriptor = buildClassSerialDescriptor("Any")

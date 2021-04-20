@@ -12,6 +12,7 @@ import com.sgorinov.exilehelper.exchange.R
 import com.sgorinov.exilehelper.exchange.data.models.Filter
 import com.sgorinov.exilehelper.exchange.databinding.FilterHeaderViewBinding
 import com.sgorinov.exilehelper.exchange.presentation.adapters.ItemsFilterAdapter
+import com.sgorinov.exilehelper.exchange.presentation.models.enums.IFilter
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.ViewFilters
 
 internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -19,7 +20,7 @@ internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
     private val viewBinding = FilterHeaderViewBinding.bind(itemView)
     private val animator = SlideUpDownAnimator(viewBinding.filterItemsLayout)
 
-    fun bind(item: ViewFilters.AllFilters, filters: MutableList<Filter>) {
+    fun bind(item: ViewFilters.Filter, filters: MutableList<Filter>) {
         val filter = getOrCreateFilter(filters, item.id) {
             viewBinding.filterClearAll.visibility = if (it) View.GONE else View.VISIBLE
         }
@@ -34,6 +35,7 @@ internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
         }
 
         viewBinding.filterEnabled.setOnCheckedChangeListener { _, checked ->
+            setupAdapterIfNeeded(item.values, filter)
             when {
                 !checked && viewBinding.filterItemsLayout.visibility == View.VISIBLE -> {
                     animator.slideUp()
@@ -46,17 +48,7 @@ internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
         }
 
         viewBinding.filterShowHideButton.setOnClickListener {
-            if (viewBinding.filterItemsLayout.adapter == null) {
-                val divider = DividerItemDecoration(itemView.context, RecyclerView.VERTICAL)
-                ContextCompat.getDrawable(itemView.context, R.drawable.table_column_divider)
-                    ?.let { divider.setDrawable(it) }
-
-                viewBinding.filterItemsLayout.layoutManager = LinearLayoutManager(itemView.context)
-                viewBinding.filterItemsLayout.setHasFixedSize(true)
-                viewBinding.filterItemsLayout.addItemDecoration(divider)
-                viewBinding.filterItemsLayout.adapter = ItemsFilterAdapter(item.values, filter)
-                animator.setHeight(viewBinding.filterItemsLayout.measureForAnimator())
-            }
+            setupAdapterIfNeeded(item.values, filter)
             if (viewBinding.filterItemsLayout.visibility == View.VISIBLE) {
                 animator.slideUp()
             } else {
@@ -67,6 +59,20 @@ internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
                     animator.slideDown()
                 }
             }
+        }
+    }
+
+    private fun setupAdapterIfNeeded(values: List<IFilter>, filter: Filter) {
+        if (viewBinding.filterItemsLayout.adapter == null) {
+            val divider = DividerItemDecoration(itemView.context, RecyclerView.VERTICAL)
+            ContextCompat.getDrawable(itemView.context, R.drawable.table_column_divider)
+                ?.let { divider.setDrawable(it) }
+
+            viewBinding.filterItemsLayout.layoutManager = LinearLayoutManager(itemView.context)
+            viewBinding.filterItemsLayout.setHasFixedSize(true)
+            viewBinding.filterItemsLayout.addItemDecoration(divider)
+            viewBinding.filterItemsLayout.adapter = ItemsFilterAdapter(values, filter)
+            animator.setHeight(viewBinding.filterItemsLayout.measureForAnimator())
         }
     }
 
@@ -81,7 +87,7 @@ internal class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
             filters.add(newFilter)
             newFilter
         } else {
-            existingFilter
+            existingFilter.apply { this.onFieldsChanged = onFieldsChanged }
         }
     }
 }

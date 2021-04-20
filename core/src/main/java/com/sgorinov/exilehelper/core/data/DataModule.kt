@@ -21,8 +21,8 @@ internal val dataModule = module {
             .baseUrl("http://18.156.126.44:8080/")//18.156.126.44//10.0.2.2
             .addConverterFactory(Json.asConverterFactory(MediaType.get("application/json")))
             .build()
-            .create(PoeTradeApi::class.java)
-    } bind PoeTradeApi::class
+            .create(ExileHelperApi::class.java)
+    } bind ExileHelperApi::class
     single {
         CoreRepository(get(), get())
     } bind ICoreRepository::class

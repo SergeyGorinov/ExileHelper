@@ -8,7 +8,7 @@ import retrofit2.Response
 
 internal class CoreRepository(
     private val staticApi: StaticApi,
-    private val poeTradeApi: PoeTradeApi
+    private val exileHelperApi: ExileHelperApi
 ) : BaseCoreRepository() {
 
     override var leagues: List<String> = listOf()
@@ -33,7 +33,7 @@ internal class CoreRepository(
     }
 
     override suspend fun setNotificationRequestRemote(request: RemoteNotificationRequest): Response<Void> {
-        return poeTradeApi.sendRequest(request)
+        return exileHelperApi.sendRequest(request)
     }
 
     override suspend fun setNotificationRequestLocal(request: NotificationRequest) {
@@ -43,10 +43,12 @@ internal class CoreRepository(
     override suspend fun syncRemoteNotificationRequests(
         messagingToken: String,
         authorizationToken: String?,
-        type: String
+        type: String,
+        league: String
     ) {
         val result = try {
-            val response = poeTradeApi.getRequests(authorizationToken, messagingToken, type)
+            val response =
+                exileHelperApi.getRequests(authorizationToken, messagingToken, type, league)
             response.body()
         } catch (e: Exception) {
             Log.e("GET REQUESTS ERROR", e.stackTraceToString())
@@ -60,7 +62,8 @@ internal class CoreRepository(
                 it.requestPayload,
                 Json.decodeFromString(ItemData.serializer(), it.buyingItem),
                 Json.decodeFromString(ItemData.serializer(), it.payingItem),
-                it.payingAmount
+                it.payingAmount,
+                it.league
             )
         }
         if (result != null) {
@@ -80,7 +83,7 @@ internal class CoreRepository(
 
     override suspend fun addToken(messagingToken: String, authorizationToken: String): Boolean {
         return try {
-            poeTradeApi.addToken(authorizationToken, messagingToken).isSuccessful
+            exileHelperApi.addToken(authorizationToken, messagingToken).isSuccessful
         } catch (e: Exception) {
             false
         }

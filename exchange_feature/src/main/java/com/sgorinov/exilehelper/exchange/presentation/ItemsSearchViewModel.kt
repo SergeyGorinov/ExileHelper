@@ -22,7 +22,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 internal class ItemsSearchViewModel(
-    getCurrencyItemsUseCase: GetCurrencyItemsUseCase,
     getItemsUseCase: GetItemsUseCase,
     getStatsUseCase: GetStatsUseCase,
     getTotalItemsResultCountUseCase: GetTotalItemsResultCountUseCase,
@@ -48,6 +47,26 @@ internal class ItemsSearchViewModel(
         ItemGroupViewData(group.groupName, entries)
     }
 
+    val uniques = listOf(ViewFilters.ItemDropdownFilter(null, "Any")) + itemGroups.flatMap {
+        it.entries
+    }.filter {
+        it.flags?.unique == true
+    }.map {
+        ViewFilters.ItemDropdownFilter(it.name, it.text)
+    }
+
+    private val cards = listOf(ViewFilters.ItemDropdownFilter(null, "Any")) +
+            (itemGroups.firstOrNull { it.label == "Cards" }?.entries ?: listOf()).map {
+                ViewFilters.ItemDropdownFilter(it.text, it.text)
+            }
+
+    private val currencies = listOf(ViewFilters.ItemDropdownFilter(null, "Any")) +
+            (itemGroups.firstOrNull { it.label == "Currency" }?.entries ?: listOf()).map {
+                ViewFilters.ItemDropdownFilter(it.text, it.text)
+            }
+
+    val ultimatumInput = uniques + cards + currencies
+
     val statGroups = getStatsUseCase.execute().map { group ->
         val entries = group.entries.map { item ->
             StatViewData(
@@ -60,118 +79,118 @@ internal class ItemsSearchViewModel(
         StatGroupViewData(group.groupName, entries)
     }
 
-    val currencies = getCurrencyItemsUseCase.execute().flatMap { it.items }.map {
-        CurrencyViewData(it.id, it.label, it.imageUrl)
-    }
-
     fun getFilters() = getFiltersUseCase.execute()
 
     val totalItemsCount = getTotalItemsResultCountUseCase.execute()
 
     suspend fun fetchPartialResults(league: String, position: Int): List<ItemResultViewData> {
         return withContext(Dispatchers.IO) {
-            getItemsResultDataUseCase.execute(league, position).map { itemData ->
-                val hybridData = if (itemData.hybridData != null) {
-                    HybridData(
-                        itemData.hybridData.isVaalGem,
-                        itemData.hybridData.properties.map { property ->
-                            val values = property.values.map {
-                                PropertyData(
-                                    it.propertyValue,
-                                    it.propertyColor
+            try {
+                getItemsResultDataUseCase.execute(league, position).map { itemData ->
+                    val hybridData = if (itemData.hybridData != null) {
+                        HybridData(
+                            itemData.hybridData.isVaalGem,
+                            itemData.hybridData.properties.map { property ->
+                                val values = property.values.map {
+                                    PropertyData(
+                                        it.propertyValue,
+                                        it.propertyColor
+                                    )
+                                }
+                                Property(
+                                    property.name,
+                                    values,
+                                    property.displayMode,
+                                    property.progress,
+                                    property.type,
+                                    property.suffix
                                 )
-                            }
-                            Property(
-                                property.name,
-                                values,
-                                property.displayMode,
-                                property.progress,
-                                property.type,
-                                property.suffix
-                            )
-                        },
-                        itemData.hybridData.requirements.map { property ->
-                            val values = property.values.map {
-                                PropertyData(
-                                    it.propertyValue,
-                                    it.propertyColor
+                            },
+                            itemData.hybridData.requirements.map { property ->
+                                val values = property.values.map {
+                                    PropertyData(
+                                        it.propertyValue,
+                                        it.propertyColor
+                                    )
+                                }
+                                Property(
+                                    property.name,
+                                    values,
+                                    property.displayMode,
+                                    property.progress,
+                                    property.type,
+                                    property.suffix
                                 )
-                            }
-                            Property(
-                                property.name,
-                                values,
-                                property.displayMode,
-                                property.progress,
-                                property.type,
-                                property.suffix
-                            )
-                        },
-                        itemData.hybridData.secDescrText,
-                        itemData.hybridData.implicitMods,
-                        itemData.hybridData.explicitMods,
+                            },
+                            itemData.hybridData.secDescrText,
+                            itemData.hybridData.implicitMods,
+                            itemData.hybridData.explicitMods,
+                            null
+                        )
+                    } else {
                         null
+                    }
+                    ItemResultViewData(
+                        itemData.name,
+                        itemData.typeLine,
+                        itemData.iconUrl,
+                        itemData.frameType,
+                        itemData.synthesised,
+                        itemData.replica,
+                        itemData.corrupted,
+                        itemData.sockets?.map { Socket(it.group, it.attr, it.sColour) },
+                        itemData.hybridTypeLine,
+                        Influences(
+                            itemData.influences.elder,
+                            itemData.influences.shaper,
+                            itemData.influences.warlord,
+                            itemData.influences.hunter,
+                            itemData.influences.redeemer,
+                            itemData.influences.crusader
+                        ),
+                        ItemData(
+                            itemData.itemData.properties.map { property ->
+                                val values = property.values.map {
+                                    PropertyData(
+                                        it.propertyValue,
+                                        it.propertyColor
+                                    )
+                                }
+                                Property(
+                                    property.name,
+                                    values,
+                                    property.displayMode,
+                                    property.progress,
+                                    property.type,
+                                    property.suffix
+                                )
+                            },
+                            itemData.itemData.requirements.map { property ->
+                                val values = property.values.map {
+                                    PropertyData(
+                                        it.propertyValue,
+                                        it.propertyColor
+                                    )
+                                }
+                                Property(
+                                    property.name,
+                                    values,
+                                    property.displayMode,
+                                    property.progress,
+                                    property.type,
+                                    property.suffix
+                                )
+                            },
+                            itemData.itemData.secDescrText,
+                            itemData.itemData.implicitMods,
+                            itemData.itemData.explicitMods,
+                            itemData.itemData.note
+                        ),
+                        hybridData
                     )
-                } else {
-                    null
                 }
-                ItemResultViewData(
-                    itemData.name,
-                    itemData.typeLine,
-                    itemData.iconUrl,
-                    itemData.frameType,
-                    itemData.synthesised,
-                    itemData.replica,
-                    itemData.corrupted,
-                    itemData.sockets?.map { Socket(it.group, it.attr, it.sColour) },
-                    itemData.hybridTypeLine,
-                    Influences(
-                        itemData.influences.elder,
-                        itemData.influences.shaper,
-                        itemData.influences.warlord,
-                        itemData.influences.hunter,
-                        itemData.influences.redeemer,
-                        itemData.influences.crusader
-                    ),
-                    ItemData(
-                        itemData.itemData.properties.map { property ->
-                            val values = property.values.map {
-                                PropertyData(
-                                    it.propertyValue,
-                                    it.propertyColor
-                                )
-                            }
-                            Property(
-                                property.name,
-                                values,
-                                property.displayMode,
-                                property.progress,
-                                property.type,
-                                property.suffix
-                            )
-                        },
-                        itemData.itemData.requirements.map { property ->
-                            val values = property.values.map {
-                                PropertyData(
-                                    it.propertyValue,
-                                    it.propertyColor
-                                )
-                            }
-                            Property(
-                                property.name,
-                                values,
-                                property.displayMode,
-                                property.progress,
-                                property.type,
-                                property.suffix
-                            )
-                        },
-                        itemData.itemData.secDescrText,
-                        itemData.itemData.implicitMods,
-                        itemData.itemData.explicitMods,
-                        itemData.itemData.note
-                    ),
-                    hybridData
-                )
+            } catch (e: Exception) {
+                listOf()
             }
         }
     }
@@ -182,7 +201,8 @@ internal class ItemsSearchViewModel(
 
     suspend fun sendNotificationRequest(
         buyingItem: SuggestionItem,
-        payingAmount: Int
+        payingAmount: Int,
+        league: String
     ) = withContext(Dispatchers.IO) {
         val request = NotificationRequest(
             NotificationItemData(
@@ -214,7 +234,7 @@ internal class ItemsSearchViewModel(
                 query.name = buyingItem.name
                 query.type = buyingItem.type
                 query.filters = ItemsRequestModelFields.Filters(
-                    mapOf(ViewFilters.AllFilters.TradeFilter.id to priceFilter)
+                    mapOf("trade_filters" to priceFilter)
                 )
             }
         )
@@ -224,6 +244,7 @@ internal class ItemsSearchViewModel(
                 payload,
                 ItemsSearchMainFragment.NOTIFICATION_REQUESTS_TYPE.toInt(),
                 FirebaseUtils.getMessagingToken(),
+                league,
                 FirebaseUtils.getAuthToken()
             )
         } catch (e: Exception) {
@@ -233,14 +254,15 @@ internal class ItemsSearchViewModel(
         }
     }
 
-    suspend fun getNotificationRequests(): List<NotificationRequestViewData> {
+    suspend fun getNotificationRequests(league: String): List<NotificationRequestViewData> {
         viewLoadingState.emit(true)
         return try {
             withContext(Dispatchers.IO) {
                 getNotificationRequestsUseCase.execute(
                     FirebaseUtils.getMessagingToken(),
                     FirebaseUtils.getAuthToken(),
-                    ItemsSearchMainFragment.NOTIFICATION_REQUESTS_TYPE
+                    ItemsSearchMainFragment.NOTIFICATION_REQUESTS_TYPE,
+                    league
                 ).map {
                     NotificationRequestViewData(
                         it.buyingItem.itemName,

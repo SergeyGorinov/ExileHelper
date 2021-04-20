@@ -15,16 +15,15 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.sgorinov.exilehelper.core.presentation.FragmentScopes
-import com.sgorinov.exilehelper.core.presentation.getTransparentProgressDialog
-import com.sgorinov.exilehelper.core.presentation.hideKeyboard
-import com.sgorinov.exilehelper.core.presentation.scopedViewModel
+import com.sgorinov.exilehelper.core.DI
+import com.sgorinov.exilehelper.core.presentation.*
 import com.sgorinov.exilehelper.currency.R
 import com.sgorinov.exilehelper.currency.databinding.FragmentCurrencyNotificationRequestAddBinding
 import com.sgorinov.exilehelper.currency.presentation.CurrencyExchangeViewModel
 import com.sgorinov.exilehelper.currency.presentation.adapters.CurrencySearchListAdapter
 import com.sgorinov.exilehelper.currency.presentation.models.CurrencyViewData
 import kotlinx.coroutines.launch
+import org.koin.core.component.inject
 
 class NotificationRequestAddFragment : BottomSheetDialogFragment() {
 
@@ -32,6 +31,8 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         FragmentScopes.CURRENCY_FEATURE.scopeId,
         FragmentScopes.CURRENCY_FEATURE
     )
+
+    private val settings by DI.inject<ApplicationSettings>()
 
     private val wantItemId by lazy { requireArguments().getString(WANT_ITEM_ID_KEY) }
     private val haveItemId by lazy { requireArguments().getString(HAVE_ITEM_ID_KEY) }
@@ -101,7 +102,12 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
                 }
                 lifecycleScope.launch {
                     progressDialog.show()
-                    val result = viewModel.sendNotificationRequest(wantItem, haveItem, amount)
+                    val result = viewModel.sendNotificationRequest(
+                        wantItem,
+                        haveItem,
+                        amount,
+                        settings.league
+                    )
                     progressDialog.hide()
                     if (result) {
                         Toast.makeText(

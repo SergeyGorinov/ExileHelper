@@ -19,7 +19,8 @@ data class NotificationRequest(
     var buyingItem: ItemData,
     @Convert(converter = ItemDataConverter::class, dbType = String::class)
     var payingItem: ItemData,
-    var payingAmount: Int
+    var payingAmount: Int,
+    var league: String
 ) {
     internal class ItemDataConverter : PropertyConverter<ItemData, String> {
         override fun convertToEntityProperty(databaseValue: String): ItemData {
