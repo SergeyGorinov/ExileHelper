@@ -71,7 +71,7 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
                     if (it.isSuccessful) {
                         lifecycleScope.launch {
                             viewModel.addToken()
-                            getMainActivity()?.goToCurrencyExchange(firstTime = true)
+                            getMainActivity()?.goToCurrencyExchange()
                         }
                     } else {
                         Toast.makeText(

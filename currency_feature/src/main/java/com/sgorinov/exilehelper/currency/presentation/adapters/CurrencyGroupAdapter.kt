@@ -74,7 +74,7 @@ internal class CurrencyGroupAdapter(
             onItemClick: (Boolean, String) -> Unit
         ) {
             viewBinding.root.isSelected = isSelected
-            Picasso.get().load(item.imageUrl).into(viewBinding.root)
+            Picasso.get().load(item.imageUrl).into(viewBinding.image)
             viewBinding.root.setOnClickListener {
                 it.isSelected = !it.isSelected
                 onItemClick(it.isSelected, item.id)

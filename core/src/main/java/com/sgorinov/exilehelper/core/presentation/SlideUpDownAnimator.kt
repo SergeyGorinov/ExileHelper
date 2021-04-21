@@ -1,6 +1,6 @@
 package com.sgorinov.exilehelper.core.presentation
 
-import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -14,12 +14,10 @@ class SlideUpDownAnimator(private val view: View) {
         if (view is RecyclerView) {
             view.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
         }
-
-        val height = preMeasuredHeight
-        val valueAnimator = ObjectAnimator.ofInt(1, height)
+        val valueAnimator = ValueAnimator.ofInt(1, preMeasuredHeight)
         valueAnimator.addUpdateListener { animation ->
             val value = animation?.animatedValue as Int
-            if (height > value) {
+            if (preMeasuredHeight > value) {
                 val layoutParams = view.layoutParams
                 layoutParams.height = value
                 view.layoutParams = layoutParams
@@ -34,9 +32,9 @@ class SlideUpDownAnimator(private val view: View) {
     }
 
     fun slideUp() {
-        view.post(kotlinx.coroutines.Runnable {
+        view.post {
             preMeasuredHeight = view.height
-            val valueAnimator = ObjectAnimator.ofInt(preMeasuredHeight, 0)
+            val valueAnimator = ValueAnimator.ofInt(preMeasuredHeight, 0)
             valueAnimator.addUpdateListener { animation ->
                 val value = animation?.animatedValue as Int
                 if (value > 0) {
@@ -49,7 +47,7 @@ class SlideUpDownAnimator(private val view: View) {
             }
             valueAnimator.duration = 500L
             valueAnimator.start()
-        })
+        }
     }
 
     fun setHeight(h: Int) {

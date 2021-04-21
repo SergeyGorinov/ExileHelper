@@ -9,14 +9,12 @@ interface IMainActivity {
     fun goToCurrencyExchange(
         wantItemId: String? = null,
         haveItemId: String? = null,
-        firstTime: Boolean = false,
         withNotificationRequest: Boolean = false
     )
 
     fun goToItemsSearch(
         itemType: String,
         itemName: String?,
-        withExchangeRequest: Boolean = false,
         withNotificationRequest: Boolean = false
     )
 
@@ -27,4 +25,5 @@ interface IMainActivity {
     fun showBottomNavBarIfNeeded()
     fun signOut()
     fun checkApiConnection()
+    fun processNotificationPayload(type: String?, payload: String?)
 }

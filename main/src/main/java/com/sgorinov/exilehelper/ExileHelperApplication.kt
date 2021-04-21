@@ -10,7 +10,7 @@ import com.sgorinov.exilehelper.exchange.exchangeFeatureModules
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Suppress("unused")
-class PoeTradeApplication : Application() {
+class ExileHelperApplication : Application() {
 
     @ExperimentalCoroutinesApi
     override fun onCreate() {

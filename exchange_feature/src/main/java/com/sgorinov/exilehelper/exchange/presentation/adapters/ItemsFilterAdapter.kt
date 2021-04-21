@@ -10,7 +10,7 @@ import com.sgorinov.exilehelper.exchange.presentation.models.enums.IFilter
 import com.sgorinov.exilehelper.exchange.presentation.models.enums.ViewType
 import com.sgorinov.exilehelper.exchange.presentation.viewholders.*
 
-internal class ItemsFilterAdapter(private val items: List<IFilter>, private val filter: Filter) :
+internal class ItemsFilterAdapter(private var items: List<IFilter>, private val filter: Filter) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =

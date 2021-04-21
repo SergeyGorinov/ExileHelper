@@ -3,6 +3,7 @@ package com.sgorinov.exilehelper.presentation.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.google.firebase.auth.FirebaseAuth
@@ -18,6 +19,9 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 class LoaderFragment : BaseFragment(R.layout.fragment_loader) {
 
     private val viewModel by sharedViewModel<MainActivityViewModel>()
+
+    private val typeFromNotification by lazy { requireArguments().getString("type") }
+    private val payloadFromNotification by lazy { requireArguments().getString("data") }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -45,8 +49,14 @@ class LoaderFragment : BaseFragment(R.layout.fragment_loader) {
                 return@launch
             }
             when {
+                typeFromNotification != null && payloadFromNotification != null -> {
+                    getMainActivity()?.processNotificationPayload(
+                        typeFromNotification,
+                        payloadFromNotification
+                    )
+                }
                 user != null && user.isEmailVerified -> {
-                    getMainActivity()?.goToCurrencyExchange(firstTime = true)
+                    getMainActivity()?.goToCurrencyExchange()
                 }
                 user != null && !user.isEmailVerified -> {
                     router.newRootScreen(EmailVerificationFragment.newInstance())
@@ -59,6 +69,13 @@ class LoaderFragment : BaseFragment(R.layout.fragment_loader) {
     }
 
     companion object {
-        fun newInstance() = FragmentScreen { LoaderFragment() }
+
+        fun newInstance(type: String?, payload: String?): FragmentScreen {
+            return FragmentScreen {
+                LoaderFragment().apply {
+                    arguments = bundleOf("type" to type, "data" to payload)
+                }
+            }
+        }
     }
 }

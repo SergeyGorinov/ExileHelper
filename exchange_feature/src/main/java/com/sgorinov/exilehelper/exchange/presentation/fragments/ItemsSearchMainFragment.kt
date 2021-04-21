@@ -1,16 +1,17 @@
 package com.sgorinov.exilehelper.exchange.presentation.fragments
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.sgorinov.exilehelper.core.presentation.*
@@ -42,12 +43,24 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 
     private lateinit var binding: FragmentItemsSearchMainBinding
     private lateinit var toolbarLayout: ItemsSearchFeatureToolbarBinding
-    private lateinit var adapter: ItemsFiltersListAdapter
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent ?: return
+            if (intent.action == NOTIFICATION_ACTION) {
+                processExternalAction(
+                    false,
+                    intent.getStringExtra(SAVED_ITEM_TYPE),
+                    intent.getStringExtra(SAVED_ITEM_NAME)
+                )
+            }
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        restoreState()
-        adapter = ItemsFiltersListAdapter(viewModel.getFilters())
+        getMainActivity()?.showBottomNavBarIfNeeded()
+        getMainActivity()?.checkApiConnection()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,14 +68,13 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 
         viewBinding = FragmentItemsSearchMainBinding.bind(view)
         binding = getBinding()
-
         toolbarLayout = ItemsSearchFeatureToolbarBinding.bind(binding.root)
 
+        restoreState()
         setupToolbar()
-        binding.filters.layoutManager = LinearLayoutManager(requireActivity())
-        binding.filters.adapter = adapter
 
         binding.accept.setOnClickListener {
+            requireActivity().hideKeyboard(binding.root)
             requestResult()
         }
     }
@@ -84,34 +96,35 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         super.onDestroyView()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        binding.filters.adapter = null
-        scope.close()
-        getMainActivity()?.saveItemsSearchFragmentState(savedState)
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+            receiver,
+            IntentFilter(NOTIFICATION_ACTION)
+        )
+        lifecycleScope.launchWhenResumed {
+            viewModel.viewLoadingState.collect {
+                if (it) {
+                    toolbarLayout.toolbarProgressBar.show()
+                } else {
+                    toolbarLayout.toolbarProgressBar.hide()
+                }
+            }
+        }
+        binding.filters.layoutManager = LinearLayoutManager(requireActivity())
+        binding.filters.adapter = ItemsFiltersListAdapter(
+            ViewFilters.allFilters,
+            viewModel.getFilters()
+        ).apply {
+            setHasStableIds(true)
+        }
+        binding.filters.setItemViewCacheSize(10)
     }
 
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-        return if (enter) {
-            AnimationUtils.loadAnimation(requireActivity(), nextAnim).apply {
-                setAnimationListener(
-                    AnimationListener(Handler(requireActivity().mainLooper)) {
-                        lifecycleScope.launchWhenResumed {
-                            viewModel.viewLoadingState.collect {
-                                if (it) {
-                                    toolbarLayout.toolbarProgressBar.show()
-                                } else {
-                                    toolbarLayout.toolbarProgressBar.hide()
-                                }
-                            }
-                        }
-                        adapter.setupData(ViewFilters.allFilters)
-                    }
-                )
-            }
-        } else {
-            null
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.close()
+        getMainActivity()?.saveItemsSearchFragmentState(savedState)
     }
 
     fun closeToolbarSearchLayoutIfNeeded(): Boolean {
@@ -123,6 +136,20 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         }
     }
 
+    fun processExternalAction(isNotificationRequest: Boolean, vararg args: String?) {
+        if (isNotificationRequest) {
+            NotificationRequestAddFragment
+                .newInstance(args.getOrNull(0), args.getOrNull(1))
+                .show(childFragmentManager, null)
+        } else {
+            args.getOrNull(0)?.let {
+                viewModel.getFilters().clear()
+                viewModel.setItemData(it, args.getOrNull(1))
+                requestResult()
+            }
+        }
+    }
+
     private fun restoreState() {
         savedState.clear()
         getMainActivity()?.restoreItemsSearchFragmentState()?.let {
@@ -131,20 +158,8 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         val savedItemName = savedState.getString(SAVED_ITEM_NAME)
         val savedItemType = savedState.getString(SAVED_ITEM_TYPE)
         val savedFilters = savedState.getString(SAVED_FILTERS)
-        val withExchangeRequest = savedState.getBoolean(WITH_EXCHANGE_REQUEST_KEY, false)
-        val withNotificationRequest = savedState.getBoolean(WITH_NOTIFICATION_REQUEST_KEY, false)
-        if (withNotificationRequest) {
-            NotificationRequestAddFragment
-                .newInstance(savedItemType, savedItemName)
-                .show(parentFragmentManager, null)
-            return
-        }
-        if (withExchangeRequest) {
-            savedItemType?.let {
-                viewModel.setItemData(it, savedItemName)
-                requestResult()
-            }
-            return
+        savedItemType?.let {
+            viewModel.setItemData(it, savedItemName)
         }
         savedFilters?.run {
             Json.decodeFromString(ListSerializer(Filter.serializer()), this)
@@ -164,7 +179,7 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
                         item.isEnabled = false
                         val items = viewModel.getNotificationRequests(settings.league)
                         NotificationRequestsFragment.newInstance(items).show(
-                            parentFragmentManager,
+                            childFragmentManager,
                             null
                         )
                         item.isEnabled = true
@@ -290,14 +305,13 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
     }
 
     private fun requestResult() {
-        requireActivity().hideKeyboard(toolbarLayout.toolbar)
-        lifecycleScope.launch {
+        lifecycleScope.launchWhenResumed {
             viewModel.viewLoadingState.emit(true)
             val results = viewModel.fetchPartialResults(settings.league, 0)
             viewModel.viewLoadingState.emit(false)
             if (results.isNotEmpty()) {
                 ItemsSearchResultFragment.newInstance(results).show(
-                    parentFragmentManager,
+                    childFragmentManager,
                     null
                 )
             } else {
@@ -310,25 +324,9 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         }
     }
 
-    private class AnimationListener(
-        private val handler: Handler,
-        private val onEndAction: () -> Unit
-    ) : Animation.AnimationListener {
-
-        override fun onAnimationStart(animation: Animation?) = Unit
-
-        override fun onAnimationRepeat(animation: Animation?) = Unit
-
-        override fun onAnimationEnd(animation: Animation?) {
-            // allow animation end completely
-            handler.postDelayed({ onEndAction() }, 50L)
-        }
-    }
-
     companion object {
         const val NOTIFICATION_REQUESTS_TYPE = "1"
-        const val WITH_NOTIFICATION_REQUEST_KEY = "WITH_NOTIFICATION_REQUEST_KEY"
-        const val WITH_EXCHANGE_REQUEST_KEY = "WITH_EXCHANGE_REQUEST_KEY"
+        const val NOTIFICATION_ACTION = "ITEMS_SEARCH_NOTIFICATION_ACTION"
         const val SAVED_FILTERS = "SAVED_FILTERS"
         const val SAVED_ITEM_NAME = "SAVED_ITEM_NAME"
         const val SAVED_ITEM_TYPE = "SAVED_ITEM_TYPE"

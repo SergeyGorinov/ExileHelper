@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.sgorinov.exilehelper.core.presentation.generateLinearDividerDecoration
+import com.sgorinov.exilehelper.core.presentation.generateCustomDividerDecoration
 import com.sgorinov.exilehelper.core.presentation.models.NotificationRequestViewData
 import com.sgorinov.exilehelper.currency.R
 import com.sgorinov.exilehelper.currency.databinding.FragmentNotificationRequestsBinding
@@ -58,7 +58,12 @@ internal class NotificationRequestsFragment : BottomSheetDialogFragment() {
                 visibility = View.VISIBLE
                 layoutManager = LinearLayoutManager(requireActivity())
                 adapter = NotificationRequestsAdapter(items)
-                addItemDecoration(requireActivity().generateLinearDividerDecoration())
+                addItemDecoration(
+                    requireActivity().generateCustomDividerDecoration(
+                        R.drawable.colored_list_divider,
+                        0
+                    )
+                )
             }
         } else {
             viewBinding?.emptyPlaceholder?.visibility = View.VISIBLE

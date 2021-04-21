@@ -72,6 +72,7 @@ dependencies {
     implementation "com.squareup.picasso:picasso:$picasso_version"
     implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
+    implementation "androidx.asynclayoutinflater:asynclayoutinflater:1.0.0"
 
     implementation project(":core")
 }

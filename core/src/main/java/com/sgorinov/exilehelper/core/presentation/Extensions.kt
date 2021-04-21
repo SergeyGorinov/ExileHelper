@@ -28,18 +28,7 @@ import org.koin.java.KoinJavaComponent.getKoin
 import java.util.*
 
 fun View.measureForAnimator(): Int {
-    val layoutParams = this.layoutParams
-    layoutParams.height = 1
-    this.layoutParams = layoutParams
-
-    this.measure(
-        View.MeasureSpec.makeMeasureSpec(
-            Resources.getSystem().displayMetrics.widthPixels,
-            View.MeasureSpec.EXACTLY
-        ),
-        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-    )
-
+    this.measure(0, 0)
     return this.measuredHeight
 }
 

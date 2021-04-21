@@ -196,7 +196,7 @@ internal class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
     private fun goToExchange(data: HistoryModel, withNotification: Boolean) {
         if (isCurrency) {
-            getMainActivity()?.goToCurrencyExchange(data.tradeId, "chaos", false, withNotification)
+            getMainActivity()?.goToCurrencyExchange(data.tradeId, "chaos", withNotification)
         } else {
             if (data.type == null) {
                 getMainActivity()?.goToItemsSearch(data.name, null, withNotification)

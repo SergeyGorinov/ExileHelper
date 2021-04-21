@@ -1,6 +1,9 @@
 package com.sgorinov.exilehelper.currency.presentation.fragments
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
@@ -10,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
@@ -20,7 +24,6 @@ import com.sgorinov.exilehelper.currency.databinding.FragmentCurrencyExchangeMai
 import com.sgorinov.exilehelper.currency.presentation.CurrencyExchangeViewModel
 import com.sgorinov.exilehelper.currency.presentation.SwipeToDeleteCallback
 import com.sgorinov.exilehelper.currency.presentation.adapters.CurrencySelectedAdapter
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
@@ -46,13 +49,23 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
     private lateinit var adapter: CurrencySelectedAdapter
     private lateinit var toolbarLayout: CurrencyFeatureToolbarBinding
 
-    private var searchJob: Job? = null
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent ?: return
+            if (intent.action == NOTIFICATION_ACTION) {
+                processExternalAction(
+                    false,
+                    intent.getStringExtra(WANT_ITEM_ID_KEY),
+                    intent.getStringExtra(HAVE_ITEM_ID_KEY)
+                )
+            }
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         getMainActivity()?.showBottomNavBarIfNeeded()
         getMainActivity()?.checkApiConnection()
-        restoreState()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,6 +73,8 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
         viewBinding = FragmentCurrencyExchangeMainBinding.bind(view)
         binding = getBinding()
+
+        restoreState()
 
         savedState.getString(SAVED_STOCK_KEY)?.let { stock ->
             binding.minimumStockValue.setText(stock)
@@ -72,6 +87,14 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         setupOnClickListeners()
         setupToolbar(savedState.getInt(SAVED_TAB_POSITION_KEY, 0))
         savedState.clear()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
+            receiver,
+            IntentFilter(NOTIFICATION_ACTION)
+        )
     }
 
     override fun onDestroyView() {
@@ -95,31 +118,30 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         getMainActivity()?.saveCurrencyExchangeFragmentState(savedState)
     }
 
+    fun processExternalAction(isNotificationRequest: Boolean, vararg args: String?) {
+        val wantItemId = args.getOrNull(0)
+        val haveItemId = args.getOrNull(1)
+        if (wantItemId != null && haveItemId != null) {
+            if (isNotificationRequest) {
+                NotificationRequestAddFragment
+                    .newInstance(wantItemId, haveItemId)
+                    .show(childFragmentManager, null)
+            } else {
+                viewModel.wantCurrencies.clear()
+                viewModel.haveCurrencies.clear()
+                viewModel.wantCurrencies.add(wantItemId)
+                viewModel.haveCurrencies.add(haveItemId)
+                requestResults()
+            }
+        }
+    }
+
     private fun restoreState() {
         savedState.clear()
         getMainActivity()?.restoreCurrencyExchangeFragmentState()?.let {
             savedState.putAll(it)
         }
         savedState.let {
-            val wantItemId = it.getString(WANT_ITEM_ID_KEY)
-            val haveItemId = it.getString(HAVE_ITEM_ID_KEY)
-            val withNotificationRequest = it.getBoolean(WITH_NOTIFICATION_REQUEST_KEY, false)
-
-            if (wantItemId != null && haveItemId != null) {
-                if (withNotificationRequest) {
-                    NotificationRequestAddFragment
-                        .newInstance(wantItemId, haveItemId)
-                        .show(parentFragmentManager, null)
-                } else {
-                    viewModel.wantCurrencies.clear()
-                    viewModel.wantCurrencies.add(wantItemId)
-                    viewModel.haveCurrencies.clear()
-                    viewModel.haveCurrencies.add(haveItemId)
-                    requestResults()
-                    return@let
-                }
-            }
-
             it.getStringArrayList(SAVED_WANT_ITEMS_IDS_KEY)?.let { wantCurrencies ->
                 viewModel.wantCurrencies.addAll(wantCurrencies)
             }
@@ -139,7 +161,7 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
                         item.isEnabled = false
                         val items = viewModel.getNotificationRequests(settings.league)
                         NotificationRequestsFragment.newInstance(items).show(
-                            parentFragmentManager,
+                            childFragmentManager,
                             null
                         )
                         item.isEnabled = true
@@ -272,10 +294,7 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             ).show()
             return
         }
-        if (searchJob?.isActive == true) {
-            searchJob?.cancel()
-        }
-        searchJob = lifecycleScope.launch {
+        lifecycleScope.launch {
             binding.search.isEnabled = false
             val result = try {
                 viewModel.requestResult(
@@ -313,7 +332,7 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
                         result,
                         binding.fullfilable.isSelected,
                         binding.minimumStockValue.text.toString()
-                    ).show(parentFragmentManager, null)
+                    ).show(childFragmentManager, null)
             }
             binding.search.isEnabled = true
         }
@@ -321,9 +340,9 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
     companion object {
         const val NOTIFICATION_REQUESTS_TYPE = "0"
+        const val NOTIFICATION_ACTION = "CURRENCY_EXCHANGE_NOTIFICATION_ACTION"
         const val WANT_ITEM_ID_KEY = "WANT_ITEM_ID_KEY"
         const val HAVE_ITEM_ID_KEY = "HAVE_ITEM_ID_KEY"
-        const val WITH_NOTIFICATION_REQUEST_KEY = "WITH_NOTIFICATION_REQUEST_KEY"
         const val SAVED_TAB_POSITION_KEY = "TAB_POSITION_KEY"
         const val SAVED_FULFILLABLE_STATE_KEY = "FULFILLABLE_STATE_KEY"
         const val SAVED_WANT_ITEMS_IDS_KEY = "WANT_ITEMS_IDS_KEY"
