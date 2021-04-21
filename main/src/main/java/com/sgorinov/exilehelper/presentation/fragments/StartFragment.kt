@@ -1,7 +1,10 @@
 package com.sgorinov.exilehelper.presentation.fragments
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.view.WindowManager
+import android.widget.PopupWindow
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.sgorinov.exilehelper.R
 import com.sgorinov.exilehelper.core.presentation.BaseFragment
@@ -26,6 +29,16 @@ class StartFragment : BaseFragment(R.layout.fragment_start) {
         }
         binding.noAccount.setOnClickListener {
             router.newRootScreen(CurrencyExchangeMainFragment.newInstance())
+        }
+        binding.info.setOnClickListener {
+            val popUpView = View.inflate(requireActivity(), R.layout.info_popup, null)
+            val popUp = PopupWindow(requireActivity()).apply {
+                contentView = popUpView
+                height = WindowManager.LayoutParams.WRAP_CONTENT
+                width = WindowManager.LayoutParams.WRAP_CONTENT
+                isOutsideTouchable = true
+            }
+            popUp.showAsDropDown(it, 0, it.height, Gravity.START or Gravity.BOTTOM)
         }
     }
 

@@ -32,7 +32,10 @@
         android:id="@+id/filterValue"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:background="@color/primaryLightColor"
         android:hint="@string/empty_hint"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
         app:hintTextColor="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guideline">
@@ -41,7 +44,8 @@
             android:id="@+id/filterAccount"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/primaryLightColor"
+            android:background="@color/transparent"
+            android:backgroundTint="@color/transparent"
             android:fontFamily="@font/fontinsmallcaps"
             android:gravity="center|center_vertical"
             android:hint="@string/account_name_hint"
@@ -49,6 +53,7 @@
             android:padding="0dp"
             android:textColor="@color/primaryTextColor"
             android:textColorHint="@color/secondaryLightColor"
+            android:textCursorDrawable="@drawable/default_cursor"
             android:textStyle="bold" />
     </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

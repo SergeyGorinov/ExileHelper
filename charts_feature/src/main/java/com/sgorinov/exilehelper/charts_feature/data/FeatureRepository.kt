@@ -45,15 +45,15 @@ internal class FeatureRepository(private val api: PoeNinjaChartsApi) : BaseFeatu
                     currencyDetail.tradeId ?: currencyOverview.detailsId,
                     sellingData,
                     buyingData,
-                    if (currencyOverview.receiveSparkLine.data.any { it == null }) {
+                    if (currencyOverview.paySparkLine.data.any { it == null }) {
                         null
                     } else {
-                        currencyOverview.receiveSparkLine.data.filterNotNull()
+                        currencyOverview.paySparkLine.data.filterNotNull()
                     },
-                    if (currencyOverview.paySparkLine.data.any { it == null }) {
+                    if (currencyOverview.receiveSparkLine.data.any { it == null }) {
                         listOf()
                     } else {
-                        currencyOverview.paySparkLine.data.filterNotNull()
+                        currencyOverview.receiveSparkLine.data.filterNotNull()
                     },
                     currencyOverview.receiveSparkLine.totalChange,
                     currencyOverview.paySparkLine.totalChange

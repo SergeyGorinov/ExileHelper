@@ -16,7 +16,8 @@
             android:layout_height="match_parent"
             android:background="@color/primaryColor"
             app:navigationIcon="@drawable/menu_24"
-            app:titleTextAppearance="@style/AppTheme.TitleFontStyle" />
+            app:titleTextAppearance="@style/AppTheme.TitleFontStyle"
+            app:titleTextColor="@color/primaryTextColor" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/toolbarProgressBar"

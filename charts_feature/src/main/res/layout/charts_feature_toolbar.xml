@@ -20,7 +20,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:navigationIcon="@drawable/menu_24"
-                app:titleTextAppearance="@style/AppTheme.TitleFontStyle" />
+                app:titleTextAppearance="@style/AppTheme.TitleFontStyle"
+                app:titleTextColor="@color/primaryTextColor" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/toolbarProgressBar"
@@ -50,12 +51,12 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/sell" />
+                android:text="@string/buy" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/buy" />
+                android:text="@string/sell" />
         </com.google.android.material.tabs.TabLayout>
     </com.google.android.material.appbar.AppBarLayout>
 </merge>

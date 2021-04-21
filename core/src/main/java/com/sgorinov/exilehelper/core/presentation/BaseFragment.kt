@@ -11,7 +11,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.github.terrakok.cicerone.Router
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.sgorinov.exilehelper.core.DI
@@ -30,15 +29,6 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
     override var viewBinding: ViewBinding? = null
 
-    private val toolbar by lazy { viewBinding?.root?.findViewById<MaterialToolbar>(R.id.toolbar) }
-
-    override fun onResume() {
-        super.onResume()
-        toolbar?.setNavigationOnClickListener {
-            showMenu()
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         viewBinding = null
@@ -48,7 +38,7 @@ abstract class BaseFragment(resId: Int) : Fragment(resId), IBaseFragment {
 
     protected fun getMainActivity() = requireActivity() as? IMainActivity
 
-    private fun showMenu() {
+    protected fun showMenu() {
         val leagues = getMainActivity()?.getLeagues() ?: listOf()
         val view = View.inflate(requireActivity(), R.layout.menu_layout, null)
         val binding = MenuLayoutBinding.bind(view)

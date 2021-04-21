@@ -58,7 +58,7 @@
             android:paddingVertical="0dp"
             android:textColor="@color/primaryTextColor"
             android:textColorHint="@color/secondaryLightColor"
-            android:textCursorDrawable="@color/primaryTextColor"
+            android:textCursorDrawable="@drawable/default_cursor"
             android:textStyle="bold"
             tools:ignore="LabelFor" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -111,6 +111,7 @@
             android:padding="0dp"
             android:textColor="@color/primaryTextColor"
             android:textColorHint="@color/secondaryLightColor"
+            android:textCursorDrawable="@drawable/default_cursor"
             android:textSize="13sp"
             android:textStyle="bold" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -151,7 +152,7 @@
             android:paddingVertical="0dp"
             android:textColor="@color/primaryTextColor"
             android:textColorHint="@color/secondaryLightColor"
-            android:textCursorDrawable="@color/primaryTextColor"
+            android:textCursorDrawable="@drawable/default_cursor"
             android:textStyle="bold"
             tools:ignore="LabelFor" />
     </com.google.android.material.textfield.TextInputLayout>

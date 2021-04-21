@@ -203,6 +203,10 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
             }
         )
 
+        toolbarLayout.toolbar.setNavigationOnClickListener {
+            showMenu()
+        }
+
         lifecycleScope.launchWhenResumed {
             viewModel.viewLoadingState.collect {
                 if (it) {

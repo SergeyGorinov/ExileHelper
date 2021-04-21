@@ -10,5 +10,9 @@ internal data class HistoryModel(
     val sellingGraphData: LineDataSet?,
     val buyingGraphData: LineDataSet?,
     val sellingValue: Float?,
-    val buyingValue: Float
+    val buyingValue: Float,
+    val sellingSparkLine: LineDataSet?,
+    val buyingSparkLine: LineDataSet,
+    val sellingTotalChange: Float?,
+    val buyingTotalChange: Float
 )

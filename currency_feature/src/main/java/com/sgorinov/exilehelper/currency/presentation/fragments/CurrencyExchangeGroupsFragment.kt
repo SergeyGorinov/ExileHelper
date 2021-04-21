@@ -45,6 +45,9 @@ internal class CurrencyExchangeGroupsFragment :
         viewBinding = FragmentCurrencyExchangeGroupsBinding.bind(view)
         binding = getBinding()
         binding.toolbarLayout.toolbar.title = "Select currency group"
+        binding.toolbarLayout.toolbar.setNavigationOnClickListener {
+            showMenu()
+        }
         binding.groups.addItemDecoration(
             DividerItemDecoration(
                 requireActivity(),

@@ -33,6 +33,9 @@ internal class CurrencyExchangeGroupFragment :
         viewBinding = FragmentCurrencyExchangeGroupBinding.bind(view)
         binding = getBinding()
         binding.toolbarLayout.toolbar.title = "Select currencies"
+        binding.toolbarLayout.toolbar.setNavigationOnClickListener {
+            showMenu()
+        }
 
         val alphaAnimator = ObjectAnimator.ofInt(255, 0)
         alphaAnimator.addUpdateListener {

@@ -255,6 +255,10 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             (toolbarLayout.toolbarSearchInput.adapter as? ItemsSearchFieldAdapter)?.selectedItem =
                 null
         }
+
+        toolbarLayout.toolbar.setNavigationOnClickListener {
+            showMenu()
+        }
     }
 
     private fun showToolbarSearchLayout() {

@@ -31,6 +31,6 @@
         <receiver android:name=".presentation.NotificationBroadcastReceiver" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/launcher_icon_foreground" />
+            android:resource="@drawable/notification_icon" />
     </application>
 </manifest>

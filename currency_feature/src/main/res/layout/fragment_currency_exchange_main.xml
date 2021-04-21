@@ -35,9 +35,8 @@
             android:background="@drawable/default_bordered_background"
             android:hint="@string/empty_hint"
             android:padding="8dp"
-            app:boxBackgroundMode="none"
             app:boxStrokeWidth="0dp"
-            app:hintEnabled="false"
+            app:boxStrokeWidthFocused="0dp"
             app:hintTextColor="@android:color/transparent"
             app:layout_constraintBottom_toTopOf="@id/optionsBarrier"
             app:layout_constraintStart_toEndOf="@id/minimum_stock_header"
@@ -56,6 +55,7 @@
                 android:padding="0dp"
                 android:textColor="@color/primaryTextColor"
                 android:textColorHint="@color/secondaryLightColor"
+                android:textCursorDrawable="@drawable/default_cursor"
                 android:textStyle="bold" />
         </com.google.android.material.textfield.TextInputLayout>
 

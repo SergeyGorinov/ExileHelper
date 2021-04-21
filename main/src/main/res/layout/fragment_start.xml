@@ -7,7 +7,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signIn"
-        android:layout_width="250dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/image_button_border_default"
         android:drawableStart="@drawable/sign_in_24"
@@ -16,14 +16,14 @@
         android:text="@string/sign_in_text"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toTopOf="@id/signUp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/info"
+        app:layout_constraintStart_toStartOf="@id/noAccount"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signUp"
-        android:layout_width="250dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:background="@drawable/image_button_border_default"
@@ -33,8 +33,8 @@
         android:text="@string/sign_up_text"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toTopOf="@id/noAccount"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/info"
+        app:layout_constraintStart_toStartOf="@id/noAccount"
         app:layout_constraintTop_toBottomOf="@id/signIn" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -42,6 +42,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="128dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/image_button_border_default"
         android:drawableStart="@drawable/no_account_24"
         android:fontFamily="@font/fontinsmallcaps"
@@ -49,7 +50,19 @@
         android:text="@string/without_account"
         android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/info"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/signUp" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/info_icon"
+        app:layout_constraintBottom_toBottomOf="@id/noAccount"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/noAccount"
+        app:layout_constraintTop_toTopOf="@id/noAccount" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

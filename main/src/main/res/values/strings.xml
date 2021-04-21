@@ -16,4 +16,5 @@
     <string name="main_charts_button">Charts</string>
     <string name="without_account">Go without account</string>
     <string name="exile_helper_logo">Exile Helper</string>
+    <string name="without_account_popup_text">Without account\nYou can\'t synchronize\nYour notification Requests</string>
 </resources>

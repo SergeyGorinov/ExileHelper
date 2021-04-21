@@ -128,7 +128,11 @@ internal class ChartsViewModel(
             sellingGraphDataSet,
             buyingGraphDataSet,
             sellingValue,
-            buyingValue
+            buyingValue,
+            overViewData?.sellingSparkLine,
+            overViewData?.buyingSparkLine ?: LineDataSet(emptyList(), ""),
+            overViewData?.sellingTotalChange,
+            overViewData?.buyingTotalChange ?: 0f
         )
     }
 
@@ -140,7 +144,15 @@ internal class ChartsViewModel(
         viewLoadingState.emit(true)
         val overViewData = overviewData.firstOrNull { it.id == id }
         val data = getItemHistoryUseCase.execute(league, type, id)
-        val graphData = getFilteredGraphData(data.maxOfOrNull { it.daysAgo } ?: 0, data, false)
+        val graphData = getFilteredGraphData(
+            data.filter {
+                it.daysAgo <= 50
+            }.maxOfOrNull {
+                it.daysAgo
+            } ?: 0,
+            data,
+            false
+        )
         viewLoadingState.emit(false)
         HistoryModel(
             overViewData?.name ?: "",
@@ -150,7 +162,11 @@ internal class ChartsViewModel(
             null,
             graphData,
             null,
-            overViewData?.buyingListingData?.value?.toFloat() ?: 0f
+            overViewData?.buyingListingData?.value?.toFloat() ?: 0f,
+            overViewData?.sellingSparkLine,
+            overViewData?.buyingSparkLine ?: LineDataSet(emptyList(), ""),
+            overViewData?.sellingTotalChange,
+            overViewData?.buyingTotalChange ?: 0f
         )
     }
 
@@ -159,7 +175,8 @@ internal class ChartsViewModel(
         unfilteredData: List<com.sgorinov.exilehelper.charts_feature.domain.models.GraphData>,
         selling: Boolean
     ): LineDataSet {
-        val filteredGraphData = unfilteredData.filter { it.daysAgo <= 50 }
+        val filteredGraphData =
+            unfilteredData.filter { it.daysAgo <= 50 && it.count >= 10 }
         val takeAmount = if (filteredGraphData.size / 10 > 0) {
             filteredGraphData.size / 10
         } else {

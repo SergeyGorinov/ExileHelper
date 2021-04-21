@@ -47,7 +47,7 @@ internal class CurrencySelectedAdapter(private val onRemove: (String, Boolean) -
 
         fun bind(item: CurrencyViewData) {
             if (item.imageUrl != null) {
-                Picasso.get().load(item.imageUrl).into(viewBinding.image)
+                Picasso.get().load(item.imageUrl).resize(32, 32).into(viewBinding.image)
             }
             viewBinding.label.text = item.label
         }

@@ -36,6 +36,9 @@ class ChartsMainFragment : BaseFragment(R.layout.fragment_charts_main) {
         binding = getBinding()
 
         binding.toolbarLayout.toolbar.title = "Select items group"
+        binding.toolbarLayout.toolbar.setNavigationOnClickListener {
+            showMenu()
+        }
         binding.groups.addItemDecoration(requireActivity().generateLinearDividerDecoration())
         binding.groups.layoutManager = LinearLayoutManager(requireActivity())
         binding.groups.adapter = ItemsGroupsAdapter(

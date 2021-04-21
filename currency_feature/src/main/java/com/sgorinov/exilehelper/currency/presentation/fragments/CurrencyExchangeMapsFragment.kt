@@ -35,6 +35,9 @@ internal class CurrencyExchangeMapsFragment :
         viewBinding = FragmentCurrencyExchangeMapsBinding.bind(view)
         binding = getBinding()
         binding.toolbarLayout.toolbar.title = "Select map tier"
+        binding.toolbarLayout.toolbar.setNavigationOnClickListener {
+            showMenu()
+        }
         binding.mapTiers.layoutManager = LinearLayoutManager(requireActivity())
         binding.mapTiers.addItemDecoration(
             DividerItemDecoration(

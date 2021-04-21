@@ -59,6 +59,9 @@ internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
         }
 
         toolbarLayout.toolbar.title = "Select currency"
+        toolbarLayout.toolbar.setNavigationOnClickListener {
+            showMenu()
+        }
 
         binding.overviewList.apply {
             addItemDecoration(
@@ -119,7 +122,7 @@ internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
                 R.font.fontinsmallcaps
             )
         )
-        adapter.selling = selectedTabPosition == 0
+        adapter.selling = selectedTabPosition != 0
         if (toolbarLayout.tabLayout.selectedTabPosition != selectedTabPosition) {
             toolbarLayout.tabLayout.getTabAt(selectedTabPosition)?.let {
                 toolbarLayout.tabLayout.selectTab(it, true)
@@ -132,7 +135,7 @@ internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
                 binding.overviewList,
                 binding.emptyPlaceholder
             ) {
-                adapter.selling = toolbarLayout.tabLayout.selectedTabPosition == 0
+                adapter.selling = it != 0
             }
         )
     }
