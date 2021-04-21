@@ -1,3 +1,3 @@
-# PoeTradeApp
+# Exile Helper
 
-Application for getting results from pathofexile.com trade section.
+Unofficial tool for popular ARPG game Path of Exile.
