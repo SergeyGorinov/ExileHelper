@@ -58,7 +58,7 @@ internal class OverviewFragment : BaseFragment(R.layout.fragment_overview) {
             }
         }
 
-        toolbarLayout.toolbar.title = "Select currency"
+        toolbarLayout.toolbar.title = getString(R.string.currency_title)
         toolbarLayout.toolbar.setNavigationOnClickListener {
             showMenu()
         }

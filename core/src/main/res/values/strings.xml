@@ -4,4 +4,8 @@
     <string name="empty_hint">" "</string>
     <string name="select_league_text">Select league:</string>
     <string name="account">Account</string>
+    <string name="notify_item_left_side">Notify me when</string>
+    <string name="notify_right_side_text">will cost less than</string>
+    <string name="notification_requests_list_empty">Currency notification\nrequests list is empty</string>
+    <string name="add_new_notification_request">Add request</string>
 </resources>

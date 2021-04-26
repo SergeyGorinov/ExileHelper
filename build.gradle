@@ -24,6 +24,7 @@ buildscript {
 
     dependencies {
         classpath 'com.google.gms:google-services:4.3.5'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.2'
         classpath "com.android.tools.build:gradle:$gradle_version"
         classpath "io.objectbox:objectbox-gradle-plugin:$objectbox_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -35,8 +36,8 @@ buildscript {
         buildToolsVersion = "30.0.3"
         minSdkVersion = 23
         targetSdkVersion = 30
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.03"
     }
 }
 

@@ -98,6 +98,7 @@
                 android:layout_marginEnd="8dp"
                 android:ellipsize="end"
                 android:fontFamily="@font/fontinsmallcaps"
+                android:gravity="center_vertical"
                 android:maxLines="1"
                 android:textColor="@color/primaryTextColor"
                 android:textSize="20sp"

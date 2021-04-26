@@ -11,9 +11,9 @@ import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.sgorinov.exilehelper.MyFirebaseMessaging
 import com.sgorinov.exilehelper.R
-import com.sgorinov.exilehelper.currency.data.models.CurrencyRequest
-import com.sgorinov.exilehelper.currency.presentation.fragments.CurrencyExchangeMainFragment
-import com.sgorinov.exilehelper.exchange.presentation.fragments.ItemsSearchMainFragment
+import com.sgorinov.exilehelper.currency_feature.data.models.CurrencyRequest
+import com.sgorinov.exilehelper.currency_feature.presentation.fragments.CurrencyExchangeMainFragment
+import com.sgorinov.exilehelper.exchange_feature.presentation.fragments.ItemsSearchMainFragment
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement

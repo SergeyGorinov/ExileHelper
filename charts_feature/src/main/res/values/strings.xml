@@ -18,4 +18,5 @@
     <string name="add_notification">Add notification</string>
     <string name="additional_data_header">Last 7 days</string>
     <string name="no_data">No data</string>
+    <string name="currency_title">Select currency</string>
 </resources>

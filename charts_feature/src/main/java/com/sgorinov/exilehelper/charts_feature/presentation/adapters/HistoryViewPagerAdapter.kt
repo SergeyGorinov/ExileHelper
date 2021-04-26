@@ -78,9 +78,18 @@ internal class HistoryViewPagerAdapter(
         )
 
         fun bind(data: HistoryModel) {
-            setupChartData(data.buyingGraphData, false, textColor, textFont)
-            setupChartData(data.sellingGraphData, true, textColor, textFont)
-            setupChart(data, textColor, textFont)
+            if ((data.buyingGraphData == null || data.buyingGraphData.entryCount == 0)
+                && (data.sellingGraphData == null || data.sellingGraphData.entryCount == 0)
+            ) {
+                viewBinding.noData.visibility = View.VISIBLE
+                viewBinding.chart.visibility = View.GONE
+            } else {
+                viewBinding.noData.visibility = View.GONE
+                viewBinding.chart.visibility = View.VISIBLE
+                setupChartData(data.buyingGraphData, false, textColor, textFont)
+                setupChartData(data.sellingGraphData, true, textColor, textFont)
+                setupChart(data, textColor, textFont)
+            }
         }
 
         private fun setupChartData(
@@ -134,14 +143,12 @@ internal class HistoryViewPagerAdapter(
                         ).format(currentDate.time)
                     }
                 }
-                setDrawGridLines(false)
             }
             viewBinding.chart.axisLeft.apply {
-                xOffset = 25f
+                xOffset = 8.dpf
                 textSize = 16f
                 typeface = textFont
                 this.textColor = textColor
-                setDrawGridLines(false)
             }
             viewBinding.chart.apply {
                 marker = CustomMarkerView(itemView.context, R.layout.custom_marker_view)
@@ -149,6 +156,7 @@ internal class HistoryViewPagerAdapter(
                 legend.isEnabled = false
                 axisRight.isEnabled = false
                 isDoubleTapToZoomEnabled = false
+                extraRightOffset = 8.dpf
                 setTouchEnabled(true)
                 this.data = if (data.sellingGraphData != null) {
                     LineData(data.buyingGraphData, data.sellingGraphData)

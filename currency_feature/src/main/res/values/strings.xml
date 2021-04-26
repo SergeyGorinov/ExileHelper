@@ -10,10 +10,6 @@
     <string name="exchange_get_text">"You will get %d x"</string>
     <string name="exchange_pay_text">"You will pay %d x"</string>
     <string name="account_text">"%s (%s)"</string>
-    <string name="notify_item_left_side">Notify me when</string>
-    <string name="notify_right_side_text">will cost less than</string>
-    <string name="notification_requests_list_empty">Currency notification\nrequests list is empty</string>
-    <string name="add_new_notification_request">Add request</string>
     <string name="currency_list_hint">Enter currency name…</string>
     <string name="minimum_stock_hint">Min</string>
     <string name="enter_amount_hint">Enter amount…</string>

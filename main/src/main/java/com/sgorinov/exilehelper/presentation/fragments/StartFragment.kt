@@ -8,7 +8,7 @@ import android.widget.PopupWindow
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.sgorinov.exilehelper.R
 import com.sgorinov.exilehelper.core.presentation.BaseFragment
-import com.sgorinov.exilehelper.currency.presentation.fragments.CurrencyExchangeMainFragment
+import com.sgorinov.exilehelper.currency_feature.presentation.fragments.CurrencyExchangeMainFragment
 import com.sgorinov.exilehelper.databinding.FragmentStartBinding
 
 class StartFragment : BaseFragment(R.layout.fragment_start) {

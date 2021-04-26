@@ -25,10 +25,10 @@ import com.sgorinov.exilehelper.R
 import com.sgorinov.exilehelper.charts_feature.presentation.fragments.ChartsMainFragment
 import com.sgorinov.exilehelper.core.DI
 import com.sgorinov.exilehelper.core.presentation.IMainActivity
-import com.sgorinov.exilehelper.currency.data.models.CurrencyRequest
-import com.sgorinov.exilehelper.currency.presentation.fragments.CurrencyExchangeMainFragment
+import com.sgorinov.exilehelper.currency_feature.data.models.CurrencyRequest
+import com.sgorinov.exilehelper.currency_feature.presentation.fragments.CurrencyExchangeMainFragment
 import com.sgorinov.exilehelper.databinding.ActivityMainBinding
-import com.sgorinov.exilehelper.exchange.presentation.fragments.ItemsSearchMainFragment
+import com.sgorinov.exilehelper.exchange_feature.presentation.fragments.ItemsSearchMainFragment
 import com.sgorinov.exilehelper.presentation.fragments.LoaderFragment
 import com.sgorinov.exilehelper.presentation.fragments.StartFragment
 import kotlinx.coroutines.Dispatchers
@@ -171,9 +171,15 @@ class MainActivity : FragmentActivity(), IMainActivity {
         viewBinding.bottomNavBar.setOnNavigationItemReselectedListener {
             return@setOnNavigationItemReselectedListener
         }
-        val type = intent.getStringExtra("type")
-        val payload = intent.getStringExtra("data")
-        router.replaceScreen(LoaderFragment.newInstance(type, payload))
+        if (savedInstanceState == null || !savedInstanceState.getBoolean(
+                CONFIGURATION_CHANGING_KEY,
+                false
+            )
+        ) {
+            val type = intent.getStringExtra("type")
+            val payload = intent.getStringExtra("data")
+            router.replaceScreen(LoaderFragment.newInstance(type, payload))
+        }
     }
 
     override fun onResume() {
@@ -198,6 +204,13 @@ class MainActivity : FragmentActivity(), IMainActivity {
             return
         }
         super.onBackPressed()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (isChangingConfigurations) {
+            outState.putBoolean(CONFIGURATION_CHANGING_KEY, true)
+        }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -333,5 +346,7 @@ class MainActivity : FragmentActivity(), IMainActivity {
 
     companion object {
         const val DEFAULT_CHANNEL_ID = "default_channel_id"
+
+        private const val CONFIGURATION_CHANGING_KEY = "CONFIGURATION_CHANGING_KEY"
     }
 }
