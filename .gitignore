@@ -12,3 +12,5 @@
 /captures
 .externalNativeBuild
 .cxx
+/main/google-services.json
+/main/google-services_old.json
