@@ -1,27 +1,46 @@
 package com.sgorinov.exilehelper.currency_feature.presentation.fragments
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.res.Resources
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.sgorinov.exilehelper.core.presentation.FragmentScopes
 import com.sgorinov.exilehelper.core.presentation.generateCustomDividerDecoration
+import com.sgorinov.exilehelper.core.presentation.getTransparentProgressDialog
 import com.sgorinov.exilehelper.core.presentation.models.NotificationRequestViewData
+import com.sgorinov.exilehelper.core.presentation.scopedViewModel
 import com.sgorinov.exilehelper.currency_feature.R
 import com.sgorinov.exilehelper.currency_feature.databinding.FragmentNotificationRequestsBinding
+import com.sgorinov.exilehelper.currency_feature.presentation.CurrencyExchangeViewModel
+import com.sgorinov.exilehelper.currency_feature.presentation.SwipeToDeleteCallback
 import com.sgorinov.exilehelper.currency_feature.presentation.adapters.NotificationRequestsAdapter
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 internal class NotificationRequestsFragment : BottomSheetDialogFragment() {
 
-    private var viewBinding: FragmentNotificationRequestsBinding? = null
+    private val viewModel by scopedViewModel<CurrencyExchangeViewModel>(
+        FragmentScopes.CURRENCY_FEATURE.scopeId,
+        FragmentScopes.CURRENCY_FEATURE
+    )
 
-    var items: List<NotificationRequestViewData> = listOf()
+    private var viewBinding: FragmentNotificationRequestsBinding? = null
+    private var progressDialog: AlertDialog? = null
+
+    var items: MutableList<NotificationRequestViewData> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,12 +71,48 @@ internal class NotificationRequestsFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewBinding = FragmentNotificationRequestsBinding.bind(view)
+
         if (items.isNotEmpty()) {
+            val adapter = NotificationRequestsAdapter(items)
+            val backgroundColor = ColorDrawable(
+                ContextCompat.getColor(requireActivity(), R.color.secondaryColor)
+            )
+            val icon = ContextCompat.getDrawable(requireActivity(), R.drawable.clear_24)
+            val itemSwipeHelper = ItemTouchHelper(
+                SwipeToDeleteCallback(backgroundColor, icon!!) {
+                    lifecycleScope.launch {
+                        val item = adapter.deleteItem(it)
+                        val itemId = item.id
+                        if (itemId == null) {
+                            adapter.restoreItem(it, item)
+                            Toast.makeText(
+                                requireActivity(),
+                                "Item has no remote id",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            return@launch
+                        }
+                        if (!viewModel.removeRequest(itemId)) {
+                            adapter.restoreItem(it, item)
+                            Toast.makeText(
+                                requireActivity(),
+                                "Error during notification removing",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            return@launch
+                        }
+                        if (adapter.itemCount == 0) {
+                            viewBinding?.emptyPlaceholder?.visibility = View.VISIBLE
+                            viewBinding?.notificationRequests?.visibility = View.GONE
+                        }
+                    }
+                }
+            )
             viewBinding?.emptyPlaceholder?.visibility = View.GONE
             viewBinding?.notificationRequests?.apply {
                 visibility = View.VISIBLE
                 layoutManager = LinearLayoutManager(requireActivity())
-                adapter = NotificationRequestsAdapter(items)
+                this.adapter = adapter
                 addItemDecoration(
                     requireActivity().generateCustomDividerDecoration(
                         R.drawable.colored_list_divider,
@@ -65,6 +120,7 @@ internal class NotificationRequestsFragment : BottomSheetDialogFragment() {
                     )
                 )
             }
+            itemSwipeHelper.attachToRecyclerView(viewBinding?.notificationRequests)
         } else {
             viewBinding?.emptyPlaceholder?.visibility = View.VISIBLE
             viewBinding?.notificationRequests?.visibility = View.GONE
@@ -75,16 +131,31 @@ internal class NotificationRequestsFragment : BottomSheetDialogFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        progressDialog = requireActivity().getTransparentProgressDialog()
+        lifecycleScope.launchWhenResumed {
+            viewModel.viewLoadingState.collect {
+                if (it) {
+                    progressDialog?.show()
+                } else {
+                    progressDialog?.hide()
+                }
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         viewBinding?.notificationRequests?.adapter = null
         viewBinding = null
+        progressDialog = null
     }
 
     companion object {
         fun newInstance(items: List<NotificationRequestViewData>): NotificationRequestsFragment {
             return NotificationRequestsFragment().apply {
-                this.items = items
+                this.items = items.toMutableList()
             }
         }
     }

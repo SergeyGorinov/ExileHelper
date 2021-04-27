@@ -4,12 +4,11 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.sgorinov.exilehelper.currency_feature.presentation.adapters.CurrencySelectedAdapter
 
 internal class SwipeToDeleteCallback(
-    private val adapter: CurrencySelectedAdapter,
     private val backgroundColor: Drawable,
-    private val icon: Drawable
+    private val icon: Drawable,
+    private val onSwiped: (Int) -> Unit
 ) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
     override fun onMove(
@@ -19,7 +18,7 @@ internal class SwipeToDeleteCallback(
     ) = false
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        adapter.deleteItem(viewHolder.adapterPosition)
+        onSwiped(viewHolder.adapterPosition)
     }
 
     override fun onChildDraw(

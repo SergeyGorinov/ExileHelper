@@ -22,6 +22,7 @@ class SetNotificationRequestUseCase(private val repository: ICoreRepository) {
         val payingItem = Json.encodeToString(NotificationItemData.serializer(), request.payingItem)
         val response = repository.setNotificationRequestRemote(
             RemoteNotificationRequest(
+                null,
                 authToken,
                 messagingToken,
                 type,
@@ -35,6 +36,7 @@ class SetNotificationRequestUseCase(private val repository: ICoreRepository) {
         if (response.isSuccessful) {
             repository.setNotificationRequestLocal(
                 com.sgorinov.exilehelper.core.data.models.NotificationRequest(
+                    remoteId = response.body(),
                     registrationToken = authToken,
                     notificationToken = messagingToken,
                     requestType = type,

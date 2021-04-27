@@ -1,5 +1,6 @@
 package com.sgorinov.exilehelper.exchange_feature.presentation.fragments
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.res.Resources
 import android.os.Bundle
@@ -38,6 +39,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
     private val itemName by lazy { requireArguments().getString(ITEM_NAME_KEY) }
 
     private var viewBinding: FragmentItemNotificationRequestAddBinding? = null
+    private var progressDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +71,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         viewBinding = FragmentItemNotificationRequestAddBinding.bind(view)
 
-        val progressDialog = requireActivity().getTransparentProgressDialog()
+        progressDialog = requireActivity().getTransparentProgressDialog()
 
         viewBinding?.let { binding ->
             setupItemsList(binding.itemsList)
@@ -90,10 +92,10 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
                     return@setOnClickListener
                 }
                 lifecycleScope.launch {
-                    progressDialog.show()
+                    progressDialog?.show()
                     val result =
                         viewModel.sendNotificationRequest(wantItem, amount, settings.league)
-                    progressDialog.hide()
+                    progressDialog?.hide()
                     if (result) {
                         Toast.makeText(
                             requireActivity(),
@@ -111,6 +113,11 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        progressDialog = null
     }
 
     override fun onDestroyView() {

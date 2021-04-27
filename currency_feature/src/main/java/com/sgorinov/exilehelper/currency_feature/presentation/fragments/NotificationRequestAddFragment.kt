@@ -1,5 +1,6 @@
 package com.sgorinov.exilehelper.currency_feature.presentation.fragments
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.res.Resources
 import android.os.Bundle
@@ -38,6 +39,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
     private val haveItemId by lazy { requireArguments().getString(HAVE_ITEM_ID_KEY) }
 
     private var viewBinding: FragmentCurrencyNotificationRequestAddBinding? = null
+    private var progressDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +75,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         viewBinding = FragmentCurrencyNotificationRequestAddBinding.bind(view)
 
-        val progressDialog = requireActivity().getTransparentProgressDialog()
+        progressDialog = requireActivity().getTransparentProgressDialog()
 
         viewBinding?.let { binding ->
             setupCurrencyList(binding.wantCurrencyList, wantItemId)
@@ -101,14 +103,14 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
                     return@setOnClickListener
                 }
                 lifecycleScope.launch {
-                    progressDialog.show()
+                    progressDialog?.show()
                     val result = viewModel.sendNotificationRequest(
                         wantItem,
                         haveItem,
                         amount,
                         settings.league
                     )
-                    progressDialog.hide()
+                    progressDialog?.hide()
                     if (result) {
                         Toast.makeText(
                             requireActivity(),
@@ -133,6 +135,7 @@ class NotificationRequestAddFragment : BottomSheetDialogFragment() {
         viewBinding?.wantCurrencyList?.setAdapter(null)
         viewBinding?.haveCurrencyList?.setAdapter(null)
         viewBinding = null
+        progressDialog = null
     }
 
     private fun setupCurrencyList(list: AutoCompleteTextView, preselectedCurrencyId: String?) {

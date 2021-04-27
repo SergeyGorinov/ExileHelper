@@ -7,6 +7,16 @@ apply plugin: 'kotlinx-serialization'
 apply plugin: 'io.objectbox'
 
 android {
+    signingConfigs {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        'default' {
+            storeFile file(properties.getProperty('sign.storeFile'))
+            storePassword properties.getProperty('sign.password')
+            keyAlias properties.getProperty('sign.keyAlias')
+            keyPassword properties.getProperty('sign.password')
+        }
+    }
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
@@ -16,6 +26,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
+        signingConfig signingConfigs.'default'
     }
 
     buildTypes {

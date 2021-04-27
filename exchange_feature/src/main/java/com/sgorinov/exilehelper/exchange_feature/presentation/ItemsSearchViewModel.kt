@@ -28,7 +28,8 @@ internal class ItemsSearchViewModel(
     private val getItemsResultDataUseCase: GetItemsResultDataUseCase,
     private val setItemDataUseCase: SetItemDataUseCase,
     private val getNotificationRequestsUseCase: GetNotificationRequestsUseCase,
-    private val setNotificationRequestUseCase: SetNotificationRequestUseCase
+    private val setNotificationRequestUseCase: SetNotificationRequestUseCase,
+    private val removeRequestUseCase: RemoveRequestUseCase
 ) : ViewModel() {
 
     val viewLoadingState = MutableStateFlow(false)
@@ -205,6 +206,7 @@ internal class ItemsSearchViewModel(
         league: String
     ) = withContext(Dispatchers.IO) {
         val request = NotificationRequest(
+            null,
             NotificationItemData(
                 "${buyingItem.name}${if (buyingItem.name != null) " " else ""}${buyingItem.type}",
                 ""
@@ -265,6 +267,7 @@ internal class ItemsSearchViewModel(
                     league
                 ).map {
                     NotificationRequestViewData(
+                        it.id,
                         it.buyingItem.itemName,
                         it.buyingItem.itemIcon,
                         it.payingItem.itemName,
@@ -279,5 +282,12 @@ internal class ItemsSearchViewModel(
         } finally {
             viewLoadingState.emit(false)
         }
+    }
+
+    suspend fun removeRequest(id: Long): Boolean {
+        viewLoadingState.emit(true)
+        val result = removeRequestUseCase.execute(id)
+        viewLoadingState.emit(false)
+        return result != null && result.isSuccessful
     }
 }

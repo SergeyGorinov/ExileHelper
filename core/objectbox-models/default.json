@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:2145128458785260503",
-      "lastPropertyId": "9:8802248165312699351",
+      "lastPropertyId": "10:7664953795546377902",
       "name": "NotificationRequest",
       "properties": [
         {
@@ -55,6 +55,12 @@
           "id": "9:8802248165312699351",
           "name": "league",
           "type": 9
+        },
+        {
+          "id": "10:7664953795546377902",
+          "name": "remoteId",
+          "type": 6,
+          "flags": 2
         }
       ],
       "relations": []

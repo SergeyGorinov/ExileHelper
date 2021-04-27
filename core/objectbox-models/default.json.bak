@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:2145128458785260503",
-      "lastPropertyId": "8:1980431308599487848",
+      "lastPropertyId": "9:8802248165312699351",
       "name": "NotificationRequest",
       "properties": [
         {
@@ -50,6 +50,11 @@
           "name": "payingAmount",
           "type": 5,
           "flags": 4
+        },
+        {
+          "id": "9:8802248165312699351",
+          "name": "league",
+          "type": 9
         }
       ],
       "relations": []

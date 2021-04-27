@@ -1,9 +1,5 @@
 package com.sgorinov.exilehelper.currency_feature.presentation.fragments
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
@@ -12,8 +8,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
@@ -49,17 +45,11 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
     private lateinit var adapter: CurrencySelectedAdapter
     private lateinit var toolbarLayout: CurrencyFeatureToolbarBinding
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent ?: return
-            if (intent.action == NOTIFICATION_ACTION) {
-                processExternalAction(
-                    false,
-                    intent.getStringExtra(WANT_ITEM_ID_KEY),
-                    intent.getStringExtra(HAVE_ITEM_ID_KEY)
-                )
-            }
-        }
+    internal var onResumeAction: ((Fragment) -> Unit)? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -91,10 +81,17 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
 
     override fun onResume() {
         super.onResume()
-        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
-            receiver,
-            IntentFilter(NOTIFICATION_ACTION)
-        )
+        lifecycleScope.launchWhenResumed {
+            viewModel.viewLoadingState.collect {
+                if (it) {
+                    toolbarLayout.toolbarProgressBar.show()
+                } else {
+                    toolbarLayout.toolbarProgressBar.hide()
+                }
+            }
+        }
+        onResumeAction?.invoke(this)
+        onResumeAction = null
     }
 
     override fun onDestroyView() {
@@ -119,19 +116,21 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
     }
 
     fun processExternalAction(isNotificationRequest: Boolean, vararg args: String?) {
-        val wantItemId = args.getOrNull(0)
-        val haveItemId = args.getOrNull(1)
-        if (wantItemId != null && haveItemId != null) {
-            if (isNotificationRequest) {
-                NotificationRequestAddFragment
-                    .newInstance(wantItemId, haveItemId)
-                    .show(childFragmentManager, null)
-            } else {
-                viewModel.wantCurrencies.clear()
-                viewModel.haveCurrencies.clear()
-                viewModel.wantCurrencies.add(wantItemId)
-                viewModel.haveCurrencies.add(haveItemId)
-                requestResults()
+        lifecycleScope.launchWhenResumed {
+            val wantItemId = args.getOrNull(0)
+            val haveItemId = args.getOrNull(1)
+            if (wantItemId != null && haveItemId != null) {
+                if (isNotificationRequest) {
+                    NotificationRequestAddFragment
+                        .newInstance(wantItemId, haveItemId)
+                        .show(childFragmentManager, null)
+                } else {
+                    viewModel.wantCurrencies.clear()
+                    viewModel.haveCurrencies.clear()
+                    viewModel.wantCurrencies.add(wantItemId)
+                    viewModel.haveCurrencies.add(haveItemId)
+                    requestResults()
+                }
             }
         }
     }
@@ -206,16 +205,6 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         toolbarLayout.toolbar.setNavigationOnClickListener {
             showMenu()
         }
-
-        lifecycleScope.launchWhenResumed {
-            viewModel.viewLoadingState.collect {
-                if (it) {
-                    toolbarLayout.toolbarProgressBar.show()
-                } else {
-                    toolbarLayout.toolbarProgressBar.hide()
-                }
-            }
-        }
     }
 
     private fun setupCurrencyList() {
@@ -234,7 +223,9 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         )
         val icon = ContextCompat.getDrawable(requireActivity(), R.drawable.clear_24)
         val itemSwipeHelper = ItemTouchHelper(
-            SwipeToDeleteCallback(adapter, backgroundColor, icon!!)
+            SwipeToDeleteCallback(backgroundColor, icon!!) {
+                adapter.deleteItem(it)
+            }
         )
         binding.currencies.layoutManager = LinearLayoutManager(requireActivity())
         binding.currencies.adapter = adapter
@@ -338,7 +329,11 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
                         binding.minimumStockValue.text.toString()
                     ).show(childFragmentManager, null)
             } else {
-
+                Toast.makeText(
+                    requireActivity(),
+                    "Items not found!",
+                    Toast.LENGTH_LONG
+                ).show()
             }
             binding.search.isEnabled = true
         }
@@ -355,6 +350,12 @@ class CurrencyExchangeMainFragment : BaseFragment(R.layout.fragment_currency_exc
         const val SAVED_HAVE_ITEMS_IDS_KEY = "HAVE_ITEMS_IDS_KEY"
         const val SAVED_STOCK_KEY = "SAVED_STOCK_KEY"
 
-        fun newInstance() = FragmentScreen { CurrencyExchangeMainFragment() }
+        fun newInstance(onResumeAction: ((Fragment) -> Unit)?): FragmentScreen {
+            return FragmentScreen {
+                CurrencyExchangeMainFragment().apply {
+                    this.onResumeAction = onResumeAction
+                }
+            }
+        }
     }
 }

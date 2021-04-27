@@ -29,9 +29,9 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/minimum_stock"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-            android:layout_width="75dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginHorizontal="8dp"
             android:background="@drawable/default_bordered_background"
             android:hint="@string/empty_hint"
             android:padding="8dp"
@@ -39,6 +39,7 @@
             app:boxStrokeWidthFocused="0dp"
             app:hintTextColor="@android:color/transparent"
             app:layout_constraintBottom_toTopOf="@id/optionsBarrier"
+            app:layout_constraintEnd_toStartOf="@id/fullfilable_header"
             app:layout_constraintStart_toEndOf="@id/minimum_stock_header"
             app:layout_constraintTop_toTopOf="parent">
 

@@ -3,6 +3,7 @@ package com.sgorinov.exilehelper.core.data
 import android.util.Log
 import com.sgorinov.exilehelper.core.data.models.*
 import io.objectbox.kotlin.boxFor
+import io.objectbox.kotlin.query
 import kotlinx.serialization.json.Json
 import retrofit2.Response
 
@@ -32,8 +33,35 @@ internal class CoreRepository(
         leagues = staticApi.getLeagueData().result.map { it.id }
     }
 
-    override suspend fun setNotificationRequestRemote(request: RemoteNotificationRequest): Response<Void> {
+    override suspend fun setNotificationRequestRemote(request: RemoteNotificationRequest): Response<Long> {
         return exileHelperApi.sendRequest(request)
+    }
+
+    override suspend fun removeRequestRemote(requestId: Long): Response<Void>? {
+        val existingRequest = ObjectBox.objectBox.boxFor<NotificationRequest>().query {
+            equal(NotificationRequest_.remoteId, requestId)
+        }.findFirst()
+        return if (existingRequest != null) {
+            val response = exileHelperApi.removeRequest(
+                RemoteNotificationRequest(
+                    existingRequest.remoteId,
+                    existingRequest.registrationToken,
+                    existingRequest.notificationToken,
+                    existingRequest.requestType,
+                    existingRequest.requestPayload,
+                    existingRequest.buyingItem.itemName,
+                    existingRequest.payingItem.itemName,
+                    existingRequest.payingAmount,
+                    existingRequest.league
+                )
+            )
+            if (response.isSuccessful) {
+                ObjectBox.objectBox.boxFor<NotificationRequest>().remove(existingRequest.id)
+            }
+            response
+        } else {
+            null
+        }
     }
 
     override suspend fun setNotificationRequestLocal(request: NotificationRequest) {
@@ -56,6 +84,7 @@ internal class CoreRepository(
         }?.map {
             NotificationRequest(
                 0L,
+                it.id,
                 it.firebaseAuthenticationToken,
                 it.firebaseMessagingToken,
                 it.requestType,

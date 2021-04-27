@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 data class NotificationRequest(
     @Id
     var id: Long = 0L,
+    var remoteId: Long?,
     var registrationToken: String? = null,
     var notificationToken: String,
     var requestType: Int,

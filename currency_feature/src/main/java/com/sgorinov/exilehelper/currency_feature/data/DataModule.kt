@@ -4,7 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import com.sgorinov.exilehelper.core.presentation.FragmentScopes
 import com.sgorinov.exilehelper.currency_feature.domain.repository.IFeatureRepository
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -15,7 +15,7 @@ internal val dataModule = module {
         scoped {
             Retrofit.Builder()
                 .baseUrl("https://www.pathofexile.com/")
-                .addConverterFactory(Json.asConverterFactory(MediaType.get("application/json")))
+                .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
                 .build()
                 .create(ApiService::class.java) as ApiService
         }

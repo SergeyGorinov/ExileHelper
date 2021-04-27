@@ -12,4 +12,5 @@ internal val domainModule = module {
     single { GetNotificationRequestsUseCase(get()) }
     single { SetNotificationRequestUseCase(get()) }
     single { AddTokenUseCase(get()) }
+    single { RemoveRequestUseCase(get()) }
 }

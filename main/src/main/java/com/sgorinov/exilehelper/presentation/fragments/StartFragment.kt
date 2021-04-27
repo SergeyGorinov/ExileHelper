@@ -28,7 +28,7 @@ class StartFragment : BaseFragment(R.layout.fragment_start) {
             router.navigateTo(LoginFragment.newInstance(false))
         }
         binding.noAccount.setOnClickListener {
-            router.newRootScreen(CurrencyExchangeMainFragment.newInstance())
+            router.newRootScreen(CurrencyExchangeMainFragment.newInstance(null))
         }
         binding.info.setOnClickListener {
             val popUpView = View.inflate(requireActivity(), R.layout.info_popup, null)

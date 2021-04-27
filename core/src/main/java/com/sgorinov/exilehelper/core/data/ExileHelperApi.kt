@@ -10,7 +10,10 @@ import retrofit2.http.Query
 interface ExileHelperApi {
 
     @POST("addRequest")
-    suspend fun sendRequest(@Body userRequest: RemoteNotificationRequest): Response<Void>
+    suspend fun sendRequest(@Body userRequest: RemoteNotificationRequest): Response<Long>
+
+    @POST("removeRequest")
+    suspend fun removeRequest(@Body userRequest: RemoteNotificationRequest): Response<Void>
 
     @GET("getRequests")
     suspend fun getRequests(

@@ -9,7 +9,7 @@ import com.sgorinov.exilehelper.exchange_feature.R
 import com.sgorinov.exilehelper.exchange_feature.databinding.NotificationItemBinding
 import com.squareup.picasso.Picasso
 
-class NotificationRequestsAdapter(private val items: List<NotificationRequestViewData>) :
+class NotificationRequestsAdapter(private val items: MutableList<NotificationRequestViewData>) :
     RecyclerView.Adapter<NotificationRequestsAdapter.NotificationRequestsViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -28,6 +28,18 @@ class NotificationRequestsAdapter(private val items: List<NotificationRequestVie
     }
 
     override fun getItemCount() = items.size
+
+    fun deleteItem(position: Int): NotificationRequestViewData {
+        val item = items[position]
+        items.remove(item)
+        notifyItemRemoved(position)
+        return item
+    }
+
+    fun restoreItem(position: Int, item: NotificationRequestViewData) {
+        items.add(position, item)
+        notifyItemInserted(position)
+    }
 
     class NotificationRequestsViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {

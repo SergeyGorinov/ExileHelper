@@ -1,17 +1,13 @@
 package com.sgorinov.exilehelper.exchange_feature.presentation.fragments
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import com.sgorinov.exilehelper.core.presentation.*
@@ -45,19 +41,13 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
     private lateinit var toolbarLayout: ItemsSearchFeatureToolbarBinding
     private lateinit var itemsSearchAdapter: ItemsSearchFieldAdapter
 
+    internal var onResumeAction: ((Fragment) -> Unit)? = null
+
     private val viewFilters = mutableMapOf<ViewFilters.Filter, Boolean>()
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent ?: return
-            if (intent.action == NOTIFICATION_ACTION) {
-                processExternalAction(
-                    false,
-                    intent.getStringExtra(SAVED_ITEM_TYPE),
-                    intent.getStringExtra(SAVED_ITEM_NAME)
-                )
-            }
-        }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -122,10 +112,6 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
 
     override fun onResume() {
         super.onResume()
-        LocalBroadcastManager.getInstance(requireActivity()).registerReceiver(
-            receiver,
-            IntentFilter(NOTIFICATION_ACTION)
-        )
         lifecycleScope.launchWhenResumed {
             viewModel.viewLoadingState.collect {
                 if (it) {
@@ -143,6 +129,8 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
             setHasStableIds(true)
         }
         binding.filters.setItemViewCacheSize(10)
+        onResumeAction?.invoke(this)
+        onResumeAction = null
     }
 
     override fun onDestroy() {
@@ -346,6 +334,12 @@ class ItemsSearchMainFragment : BaseFragment(R.layout.fragment_items_search_main
         const val SAVED_ITEM_NAME = "SAVED_ITEM_NAME"
         const val SAVED_ITEM_TYPE = "SAVED_ITEM_TYPE"
 
-        fun newInstance() = FragmentScreen { ItemsSearchMainFragment() }
+        fun newInstance(onResumeAction: ((Fragment) -> Unit)? = null): FragmentScreen {
+            return FragmentScreen {
+                ItemsSearchMainFragment().apply {
+                    this.onResumeAction = onResumeAction
+                }
+            }
+        }
     }
 }

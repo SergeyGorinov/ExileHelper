@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RemoteNotificationRequest(
+    var id: Long?,
     @Required
     var firebaseAuthenticationToken: String? = null,
     var firebaseMessagingToken: String,

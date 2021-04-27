@@ -54,7 +54,7 @@ internal class FeatureRepository(private val apiService: ApiService) : BaseFeatu
 
         currencyResultData.addAll(parseCurrencyExchangeData(data))
 
-        return currencyResultData
+       return currencyResultData
     }
 
     private suspend fun getCurrencyExchangeList(

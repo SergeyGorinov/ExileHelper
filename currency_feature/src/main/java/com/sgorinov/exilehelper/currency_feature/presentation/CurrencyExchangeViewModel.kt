@@ -5,6 +5,7 @@ import com.sgorinov.exilehelper.core.domain.models.NotificationItemData
 import com.sgorinov.exilehelper.core.domain.models.NotificationRequest
 import com.sgorinov.exilehelper.core.domain.usecases.GetCurrencyItemsUseCase
 import com.sgorinov.exilehelper.core.domain.usecases.GetNotificationRequestsUseCase
+import com.sgorinov.exilehelper.core.domain.usecases.RemoveRequestUseCase
 import com.sgorinov.exilehelper.core.domain.usecases.SetNotificationRequestUseCase
 import com.sgorinov.exilehelper.core.presentation.FirebaseUtils
 import com.sgorinov.exilehelper.core.presentation.models.NotificationRequestViewData
@@ -31,7 +32,8 @@ internal class CurrencyExchangeViewModel(
     getTotalResultCountUseCase: GetTotalResultCountUseCase,
     private val getCurrencyResult: GetCurrencyExchangeResultUseCase,
     private val setNotificationRequestUseCase: SetNotificationRequestUseCase,
-    private val getNotificationRequestsUseCase: GetNotificationRequestsUseCase
+    private val getNotificationRequestsUseCase: GetNotificationRequestsUseCase,
+    private val removeRequestUseCase: RemoveRequestUseCase
 ) : ViewModel() {
 
     val allCurrencies =
@@ -90,6 +92,7 @@ internal class CurrencyExchangeViewModel(
     ) = withContext(Dispatchers.IO) {
         viewLoadingState.emit(true)
         val request = NotificationRequest(
+            null,
             NotificationItemData(buyingItem.label, buyingItem.imageUrl ?: ""),
             NotificationItemData(payingItem.label, payingItem.imageUrl ?: ""),
             payingAmount
@@ -128,6 +131,7 @@ internal class CurrencyExchangeViewModel(
             league
         ).map {
             NotificationRequestViewData(
+                it.id ?: 0L,
                 it.buyingItem.itemName,
                 it.buyingItem.itemIcon,
                 it.payingItem.itemName,
@@ -137,5 +141,12 @@ internal class CurrencyExchangeViewModel(
         }
         viewLoadingState.emit(false)
         return@withContext result
+    }
+
+    suspend fun removeRequest(id: Long): Boolean {
+        viewLoadingState.emit(true)
+        val result = removeRequestUseCase.execute(id)
+        viewLoadingState.emit(false)
+        return result != null && result.isSuccessful
     }
 }

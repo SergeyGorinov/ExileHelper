@@ -16,6 +16,7 @@ class GetNotificationRequestsUseCase(private val repository: ICoreRepository) {
         repository.syncRemoteNotificationRequests(messagingToken, authorizationToken, type, league)
         return repository.getNotificationRequestsLocal().map { request ->
             NotificationRequest(
+                request.remoteId,
                 NotificationItemData(request.buyingItem.itemName, request.buyingItem.itemIcon),
                 NotificationItemData(request.payingItem.itemName, request.payingItem.itemIcon),
                 request.payingAmount

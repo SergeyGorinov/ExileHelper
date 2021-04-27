@@ -14,7 +14,8 @@ interface ICoreRepository {
     suspend fun getItems()
     suspend fun getStats()
     suspend fun getLeagues()
-    suspend fun setNotificationRequestRemote(request: RemoteNotificationRequest): Response<Void>
+    suspend fun setNotificationRequestRemote(request: RemoteNotificationRequest): Response<Long>
+    suspend fun removeRequestRemote(requestId: Long): Response<Void>?
     suspend fun setNotificationRequestLocal(request: NotificationRequest)
     suspend fun syncRemoteNotificationRequests(
         messagingToken: String,

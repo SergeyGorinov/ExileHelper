@@ -1,6 +1,8 @@
 package com.sgorinov.exilehelper.presentation
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Rect
 import android.os.Bundle
@@ -32,7 +34,6 @@ import com.sgorinov.exilehelper.exchange_feature.presentation.fragments.ItemsSea
 import com.sgorinov.exilehelper.presentation.fragments.LoaderFragment
 import com.sgorinov.exilehelper.presentation.fragments.StartFragment
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -55,6 +56,28 @@ class MainActivity : FragmentActivity(), IMainActivity {
     private var isApiConnectionChecked = false
 
     private val receiver = NotificationBroadcastReceiver()
+
+    private val pushClickReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent ?: return
+            when (intent.action) {
+                CurrencyExchangeMainFragment.NOTIFICATION_ACTION -> {
+                    goToCurrencyExchange(
+                        intent.getStringExtra(CurrencyExchangeMainFragment.WANT_ITEM_ID_KEY),
+                        intent.getStringExtra(CurrencyExchangeMainFragment.HAVE_ITEM_ID_KEY),
+                        false
+                    )
+                }
+                ItemsSearchMainFragment.NOTIFICATION_ACTION -> {
+                    goToItemsSearch(
+                        intent.getStringExtra(ItemsSearchMainFragment.SAVED_ITEM_TYPE) ?: "",
+                        intent.getStringExtra(ItemsSearchMainFragment.SAVED_ITEM_NAME),
+                        false
+                    )
+                }
+            }
+        }
+    }
 
     private val navigator = object : AppNavigator(this@MainActivity, R.id.mainContainer) {
 
@@ -152,7 +175,7 @@ class MainActivity : FragmentActivity(), IMainActivity {
         viewBinding.bottomNavBar.setOnNavigationItemSelectedListener {
             return@setOnNavigationItemSelectedListener when (it.itemId) {
                 R.id.currencyExchangeMenu -> {
-                    router.newRootScreen(CurrencyExchangeMainFragment.newInstance())
+                    router.newRootScreen(CurrencyExchangeMainFragment.newInstance(null))
                     true
                 }
                 R.id.itemsSearchMenu -> {
@@ -189,12 +212,20 @@ class MainActivity : FragmentActivity(), IMainActivity {
             addAction(MyFirebaseMessaging.FIREBASE_NOTIFICATION)
             addAction(MyFirebaseMessaging.APP_NOTIFICATION)
         }
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, intentFilter)
+        val pushClickIntentFilter = IntentFilter().apply {
+            addAction(CurrencyExchangeMainFragment.NOTIFICATION_ACTION)
+            addAction(ItemsSearchMainFragment.NOTIFICATION_ACTION)
+        }
+        LocalBroadcastManager.getInstance(this).apply {
+            registerReceiver(receiver, intentFilter)
+            registerReceiver(pushClickReceiver, pushClickIntentFilter)
+        }
     }
 
     override fun onPause() {
         navigatorHolder.removeNavigator()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(pushClickReceiver)
         super.onPause()
     }
 
@@ -247,17 +278,24 @@ class MainActivity : FragmentActivity(), IMainActivity {
         haveItemId: String?,
         withNotificationRequest: Boolean
     ) {
-        lifecycleScope.launchWhenResumed {
-            viewBinding.bottomNavBar.selectedItemId = R.id.currencyExchangeMenu
-            delay(200L)
-            val currentFragment = supportFragmentManager.findFragmentById(R.id.mainContainer)
-            if (currentFragment is CurrencyExchangeMainFragment && !withNotificationRequest) {
-                currentFragment.processExternalAction(
-                    withNotificationRequest,
-                    wantItemId,
-                    haveItemId
-                )
-            }
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.mainContainer)
+        if (currentFragment is CurrencyExchangeMainFragment) {
+            currentFragment.processExternalAction(
+                withNotificationRequest,
+                wantItemId,
+                haveItemId
+            )
+        } else {
+            router.newRootScreen(CurrencyExchangeMainFragment.newInstance {
+                if (it is CurrencyExchangeMainFragment) {
+                    it.processExternalAction(
+                        withNotificationRequest,
+                        wantItemId,
+                        haveItemId
+                    )
+                }
+            })
+            viewBinding.bottomNavBar.menu.findItem(R.id.currencyExchangeMenu).isChecked = true
         }
     }
 
@@ -266,17 +304,24 @@ class MainActivity : FragmentActivity(), IMainActivity {
         itemName: String?,
         withNotificationRequest: Boolean
     ) {
-        lifecycleScope.launchWhenResumed {
-            viewBinding.bottomNavBar.selectedItemId = R.id.itemsSearchMenu
-            delay(200L)
-            val currentFragment = supportFragmentManager.findFragmentById(R.id.mainContainer)
-            if (currentFragment is ItemsSearchMainFragment) {
-                currentFragment.processExternalAction(
-                    withNotificationRequest,
-                    itemType,
-                    itemName
-                )
-            }
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.mainContainer)
+        if (currentFragment is ItemsSearchMainFragment) {
+            currentFragment.processExternalAction(
+                withNotificationRequest,
+                itemType,
+                itemName
+            )
+        } else {
+            router.newRootScreen(ItemsSearchMainFragment.newInstance {
+                if (it is ItemsSearchMainFragment) {
+                    it.processExternalAction(
+                        withNotificationRequest,
+                        itemType,
+                        itemName
+                    )
+                }
+            })
+            viewBinding.bottomNavBar.menu.findItem(R.id.itemsSearchMenu).isChecked = true
         }
     }
 
